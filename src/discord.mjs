@@ -30,6 +30,11 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
           name: guild.name,
           channels: {
             list: () => guild.channels.cache.map(normalizeChannel),
+            create: async name => {
+              requireApproval('Creating a channel');
+              if (dryRun) return { dryRun: true, guildId: guild.id, name, type: 0 };
+              return normalizeChannel(await guild.channels.create({ name: String(name), type: 0 }));
+            },
             get: channelId => {
               const channel = guild.channels.cache.get(String(channelId));
               if (!channel) throw Object.assign(new Error(`Channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });

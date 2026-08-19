@@ -44,6 +44,13 @@ npm start -- messages send --channel <channel-id> --content "Hello" --dry-run --
 npm start -- messages send --channel <channel-id> --content "Hello" --yes --json
 ```
 
+Create a test channel with the configured test guild:
+
+```sh
+npm start -- channels create --guild "$TEST_GUILD" --name discript-test --dry-run --json
+npm start -- channels create --guild "$TEST_GUILD" --name discript-test --yes --json
+```
+
 Evaluate source inline:
 
 ```sh
