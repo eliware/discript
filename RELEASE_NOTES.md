@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.0.6
+
+- Added user-level `~/.discript.env` configuration with quiet, cross-platform loading and local environment precedence.
+- Hardened synchronous Discord login failure handling and completed additional CLI 100×4 coverage for invite, event, and permission handlers.
+- Corrected local tarball installation and setup documentation for Windows and Linux users.
+
 ## 1.0.5
 
 - Added runtime and CLI integration coverage, mutation safety matrix coverage, and complete direct command-handler tests.
