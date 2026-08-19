@@ -9,6 +9,13 @@ export function parse(source) {
   return { type: 'Program', body };
 
   function parseStatement() {
+    if (peek()?.type === 'identifier' && peek().value === 'on') {
+      index += 1;
+      consume('(', 'Expected `(` after `on`.' ) ;
+      const event = consume('string', 'Expected an event name after `on(`.');
+      consume(')', 'Expected `)` after the event name.');
+      return { type: 'EventStatement', event: event.value, body: parseBlock() };
+    }
     if (peek()?.type === 'identifier' && (peek().value === 'if' || peek().value === 'while')) {
       const keyword = peek().value;
       index += 1;

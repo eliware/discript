@@ -15,6 +15,14 @@ export async function evaluate(program, globals = {}) {
       return value;
     }
     if (statement.type === 'ExpressionStatement') return evaluateExpression(statement.expression);
+    if (statement.type === 'EventStatement') {
+      const register = scope.get('on');
+      if (typeof register !== 'function') throw runtimeError('Event handlers are unavailable in this execution mode.');
+      return register(statement.event, async payload => {
+        scope.set('event', payload);
+        return evaluateBlock(statement.body);
+      });
+    }
     if (statement.type === 'IfStatement') {
       const branch = await evaluateExpression(statement.test) ? statement.consequent : statement.alternate;
       let branchResult;
