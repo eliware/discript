@@ -9,7 +9,6 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
       const value = Reflect.get(current, property);
       return typeof value === 'function' ? value.bind(current) : value;
     },
-    set(target, property, value) { return Reflect.set(scopeContext.getStore() ?? target, property, value); },
   });
   return scopeContext.run(baseScope, () => evaluateBlock(program.body));
 
