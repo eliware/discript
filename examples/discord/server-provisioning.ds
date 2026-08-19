@@ -1,0 +1,75 @@
+// Repeatable server provisioning template.
+//
+// Current limitation: Discript's channel API creates text channels only and
+// does not yet expose category creation or channel-parent assignment. The
+// channels below are therefore created at the guild root until that capability
+// is added. The rest of the template is intentionally explicit so it can be
+// adapted to category-aware APIs later.
+//
+// Preview by default. To apply, set DISCORD_PROVISION=true and run with a bot
+// that has ManageChannels, ManageRoles, and the required message permissions.
+
+guildId = env.TEST_GUILD
+approved = env.DISCORD_PROVISION
+if (guildId == null) {
+  exit(2, "set TEST_GUILD to the destination guild")
+}
+
+fn options() {
+  if (approved == "true") {
+    return {force: true}
+  }
+  return {dryRun: true}
+}
+
+fn show(label, result) {
+  print({step: label, result: result})
+  return result
+}
+
+guild = discord.guilds.get(guildId)
+show("guild", {id: guild.id, name: guild.name})
+
+// Roles. Existing roles are left untouched; rerunning this template creates
+// duplicates, so production use should add idempotent lookup/update support.
+adminRole = show("role-admin", guild.roles.create("Server Admin", options()))
+moderatorRole = show("role-moderator", guild.roles.create("Moderator", options()))
+memberRole = show("role-member", guild.roles.create("Member", options()))
+
+// Root-level text channels. These names represent the intended categories.
+rules = show("channel-rules", guild.channels.create("rules", options()))
+welcome = show("channel-welcome", guild.channels.create("welcome", options()))
+announcements = show("channel-announcements", guild.channels.create("announcements", options()))
+general = show("channel-general", guild.channels.create("general", options()))
+support = show("channel-support", guild.channels.create("support", options()))
+modLog = show("channel-mod-log", guild.channels.create("mod-log", options()))
+
+if (approved != "true") {
+  print({mode: "preview", next: "set DISCORD_PROVISION=true to apply this plan"})
+  exit(0, "provisioning preview complete")
+}
+
+// @everyone is represented by the guild ID in Discord permission overwrites.
+everyoneId = guildId
+show("rules-permissions", discord.channels.get(rules.id).permissions.set(everyoneId, {allow: ["ViewChannel", "ReadMessageHistory"], deny: ["SendMessages"]}, options()))
+show("welcome-permissions", discord.channels.get(welcome.id).permissions.set(everyoneId, {allow: ["ViewChannel", "ReadMessageHistory"], deny: ["SendMessages"]}, options()))
+show("announcements-permissions", discord.channels.get(announcements.id).permissions.set(everyoneId, {allow: ["ViewChannel", "ReadMessageHistory"], deny: ["SendMessages"]}, options()))
+show("mod-log-permissions", discord.channels.get(modLog.id).permissions.set(everyoneId, {allow: ["ViewChannel", "ReadMessageHistory"], deny: ["SendMessages"]}, options()))
+show("general-member-permissions", discord.channels.get(general.id).permissions.set(memberRole.id, {allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]}, options()))
+show("support-member-permissions", discord.channels.get(support.id).permissions.set(memberRole.id, {allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"]}, options()))
+show("mod-log-moderator-permissions", discord.channels.get(modLog.id).permissions.set(moderatorRole.id, {allow: ["ViewChannel", "ReadMessageHistory", "SendMessages"], deny: ["AddReactions"]}, options()))
+
+// Initial content. Keep this in the script so each deployment has the same
+// baseline instructions and welcome copy.
+show("rules-message", discord.channels.get(rules.id).send("Server rules:\n1. Be respectful.\n2. Keep content in the appropriate channel.\n3. Follow the platform rules.\n4. Contact the moderators if you need help.", options()))
+show("welcome-message", discord.channels.get(welcome.id).send("Welcome! Please read #rules, introduce yourself in #general, and ask for help in #support.", options()))
+show("announcements-message", discord.channels.get(announcements.id).send("This channel contains official server announcements. Members cannot post here.", options()))
+show("support-message", discord.channels.get(support.id).send("Support requests: describe the problem, include relevant IDs, and never post tokens or passwords.", options()))
+
+// Verification report for an agent or release log.
+print({
+  mode: "applied",
+  guildId: guildId,
+  roles: [adminRole, moderatorRole, memberRole],
+  channels: [rules, welcome, announcements, general, support, modLog]
+})
