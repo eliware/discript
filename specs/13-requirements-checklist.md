@@ -1,0 +1,41 @@
+# Discript Requirements Checklist
+
+Each line represents one requirement and is marked `Fully complete`, `Half complete`, or `Not started`.
+
+- [Half complete] Discript provides a Discord-focused scripting language.
+- [Fully complete] Discript runs as a command-line tool.
+- [Fully complete] Discript supports one-shot startup, connection, execution, shutdown, and exit.
+- [Half complete] Discript executes reusable script files.
+- [Fully complete] Discript accepts inline source with `--eval` / `-e`.
+- [Fully complete] Discript accepts source through standard input.
+- [Fully complete] Discript supports direct resource-operation commands.
+- [Fully complete] Discript supports variables and sequential result reuse.
+- [Half complete] Discript supports structured values, arrays, objects, and basic collection helpers.
+- [Half complete] Discript supports asynchronous operations.
+- [Not started] Discript supports explicit concurrency primitives.
+- [Half complete] Discript supports conditionals, comparisons, arithmetic, and bounded `while` loops.
+- [Not started] Discript supports callback syntax and general-purpose collection callbacks.
+- [Not started] Discript supports imports and reusable script modules.
+- [Not started] Discript supports event listener declarations.
+- [Not started] Discript supports timers and intentional long-running loops.
+- [Fully complete] Finite CLI executions shut down their Discord client.
+- [Half complete] Discript supports dry-run previews for state mutations.
+- [Half complete] Destructive operations require explicit force approval.
+- [Half complete] CLI commands return stable process exit codes.
+- [Not started] Scripts can capture operation exit codes and branch on them internally.
+- [Not started] Scripts can explicitly terminate with a chosen exit code and message.
+- [Half complete] Discript emits machine-readable JSON results.
+- [Not started] Discript emits structured JSONL streams for long-running execution.
+- [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
+- [Not started] Discript covers threads, invites, emojis, stickers, scheduled events, and voice operations.
+- [Half complete] Discript enforces Discord permissions and authorization safeguards.
+- [Not started] Discript enforces complete role hierarchy and protected-target checks.
+- [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
+- [Fully complete] Discript has a `TEST_GUILD` configuration value.
+- [Fully complete] Discript has gated read-only live Discord tests.
+- [Fully complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD`.
+- [Half complete] Discript provides agent-oriented structured errors and diagnostics.
+- [Not started] Discript provides command discovery, aliases, suggestions, and shell completions.
+- [Half complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
+- [Half complete] Discript has agent-focused examples and usage documentation.
+- [Not started] Discript is packaged and published as a finished CLI product.
