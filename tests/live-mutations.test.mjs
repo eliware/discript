@@ -15,6 +15,9 @@ describe('live Discord mutations', () => {
       created = await guild.channels.create(`discript-test-${Date.now()}`);
       expect(created.id).toBeTruthy();
       const api = createDiscordApi(runtime.client, { yes: true });
+      const message = await api.channels.get(created.id).send('discript mutation test');
+      await api.messages.edit(created.id, message.id, 'discript mutation test edited');
+      await api.messages.delete(created.id, message.id);
       await api.channels.get(created.id).delete();
     } finally {
       await runtime.shutdown();

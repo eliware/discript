@@ -5,7 +5,27 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
   };
   const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
   const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
+  const resolveMessage = async (channelId, messageId) => {
+    const channel = client.channels.cache.get(String(channelId));
+    if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
+    try { return await channel.messages.fetch(String(messageId)); }
+    catch { throw Object.assign(new Error(`Message not found: ${messageId}`), { code: 'MESSAGE_NOT_FOUND', exitCode: 1 }); }
+  };
   return {
+    messages: {
+      get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
+      edit: async (channelId, messageId, content) => {
+        requireApproval('Editing a message');
+        if (dryRun) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), content };
+        return normalizeMessage(await (await resolveMessage(channelId, messageId)).edit(String(content)));
+      },
+      delete: async (channelId, messageId) => {
+        requireApproval('Deleting a message');
+        if (dryRun) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), deleted: true };
+        await (await resolveMessage(channelId, messageId)).delete();
+        return { id: String(messageId), deleted: true };
+      },
+    },
     channels: {
       get: id => {
         const channel = client.channels.cache.get(String(id));

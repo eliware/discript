@@ -116,6 +116,22 @@ async function executeDirectCommand(command, options) {
       if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
       return api.channels.get(options.channel).send(options.content);
     }
+    if (command[0] === 'messages' && command[1] === 'get') {
+      if (!options.channel) throw Object.assign(new Error('messages get requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.message) throw Object.assign(new Error('messages get requires --message <id>.'), { code: 'MESSAGE_REQUIRED', exitCode: 2 });
+      return api.messages.get(options.channel, options.message);
+    }
+    if (command[0] === 'messages' && command[1] === 'edit') {
+      if (!options.channel) throw Object.assign(new Error('messages edit requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.message) throw Object.assign(new Error('messages edit requires --message <id>.'), { code: 'MESSAGE_REQUIRED', exitCode: 2 });
+      if (options.content === undefined) throw Object.assign(new Error('messages edit requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
+      return api.messages.edit(options.channel, options.message, options.content);
+    }
+    if (command[0] === 'messages' && command[1] === 'delete') {
+      if (!options.channel) throw Object.assign(new Error('messages delete requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.message) throw Object.assign(new Error('messages delete requires --message <id>.'), { code: 'MESSAGE_REQUIRED', exitCode: 2 });
+      return api.messages.delete(options.channel, options.message);
+    }
     throw Object.assign(new Error(`Unknown command: ${command.join(' ')}`), { code: 'UNKNOWN_COMMAND', exitCode: 2 });
   } finally {
     await runtime.shutdown();

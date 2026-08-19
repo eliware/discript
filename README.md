@@ -51,6 +51,14 @@ npm start -- channels create --guild "$TEST_GUILD" --name discript-test --dry-ru
 npm start -- channels create --guild "$TEST_GUILD" --name discript-test --yes --json
 ```
 
+Messages can be read or changed with explicit approval for writes:
+
+```sh
+npm start -- messages get --channel <channel-id> --message <message-id> --json
+npm start -- messages edit --channel <channel-id> --message <message-id> --content "Updated" --yes --json
+npm start -- messages delete --channel <channel-id> --message <message-id> --yes --json
+```
+
 Evaluate source inline:
 
 ```sh
