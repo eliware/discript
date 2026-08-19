@@ -93,6 +93,7 @@ npm start -- messages delete --channel <channel-id> --message <message-id> --yes
 npm start -- messages react --channel <channel-id> --message <message-id> --emoji "👍" --yes --json
 npm start -- messages pin --channel <channel-id> --message <message-id> --yes --json
 npm start -- messages unpin --channel <channel-id> --message <message-id> --yes --json
+npm start -- messages bulk-delete --channel <channel-id> --messages <id1,id2> --yes --json
 ```
 
 Evaluate source inline:

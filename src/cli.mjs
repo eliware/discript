@@ -204,6 +204,11 @@ async function executeDirectCommand(command, options) {
       }
       return api.messages[command[1]](options.channel, options.message);
     }
+    if (command[0] === 'messages' && command[1] === 'bulk-delete') {
+      if (!options.channel) throw Object.assign(new Error('messages bulk-delete requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.messages) throw Object.assign(new Error('messages bulk-delete requires --messages <id,id,...>.'), { code: 'MESSAGES_REQUIRED', exitCode: 2 });
+      return api.messages.bulkDelete(options.channel, options.messages);
+    }
     throw Object.assign(new Error(`Unknown command: ${command.join(' ')}`), { code: 'UNKNOWN_COMMAND', exitCode: 2 });
   } finally {
     await runtime.shutdown();

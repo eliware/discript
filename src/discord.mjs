@@ -64,6 +64,17 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         await (await resolveMessage(channelId, messageId)).unpin();
         return { id: String(messageId), pinned: false };
       },
+      bulkDelete: async (channelId, messageIds, operationOptions = {}) => {
+        requireChannelPermission(channelId, 'ManageMessages');
+        requireApproval('Bulk deleting messages', operationOptions);
+        const ids = Array.isArray(messageIds) ? messageIds.map(String) : String(messageIds).split(',').map(value => value.trim()).filter(Boolean);
+        if (!ids.length) throw Object.assign(new Error('At least one message ID is required.'), { code: 'MESSAGES_REQUIRED', exitCode: 2 });
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageIds: ids, deleted: ids.length };
+        const channel = client.channels.cache.get(String(channelId));
+        if (!channel?.bulkDelete) throw Object.assign(new Error(`Channel does not support bulk deletion: ${channelId}`), { code: 'BULK_DELETE_UNSUPPORTED', exitCode: 1 });
+        const deleted = await channel.bulkDelete(ids);
+        return { channelId: String(channelId), deleted: deleted.size ?? ids.length };
+      },
     },
     channels: {
       get: id => {
