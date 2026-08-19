@@ -49,4 +49,11 @@ describe('parse', () => {
       })],
     }));
   });
+
+  test('ignores line comments', () => {
+    expect(parse('// fetch the guilds\nvalue = 1; # retain the result\nvalue')).toEqual(expect.objectContaining({
+      type: 'Program',
+      body: expect.arrayContaining([expect.objectContaining({ type: 'Assignment', name: 'value' })]),
+    }));
+  });
 });
