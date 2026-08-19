@@ -59,6 +59,15 @@ npm start -- invites create --guild <guild-id> --channel <channel-id> --duration
 npm start -- invites delete --guild <guild-id> --invite <invite-code> --yes --json
 ```
 
+Scheduled events support discovery and guarded lifecycle operations:
+
+```sh
+npm start -- events list --guild <guild-id> --json
+npm start -- events create --guild <guild-id> --name "Town hall" --start "2030-01-01T00:00:00Z" --yes --json
+npm start -- events update --guild <guild-id> --event <event-id> --name "Updated" --yes --json
+npm start -- events delete --guild <guild-id> --event <event-id> --yes --json
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
