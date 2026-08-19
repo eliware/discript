@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { log, registerHandlers, registerSignals } from '@eliware/common';
 import { parseArgs } from './args.mjs';
 import { helpText, VERSION } from './help.mjs';
@@ -98,6 +100,10 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
         let accumulator = initial;
         for (const item of items ?? []) accumulator = await callback(accumulator, item);
         return accumulator;
+      },
+      importScript: async (sourcePath, sharedScope) => {
+        const source = await readFile(resolve(process.cwd(), sourcePath), 'utf8');
+        return evaluate(parse(source), {}, { scope: sharedScope });
       },
     });
     if (handlerCount > 0) await runtime.waitForStop();

@@ -1,5 +1,5 @@
-export async function evaluate(program, globals = {}) {
-  const scope = new Map(Object.entries(globals));
+export async function evaluate(program, globals = {}, { scope: sharedScope } = {}) {
+  const scope = sharedScope ?? new Map(Object.entries(globals));
   return evaluateBlock(program.body);
 
   async function evaluateBlock(statements) {
@@ -29,6 +29,11 @@ export async function evaluate(program, globals = {}) {
       };
       scope.set(statement.name, closure);
       return closure;
+    }
+    if (statement.type === 'ImportStatement') {
+      const load = scope.get('importScript');
+      if (typeof load !== 'function') throw runtimeError('Script imports are unavailable in this execution mode.');
+      return load(statement.path, scope);
     }
     if (statement.type === 'ReturnStatement') throw new ReturnSignal(statement.value === null ? undefined : await evaluateExpression(statement.value));
     if (statement.type === 'Assignment') {

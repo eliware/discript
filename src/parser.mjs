@@ -9,6 +9,11 @@ export function parse(source) {
   return { type: 'Program', body };
 
   function parseStatement() {
+    if (peek()?.type === 'identifier' && peek().value === 'import') {
+      index += 1;
+      const path = consume('string', 'Expected a source path after `import`.');
+      return { type: 'ImportStatement', path: path.value };
+    }
     if (peek()?.type === 'identifier' && peek().value === 'fn') {
       index += 1;
       const name = consume('identifier', 'Expected a function name after `fn`.');
