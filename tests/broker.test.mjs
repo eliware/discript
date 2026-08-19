@@ -1,5 +1,6 @@
 import { describe, expect, jest, test } from '@jest/globals';
 import { EventEmitter } from 'node:events';
+import { platform, tmpdir } from 'node:os';
 import { brokerEndpoint, brokerRequest, startGatewayBroker } from '../src/broker.mjs';
 
 describe('Gateway broker', () => {
@@ -9,7 +10,7 @@ describe('Gateway broker', () => {
   });
 
   test('reports status and shuts down through IPC', async () => {
-    const endpoint = `/tmp/discript-test-${process.pid}.sock`;
+    const endpoint = brokerEndpoint('test', tmpdir(), platform());
     const client = new EventEmitter();
     client.login = async () => queueMicrotask(() => client.emit('clientReady'));
     client.isReady = () => true;

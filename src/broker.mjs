@@ -1,14 +1,14 @@
 import net from 'node:net';
 import { createHash } from 'node:crypto';
 import { homedir, platform } from 'node:os';
-import { join } from 'node:path';
+import { posix } from 'node:path';
 import { unlink } from 'node:fs/promises';
 import { createDiscordRuntime } from './runtime.mjs';
 import { getGatewaySessionLimits, shouldWaitForGatewayStart } from './gateway-limits.mjs';
 
 export function brokerEndpoint(token, home = homedir(), os = platform()) {
   const id = createHash('sha256').update(String(token)).digest('hex').slice(0, 20);
-  return os === 'win32' ? `\\\\.\\pipe\\discript-${id}` : join(home, `.discript-${id}.sock`);
+  return os === 'win32' ? `\\\\.\\pipe\\discript-${id}` : posix.join(home, `.discript-${id}.sock`);
 }
 
 export async function startGatewayBroker({ token, endpoint = brokerEndpoint(token), runtimeOptions = {}, enforceSessionLimit = true, limits } = {}) {
