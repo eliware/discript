@@ -12,6 +12,16 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
     try { return await channel.messages.fetch(String(messageId)); }
     catch { throw Object.assign(new Error(`Message not found: ${messageId}`), { code: 'MESSAGE_NOT_FOUND', exitCode: 1 }); }
   };
+  const requirePermission = (guild, permission) => {
+    const botMember = guild?.members?.me;
+    if (botMember?.permissions?.has && !botMember.permissions.has(permission)) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
+  };
+  const requireManageableRole = (guild, roleId) => {
+    const role = guild.roles.cache.get(String(roleId));
+    if (role?.managed || role?.name === '@everyone') throw Object.assign(new Error('Managed and @everyone roles cannot be changed.'), { code: 'ROLE_PROTECTED', exitCode: 5 });
+    const highest = guild.members?.me?.roles?.highest;
+    if (highest?.position !== undefined && role?.position !== undefined && role.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this role change.'), { code: 'ROLE_HIERARCHY', exitCode: 5 });
+  };
   return {
     messages: {
       get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
@@ -66,34 +76,37 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                 displayName: member.displayName ?? null,
                 roles: mapCache(member.roles?.cache, role => ({ id: role.id, name: role.name })),
                 addRole: async (roleId, operationOptions = {}) => {
-                  const role = guild.roles.cache.get(String(roleId));
-                  if (role?.managed || role?.name === '@everyone') throw Object.assign(new Error('Managed and @everyone roles cannot be changed.'), { code: 'ROLE_PROTECTED', exitCode: 5 });
+                  requireManageableRole(guild, roleId);
+                  requirePermission(guild, 'ManageRoles');
                   requireApproval('Adding a role', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, roleId: String(roleId), added: true };
                   await member.roles.add(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), added: true };
                 },
                 removeRole: async (roleId, operationOptions = {}) => {
-                  const role = guild.roles.cache.get(String(roleId));
-                  if (role?.managed || role?.name === '@everyone') throw Object.assign(new Error('Managed and @everyone roles cannot be changed.'), { code: 'ROLE_PROTECTED', exitCode: 5 });
+                  requireManageableRole(guild, roleId);
+                  requirePermission(guild, 'ManageRoles');
                   requireApproval('Removing a role', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, roleId: String(roleId), removed: true };
                   await member.roles.remove(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), removed: true };
                 },
                 ban: async (reason, operationOptions = {}) => {
+                  requirePermission(guild, 'BanMembers');
                   requireApproval('Banning a member', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, banned: true, reason: reason ?? null };
                   await member.ban({ reason: reason ?? undefined });
                   return { memberId: member.id, banned: true };
                 },
                 kick: async (reason, operationOptions = {}) => {
+                  requirePermission(guild, 'KickMembers');
                   requireApproval('Kicking a member', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, kicked: true, reason: reason ?? null };
                   await member.kick(reason ?? undefined);
                   return { memberId: member.id, kicked: true };
                 },
                 timeout: async (durationMs, reason, operationOptions = {}) => {
+                  requirePermission(guild, 'ModerateMembers');
                   requireApproval('Timing out a member', operationOptions);
                   if (!Number.isInteger(Number(durationMs)) || Number(durationMs) < 1) throw Object.assign(new Error('Timeout duration must be a positive number of milliseconds.'), { code: 'INVALID_DURATION', exitCode: 2 });
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, timeoutMs: Number(durationMs), reason: reason ?? null };
@@ -114,6 +127,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
           channels: {
             list: () => guild.channels.cache.map(normalizeChannel),
             create: async (name, operationOptions = {}) => {
+              requirePermission(guild, 'ManageChannels');
               requireApproval('Creating a channel', operationOptions);
               if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, name, type: 0 };
               return normalizeChannel(await guild.channels.create({ name: String(name), type: 0 }));
