@@ -76,6 +76,8 @@ on("messageCreate") {
 }
 ```
 
+When a script registers one or more handlers, it remains running until a termination signal is received; `--timeout <milliseconds>` can bound that lifetime for automation.
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
