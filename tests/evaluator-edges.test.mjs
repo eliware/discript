@@ -1,5 +1,5 @@
 import { describe, expect, test, jest } from '@jest/globals';
-import { evaluate } from '../src/evaluator.mjs';
+import { evaluate, ScriptExit } from '../src/evaluator.mjs';
 
 const program = body => ({ type: 'Program', body });
 const expr = type => ({ type });
@@ -47,5 +47,10 @@ describe('evaluator edge paths', () => {
     await expect(evaluate(program([{ type: 'IfStatement', test: { type: 'Literal', value: false }, consequent: [], alternate: null }]))).resolves.toBeUndefined();
     await expect(evaluate(program([{ type: 'WhileStatement', test: { type: 'Literal', value: false }, body: [] }]))).resolves.toBeUndefined();
     await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'TryExpression', body: [{ type: 'ExpressionStatement', expression: expr('bad') }], binding: 'error', handler: [] } }]))).resolves.toMatchObject({ ok: false });
+    await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'TryExpression', body: [{ type: 'ExpressionStatement', expression: { type: 'CallExpression', callee: { type: 'Identifier', name: 'fail' }, arguments: [] } }], binding: 'error', handler: [] } }]), { fail: () => { throw {}; } })).resolves.toMatchObject({ ok: false, error: { code: 'DISCRIPT_ERROR', exitCode: 1 } });
+    expect(new ScriptExit()).toMatchObject({ code: 'SCRIPT_EXIT', exitCode: 0 });
+    expect(new ScriptExit(2)).toMatchObject({ code: 'SCRIPT_EXIT', exitCode: 2 });
+    const iterable = { values: () => new Set([1]) };
+    await expect(evaluate(program([{ type: 'ForInStatement', binding: 'x', iterable: { type: 'Identifier', name: 'iterable' }, body: [{ type: 'Assignment', name: 'seen', value: { type: 'Identifier', name: 'x' } }] }]), { iterable })).resolves.toBe(1);
   });
 });
