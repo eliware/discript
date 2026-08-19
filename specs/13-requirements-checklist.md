@@ -25,7 +25,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Scripts can capture operation exit codes and branch on them internally.
 - [Half complete] Scripts can explicitly terminate with a chosen exit code and message.
 - [Half complete] Discript emits machine-readable JSON results.
-- [Not started] Discript emits structured JSONL streams for long-running execution.
+- [Fully complete] Discript emits opt-in structured JSONL records with `--output jsonl`, including incremental script output.
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
 - [Half complete] Discript covers threads, invites, emojis, stickers, scheduled events, and voice operations. Scheduled events are now implemented; voice operations remain outstanding.
 - [Half complete] Discript enforces Discord permissions and authorization safeguards across current mutation groups.

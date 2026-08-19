@@ -188,6 +188,12 @@ Read source from standard input:
 printf '%s\n' 'discord.guilds.list()' | npm start -- --json
 ```
 
+For agent pipelines and long-running scripts, use JSONL output:
+
+```sh
+npm start -- --eval 'print({phase: "start"}); discord.guilds.list()' --output jsonl
+```
+
 Run a script file:
 
 ```sh
