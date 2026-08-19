@@ -1,5 +1,5 @@
 {
-    "name": "discript",
+  "name": "@eliware/discript",
     "version": "1.0.1",
     "description": "Discord scripting language and automation CLI for developers and AI agents.",
     "private": false,

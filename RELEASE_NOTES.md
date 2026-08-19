@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.0.2
+
+First public npm release under the available `@eliware/discript` package scope after the unscoped `discript` name was rejected by npm.
+
 ## 1.0.1
 
 Initial public release of Discript, a Discord-focused scripting language and CLI for developers and AI agents.

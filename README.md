@@ -24,7 +24,7 @@ npm pack
 npm install ./discript-1.0.0.tgz
 ```
 
-The package is public and publishes to npm from `v*` Git tags through the standard Eliware release workflow. The npm package name is `discript`.
+The package is public and publishes to npm from `v*` Git tags through the standard Eliware release workflow. The npm package name is `@eliware/discript` because the unscoped `discript` name is unavailable for publishing.
 
 ## Usage
 
