@@ -14,6 +14,8 @@ describe('callbacks', () => {
       filter: async (items, callback) => (await Promise.all(items.map(async item => [item, await callback(item)]))).filter(([, keep]) => keep).map(([item]) => item),
     });
     expect(result).toEqual([2, 3]);
-    expect(() => parse('map([1], (item) => item)')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    await expect(evaluate(parse('map([1], (item) => item)'), {
+      map: async (items, callback) => Promise.all(items.map(item => callback(item))),
+    })).resolves.toEqual([1]);
   });
 });

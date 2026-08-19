@@ -38,4 +38,15 @@ describe('parse', () => {
       body: expect.arrayContaining([expect.objectContaining({ type: 'Assignment', name: 'value' })]),
     }));
   });
+
+  test('parses grouped expressions in call arguments', () => {
+    expect(parse('result = choose((1 + 2));')).toEqual(expect.objectContaining({
+      type: 'Program',
+      body: [expect.objectContaining({
+        type: 'Assignment',
+        name: 'result',
+        value: expect.objectContaining({ type: 'CallExpression' }),
+      })],
+    }));
+  });
 });

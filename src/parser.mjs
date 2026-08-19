@@ -115,6 +115,11 @@ export function parse(source) {
 
   function parsePrimary() {
     const token = peek();
+    if (match('(')) {
+      const expression = parseExpression();
+      consume(')', 'Expected `)` after grouped expression.');
+      return expression;
+    }
     if (token?.type === 'identifier' && token.value === 'try') {
       index += 1;
       const body = parseBlock();
