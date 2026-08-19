@@ -96,9 +96,26 @@ async function executeDirectCommand(command, options) {
       if (!options.guild) throw Object.assign(new Error('members list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).members.list();
     }
+    if (command[0] === 'members' && command[1] === 'get') {
+      if (!options.guild) throw Object.assign(new Error('members get requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.user) throw Object.assign(new Error('members get requires --user <id>.'), { code: 'USER_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).members.get(options.user);
+    }
     if (command[0] === 'roles' && command[1] === 'list') {
       if (!options.guild) throw Object.assign(new Error('roles list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).roles.list();
+    }
+    if (command[0] === 'roles' && command[1] === 'get') {
+      if (!options.guild) throw Object.assign(new Error('roles get requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.role) throw Object.assign(new Error('roles get requires --role <id>.'), { code: 'ROLE_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).roles.get(options.role);
+    }
+    if (command[0] === 'roles' && (command[1] === 'add' || command[1] === 'remove')) {
+      if (!options.guild) throw Object.assign(new Error(`roles ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.user) throw Object.assign(new Error(`roles ${command[1]} requires --user <id>.`), { code: 'USER_REQUIRED', exitCode: 2 });
+      if (!options.role) throw Object.assign(new Error(`roles ${command[1]} requires --role <id>.`), { code: 'ROLE_REQUIRED', exitCode: 2 });
+      const member = api.guilds.get(options.guild).members.get(options.user);
+      return command[1] === 'add' ? member.addRole(options.role) : member.removeRole(options.role);
     }
     if (command[0] === 'channels' && command[1] === 'list') {
       const guildId = options.guild;

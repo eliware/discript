@@ -57,9 +57,36 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
           name: guild.name,
           members: {
             list: () => mapCache(guild.members.cache, member => ({ id: member.id, username: member.user?.username ?? null, displayName: member.displayName ?? null })),
+            get: id => {
+              const member = guild.members.cache.get(String(id));
+              if (!member) throw Object.assign(new Error(`Member not found: ${id}`), { code: 'MEMBER_NOT_FOUND', exitCode: 1 });
+              return {
+                id: member.id,
+                username: member.user?.username ?? null,
+                displayName: member.displayName ?? null,
+                roles: mapCache(member.roles?.cache, role => ({ id: role.id, name: role.name })),
+                addRole: async roleId => {
+                  requireApproval('Adding a role');
+                  if (dryRun) return { dryRun: true, memberId: member.id, roleId: String(roleId), added: true };
+                  await member.roles.add(String(roleId));
+                  return { memberId: member.id, roleId: String(roleId), added: true };
+                },
+                removeRole: async roleId => {
+                  requireApproval('Removing a role');
+                  if (dryRun) return { dryRun: true, memberId: member.id, roleId: String(roleId), removed: true };
+                  await member.roles.remove(String(roleId));
+                  return { memberId: member.id, roleId: String(roleId), removed: true };
+                },
+              };
+            },
           },
           roles: {
             list: () => mapCache(guild.roles.cache, role => ({ id: role.id, name: role.name, position: role.position, managed: role.managed })),
+            get: id => {
+              const role = guild.roles.cache.get(String(id));
+              if (!role) throw Object.assign(new Error(`Role not found: ${id}`), { code: 'ROLE_NOT_FOUND', exitCode: 1 });
+              return { id: role.id, name: role.name, position: role.position, managed: role.managed };
+            },
           },
           channels: {
             list: () => guild.channels.cache.map(normalizeChannel),

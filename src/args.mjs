@@ -20,7 +20,7 @@ export function parseArgs(argv = []) {
       const [rawKey, inlineValue] = token.slice(2).split('=', 2);
       const key = rawKey.replaceAll('-', '_');
       if (inlineValue !== undefined) options[key] = inlineValue;
-      else if (['eval', 'timeout', 'guild', 'channel', 'message', 'user', 'content', 'name', 'output'].includes(key)) options[key] = requireValue(argv, ++index, `--${rawKey}`);
+      else if (['eval', 'timeout', 'guild', 'channel', 'message', 'user', 'role', 'content', 'name', 'output'].includes(key)) options[key] = requireValue(argv, ++index, `--${rawKey}`);
       else options[key] = true;
     } else {
       throw cliError(`Unknown option: ${token}`, 'INVALID_OPTION', 2);

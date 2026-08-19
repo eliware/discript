@@ -44,6 +44,13 @@ npm start -- members list --guild <guild-id> --json
 npm start -- roles list --guild <guild-id> --json
 ```
 
+Role changes require explicit approval:
+
+```sh
+npm start -- roles add --guild <guild-id> --user <user-id> --role <role-id> --yes --json
+npm start -- roles remove --guild <guild-id> --user <user-id> --role <role-id> --yes --json
+```
+
 Preview or send a message. Writes require explicit approval:
 
 ```sh
