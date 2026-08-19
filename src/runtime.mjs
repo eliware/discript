@@ -2,9 +2,9 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { log } from '@eliware/common';
 import { loadConfig } from './config.mjs';
 
-export async function createDiscordRuntime({ token = loadConfig().token } = {}) {
+export async function createDiscordRuntime({ token = loadConfig().token, client: suppliedClient } = {}) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
-  const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
+  const client = suppliedClient ?? new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
   let stopped = false;
   let resolveStopped;
   const stoppedPromise = new Promise(resolve => { resolveStopped = resolve; });
