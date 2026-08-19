@@ -158,6 +158,8 @@ npm start -- roles delete --guild <guild-id> --role <role-id> --yes --json
 
 Moderation operations also require explicit approval:
 
+Moderation also rejects bot, owner, self, and targets at or above the bot’s role hierarchy.
+
 ```sh
 npm start -- moderation timeout --guild <guild-id> --user <user-id> --duration 3600000 --reason "reason" --yes --json
 npm start -- moderation kick --guild <guild-id> --user <user-id> --reason "reason" --yes --json
