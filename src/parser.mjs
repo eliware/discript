@@ -1,4 +1,4 @@
-const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(==|!=|>=|<=|>|<|\+|-|\*|\/)|([()[\].,;=:{}`])/y;
+const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(=>|==|!=|>=|<=|>|<|\+|-|\*|\/)|([()[\].,;=:{}`])/y;
 
 export function parse(source) {
   const tokens = tokenize(source);
@@ -80,6 +80,11 @@ export function parse(source) {
         consume(')', 'Expected `)` after arguments.');
       }
       expression = { type: 'CallExpression', callee: expression, arguments: args };
+    }
+    if (match('=>')) {
+      if (expression.type !== 'Identifier') throw syntaxError('Arrow callbacks require a single parameter name.');
+      const body = peek()?.value === '{' ? { type: 'BlockBody', body: parseBlock() } : { type: 'ExpressionBody', body: parseExpression() };
+      expression = { type: 'ArrowExpression', parameter: expression.name, body };
     }
     if (peek()?.type === 'operator') {
       const operator = tokens[index++].value;

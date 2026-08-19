@@ -61,6 +61,20 @@ export async function evaluate(program, globals = {}) {
 
   async function evaluateExpression(expression) {
     if (expression.type === 'Literal') return expression.value;
+    if (expression.type === 'ArrowExpression') {
+      return async value => {
+        const hadPrevious = scope.has(expression.parameter);
+        const previous = scope.get(expression.parameter);
+        scope.set(expression.parameter, value);
+        try {
+          if (expression.body.type === 'ExpressionBody') return evaluateExpression(expression.body.body);
+          return evaluateBlock(expression.body.body);
+        } finally {
+          if (hadPrevious) scope.set(expression.parameter, previous);
+          else scope.delete(expression.parameter);
+        }
+      };
+    }
     if (expression.type === 'TryExpression') {
       try {
         const value = await evaluateBlock(expression.body);

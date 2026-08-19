@@ -75,7 +75,13 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
     const result = await evaluate(parse(input.source), {
       discord: createDiscordApi(runtime.client, options),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
-      filter: (items, property, expected) => (items ?? []).filter(item => item?.[property] === expected),
+      filter: async (items, selector, expected) => {
+        if (typeof selector === 'function') {
+          const values = await Promise.all((items ?? []).map(async item => [item, await selector(item)]));
+          return values.filter(([, keep]) => keep).map(([item]) => item);
+        }
+        return (items ?? []).filter(item => item?.[selector] === expected);
+      },
       exit: (exitCode = 0, message = null) => { throw new ScriptExit(exitCode, message); },
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
       on: (eventName, handler) => {
@@ -87,6 +93,12 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
       after: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, false); },
       sleep: delay => new Promise(resolve => setTimeout(resolve, Number(delay))),
       parallel: (...operations) => Promise.all(operations),
+      map: async (items, callback) => Promise.all((items ?? []).map(item => callback(item))),
+      reduce: async (items, callback, initial) => {
+        let accumulator = initial;
+        for (const item of items ?? []) accumulator = await callback(accumulator, item);
+        return accumulator;
+      },
     });
     if (handlerCount > 0) await runtime.waitForStop();
     return result;
