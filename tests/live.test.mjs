@@ -104,4 +104,18 @@ describe('live Discord integration', () => {
       await runtime.shutdown();
     }
   }, 30000);
+
+  (live ? test : test.skip)('reads member voice status without mutation', async () => {
+    const config = loadConfig();
+    const runtime = await createDiscordRuntime({ token: config.token });
+    try {
+      const guild = runtime.client.guilds.cache.get(config.testGuild);
+      const botMember = [...guild.members.cache.values()].find(member => member.user?.bot);
+      expect(botMember).toBeTruthy();
+      const status = createDiscordApi(runtime.client).guilds.get(config.testGuild).members.get(botMember.id).voice.status();
+      expect(status).toMatchObject({ memberId: botMember.id, channelId: null, muted: false, deafened: false });
+    } finally {
+      await runtime.shutdown();
+    }
+  }, 30000);
 });
