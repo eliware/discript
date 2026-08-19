@@ -35,7 +35,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript has a `TEST_GUILD` configuration value.
 - [Fully complete] Discript has gated read-only live Discord tests, currently passing against `TEST_GUILD`.
 - [Fully complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD`, currently passing with cleanup.
-- [Half complete] Discript provides agent-oriented structured errors and diagnostics.
+- [Fully complete] Discript provides agent-oriented structured errors and diagnostics, including stable exit codes and sanitized Discord API metadata in JSON errors.
 - [Fully complete] Discript provides command discovery, common aliases, typo suggestions, and Bash/Zsh/Fish shell completions.
 - [Half complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
 - [Fully complete] Discript has agent-focused examples and usage documentation covering discovery, guarded mutation workflows, exit handling, events, timers, callbacks, imports, and JSONL output.

@@ -51,6 +51,7 @@ npm start -- bot get --json
 
 Common singular and abbreviated resource names are accepted, such as `msg send`, `chan list`, and `guild list`.
 Unknown commands include nearby command suggestions; JSON errors expose them under `details.suggestions`.
+Machine-readable errors include `error`, `code`, and `exitCode`. Discord API failures use the stable `DISCORD_API_ERROR` code with exit status `5`; sanitized request metadata may appear under `details`.
 
 List channels in a guild:
 
