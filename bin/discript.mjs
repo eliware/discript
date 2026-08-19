@@ -7,7 +7,8 @@ try {
 } catch (error) {
   const { formatError } = await import('../src/errors.mjs');
   const { parseArgs } = await import('../src/args.mjs');
-  const { options } = parseArgs(process.argv.slice(2));
+  let options = {};
+  try { ({ options } = parseArgs(process.argv.slice(2))); } catch { /* Preserve the original CLI error. */ }
   console.error(formatError(error, options));
   process.exitCode = error.exitCode ?? 1;
 }
