@@ -65,4 +65,8 @@ describe('core language contract', () => {
       source: { double: async item => item * 2 },
     })).resolves.toEqual([2, 4]);
   });
+
+  test('evaluates the right side of a false logical-or expression', async () => {
+    await expect(evaluate(parse('false || 7'))).resolves.toBe(7);
+  });
 });

@@ -3,6 +3,7 @@ import { describe, expect, jest, test } from '@jest/globals';
 import { evaluate } from '../../src/evaluator.mjs';
 
 import { parse } from '../../src/parser.mjs';
+import { createStatementEvaluator } from '../../src/evaluator/control-flow.mjs';
 
 
 
@@ -31,6 +32,26 @@ describe('for-in loops', () => {
 describe('loops', () => {
   test('evaluates bounded while loops', async () => {
     await expect(evaluate(parse('count = 0; while (count < 3) { count = count + 1 }; count'))).resolves.toBe(3);
+  });
+
+  test('returns undefined from an empty return statement', async () => {
+    class ReturnSignal extends Error {}
+    const evaluateStatement = createStatementEvaluator({
+      scope: new Map(), scopeContext: { run: (_scope, callback) => callback() },
+      evaluateBlock: async () => undefined, evaluateExpression: async () => undefined,
+      runtimeError: message => new Error(message), ReturnSignal,
+      createClosure: () => undefined, baseDir: process.cwd(),
+    });
+    await expect(evaluateStatement({ type: 'ReturnStatement', value: null })).rejects.toBeInstanceOf(ReturnSignal);
+  });
+
+  test('rejects runaway while loops', async () => {
+    await expect(evaluate(parse('while (true) {}'))).rejects.toMatchObject({ code: 'LOOP_LIMIT' });
+  });
+
+  test('rejects collections larger than the loop limit', async () => {
+    const values = Array.from({ length: 10001 }, () => 1);
+    await expect(evaluate(parse('for (item in values) {}'), { values })).rejects.toMatchObject({ code: 'LOOP_LIMIT' });
   });
 });
 
