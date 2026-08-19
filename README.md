@@ -34,6 +34,7 @@ npm start -- completion fish
 ```
 
 Common singular and abbreviated resource names are accepted, such as `msg send`, `chan list`, and `guild list`.
+Unknown commands include nearby command suggestions; JSON errors expose them under `details.suggestions`.
 
 List channels in a guild:
 
