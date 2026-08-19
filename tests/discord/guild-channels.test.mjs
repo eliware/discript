@@ -1,11 +1,26 @@
 import { describe, expect, jest, test } from '@jest/globals';
 
 import { createDiscordApi } from '../../src/discord.mjs';
+import { createGuildChannelsApi } from '../../src/discord/guild-channels.mjs';
 
 function channelCollection(entries) {
   const cache = new Map(entries);
   cache.map = callback => [...cache.values()].map(callback);
   return cache;
+}
+
+function directChannels({ channel, guild, client = {} , dryRun = false } = {}) {
+  return createGuildChannelsApi({
+    guild, client, dryRun,
+    mapCache: (cache, normalize) => cache ? [...cache.values()].map(normalize) : [],
+    normalizeChannel: value => ({ id: value.id, name: value.name, type: value.type }),
+    normalizeMessage: value => value,
+    normalizeWebhook: value => ({ id: value.id, name: value.name }),
+    normalizeOverwrite: value => value,
+    requireApproval: () => undefined,
+    requirePermission: () => undefined,
+    requireChannelPermission: () => undefined,
+  });
 }
 
 
@@ -30,6 +45,37 @@ describe('thread capabilities', () => {
 });
 
 describe('channel organization and types', () => {
+  test('covers direct channel API option branches', async () => {
+    const webhook = { id: 'w', name: 'old', edit: jest.fn(async () => ({})), delete: jest.fn() };
+    const thread = { id: 't', name: 'old', edit: jest.fn(async () => ({})), delete: jest.fn(), setArchived: jest.fn() };
+    const channel = {
+      id: '10', name: 'general', type: 0,
+      edit: jest.fn(async changes => ({ id: '10', ...changes })),
+      fetchWebhooks: jest.fn(async () => new Map([['w', webhook]])),
+      createWebhook: jest.fn(async settings => ({ id: 'w2', ...settings })),
+      permissionOverwrites: { cache: new Map(), edit: jest.fn(async () => ({})), delete: jest.fn() },
+      threads: { cache: new Map([['t', thread]]), create: jest.fn(async settings => ({ id: 't2', ...settings })) },
+      send: jest.fn(async content => ({ content })),
+    };
+    const guild = { id: '1', channels: { cache: new Map([['10', channel]]), create: jest.fn(async settings => ({ id: '11', ...settings })) } };
+    const api = directChannels({ channel, guild, client: { fetchWebhook: jest.fn(async () => webhook) } });
+    await api.create('default');
+    await api.create('parent-null', { parent: null });
+    await api.create('positioned', { position: 2 });
+    const target = api.get('10');
+    await target.update({ name: 'x', topic: undefined });
+    await target.update({ name: 'x' }, undefined);
+    await target.update({ name: 'x', topic: null, uncategorized: true, position: 1 });
+    await target.webhooks.update('w', { name: 'x' });
+    await target.permissions.set('r', { allow: ['ViewChannel'] });
+    await target.permissions.set('r', { deny: ['SendMessages'] });
+    await expect(target.permissions.set('r')).rejects.toMatchObject({ code: 'PERMISSIONS_REQUIRED' });
+    await expect(target.permissions.delete()).rejects.toMatchObject({ code: 'TARGET_REQUIRED' });
+    await target.threads.update('t', { name: 'x' });
+    await target.threads.update('t', { name: 'x' }, undefined);
+    await target.threads.update('t', { name: 'x' }, {});
+    expect(target.threads.list()).toHaveLength(1);
+  });
   test('covers guild channel list, lookup, topic updates, and deletion', async () => {
     const edit = jest.fn(async changes => ({ id: '10', name: changes.name ?? 'general', type: 0, topic: changes.topic ?? null }));
     const remove = jest.fn(async () => undefined);
@@ -227,5 +273,28 @@ describe('channel organization and types', () => {
     await expect(target.threads.update('30')).rejects.toMatchObject({ code: 'NAME_REQUIRED' });
     expect(target.threads.list()).toEqual([]);
     expect(target.permissions.list()).toEqual([]);
+  });
+
+  test('exercises fallback values and every optional mutation shape', async () => {
+    const edit = jest.fn(async changes => ({ ...changes }));
+    const webhook = { edit: jest.fn(async () => ({})), delete: jest.fn() };
+    const thread = { edit: jest.fn(async () => ({})), delete: jest.fn() };
+    const channel = {
+      id: '10', type: 0, guild: { members: { me: { permissions: { has: () => true } } } }, edit,
+      fetchWebhooks: jest.fn(async () => new Map([['w', webhook]])),
+      permissionOverwrites: { cache: new Map(), edit: jest.fn(async () => ({ id: 'r', allow: { toArray: () => [] }, deny: { toArray: () => [] } })), delete: jest.fn() },
+      threads: { cache: new Map([['t', thread]]) }, send: jest.fn(),
+    };
+    const guild = { id: '1', channels: { cache: channelCollection([['10', channel]]), create: jest.fn(async settings => settings) }, roles: { cache: new Map() }, members: { me: { permissions: { has: () => true } } } };
+    const client = { guilds: { cache: new Map([['1', guild]]) }, channels: { cache: new Map([['10', channel]]) }, fetchWebhook: jest.fn(async () => webhook) };
+    const target = createDiscordApi(client, { yes: true }).channels.get('10');
+    await target.update({ name: 'x', topic: undefined }, {});
+    await target.webhooks.update('w', { name: 'x' });
+    await target.permissions.set('r', { allow: ['ViewChannel'] });
+    await target.permissions.set('r', { deny: ['SendMessages'] });
+    await expect(target.permissions.delete()).rejects.toMatchObject({ code: 'TARGET_REQUIRED' });
+    await target.threads.update('t', { name: 'x' });
+    await target.threads.update('t', { name: 'x' }, {});
+    expect(edit).toHaveBeenCalled();
   });
 });

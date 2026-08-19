@@ -3,11 +3,11 @@ export function createGuildChannelsApi({ guild, client, dryRun, mapCache, normal
             list: () => guild.channels.cache.map(normalizeChannel),
             create: async (name, operationOptions = {}) => {
               const type = normalizeChannelType(operationOptions.type);
-              const parent = operationOptions.parent ?? operationOptions.category ?? undefined;
+              const parent = operationOptions.parent !== undefined ? operationOptions.parent : operationOptions.category;
               requirePermission(guild, 'ManageChannels');
               requireApproval('Creating a channel', operationOptions);
-              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, name, type, ...(parent !== undefined ? { parentId: parent ?? null } : {}), ...(operationOptions.position !== undefined ? { position: Number(operationOptions.position) } : {}) };
-              return normalizeChannel(await guild.channels.create({ name: String(name), type, ...(parent !== undefined ? { parent: parent || null } : {}), ...(operationOptions.position !== undefined ? { position: Number(operationOptions.position) } : {}) }));
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, name, type, ...previewChannelOptions(parent, operationOptions) };
+              return normalizeChannel(await guild.channels.create({ name: String(name), type, ...channelCreateOptions(parent, operationOptions) }));
             },
             get: channelId => {
               const channel = guild.channels.cache.get(String(channelId));
@@ -19,7 +19,7 @@ export function createGuildChannelsApi({ guild, client, dryRun, mapCache, normal
                   requirePermission(guild, 'ManageChannels');
                   requireApproval('Updating a channel', operationOptions);
                   const parent = settings.uncategorized === true ? null : (settings.parent ?? settings.category);
-                  const changes = { ...(settings.name ? { name: String(settings.name) } : {}), ...(settings.topic !== undefined ? { topic: settings.topic === null ? null : String(settings.topic) } : {}), ...(parent !== undefined || settings.uncategorized === true ? { parent: parent || null } : {}), ...(settings.position !== undefined ? { position: Number(settings.position) } : {}) };
+                  const changes = channelUpdateOptions(settings, parent);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, ...changes, updated: true };
                   if (!channel.edit) throw Object.assign(new Error('Channel editing is unavailable.'), { code: 'CHANNELS_UNSUPPORTED', exitCode: 1 });
                   return { ...normalizeChannel(await channel.edit(changes, operationOptions.reason)), ...changes, updated: true };
@@ -136,4 +136,27 @@ function normalizeChannelType(type = 'text') {
   const numeric = Number(type);
   if ([0, 2, 4].includes(numeric)) return numeric;
   throw Object.assign(new Error(`Unsupported channel type: ${type}. Use text, voice, or category.`), { code: 'CHANNEL_TYPE_INVALID', exitCode: 2 });
+}
+
+function previewChannelOptions(parent, options) {
+  const result = {};
+  if (parent !== undefined) result.parentId = parent ?? null;
+  if (options.position !== undefined) result.position = Number(options.position);
+  return result;
+}
+
+function channelCreateOptions(parent, options) {
+  const result = {};
+  if (parent !== undefined) result.parent = parent || null;
+  if (options.position !== undefined) result.position = Number(options.position);
+  return result;
+}
+
+function channelUpdateOptions(settings, parent) {
+  const changes = {};
+  if (settings.name) changes.name = String(settings.name);
+  if (settings.topic !== undefined) changes.topic = settings.topic === null ? null : String(settings.topic);
+  if (parent !== undefined || settings.uncategorized === true) changes.parent = parent || null;
+  if (settings.position !== undefined) changes.position = Number(settings.position);
+  return changes;
 }
