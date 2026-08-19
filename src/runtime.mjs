@@ -4,7 +4,7 @@ import { loadConfig } from './config.mjs';
 
 export async function createDiscordRuntime({ token = loadConfig().token } = {}) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
-  const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
+  const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
   let stopped = false;
   await new Promise((resolve, reject) => {
     const onReady = () => {

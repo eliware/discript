@@ -92,6 +92,14 @@ async function executeDirectCommand(command, options) {
       const guild = api.guilds.get(options.guild);
       return { id: guild.id, name: guild.name };
     }
+    if (command[0] === 'members' && command[1] === 'list') {
+      if (!options.guild) throw Object.assign(new Error('members list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).members.list();
+    }
+    if (command[0] === 'roles' && command[1] === 'list') {
+      if (!options.guild) throw Object.assign(new Error('roles list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).roles.list();
+    }
     if (command[0] === 'channels' && command[1] === 'list') {
       const guildId = options.guild;
       if (!guildId) throw Object.assign(new Error('channels list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });

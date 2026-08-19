@@ -37,6 +37,13 @@ npm start -- guilds get --guild <guild-id> --json
 npm start -- channels get --channel <channel-id> --json
 ```
 
+Discover members and roles:
+
+```sh
+npm start -- members list --guild <guild-id> --json
+npm start -- roles list --guild <guild-id> --json
+```
+
 Preview or send a message. Writes require explicit approval:
 
 ```sh

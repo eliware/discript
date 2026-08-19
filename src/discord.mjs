@@ -1,4 +1,5 @@
 export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
+  const mapCache = (cache, mapper) => typeof cache?.map === 'function' ? cache.map(mapper) : [...(cache?.values?.() ?? [])].map(mapper);
   const requireApproval = action => {
     if (dryRun) return;
     if (!yes) throw Object.assign(new Error(`${action} requires --yes.`), { code: 'CONFIRMATION_REQUIRED', exitCode: 2 });
@@ -54,6 +55,12 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         return {
           id: guild.id,
           name: guild.name,
+          members: {
+            list: () => mapCache(guild.members.cache, member => ({ id: member.id, username: member.user?.username ?? null, displayName: member.displayName ?? null })),
+          },
+          roles: {
+            list: () => mapCache(guild.roles.cache, role => ({ id: role.id, name: role.name, position: role.position, managed: role.managed })),
+          },
           channels: {
             list: () => guild.channels.cache.map(normalizeChannel),
             create: async name => {
