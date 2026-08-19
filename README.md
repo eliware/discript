@@ -81,6 +81,15 @@ npm start -- emojis list --guild <guild-id> --json
 npm start -- stickers list --guild <guild-id> --json
 ```
 
+Emoji and sticker lifecycle operations require `--yes` and support `--dry-run` previews:
+
+```sh
+npm start -- emojis create --guild <guild-id> --name wave --file ./wave.png --yes --json
+npm start -- emojis delete --guild <guild-id> --emoji <emoji-id> --yes --json
+npm start -- stickers create --guild <guild-id> --name wave --file ./wave.png --tags wave --yes --json
+npm start -- stickers delete --guild <guild-id> --sticker <sticker-id> --yes --json
+```
+
 Invite creation and deletion are guarded mutations; use `--yes` (or `-y`) and preview with `--dry-run`:
 
 ```sh
