@@ -15,6 +15,7 @@ export async function createDiscordRuntime({ token = loadConfig().token, client:
     };
     const onError = error => {
       client.off('clientReady', onReady);
+      client.off('error', onError);
       reject(error);
     };
     client.once('clientReady', onReady);
