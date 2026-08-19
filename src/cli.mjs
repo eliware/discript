@@ -111,6 +111,19 @@ async function executeDirectCommand(command, options) {
       if (!options.role) throw Object.assign(new Error('roles get requires --role <id>.'), { code: 'ROLE_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).roles.get(options.role);
     }
+    if (command[0] === 'roles' && command[1] === 'create') {
+      if (!options.guild) throw Object.assign(new Error('roles create requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.name) throw Object.assign(new Error('roles create requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).roles.create(options.name);
+    }
+    if (command[0] === 'roles' && (command[1] === 'update' || command[1] === 'delete')) {
+      if (!options.guild) throw Object.assign(new Error(`roles ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.role) throw Object.assign(new Error(`roles ${command[1]} requires --role <id>.`), { code: 'ROLE_REQUIRED', exitCode: 2 });
+      const role = api.guilds.get(options.guild).roles.get(options.role);
+      if (command[1] === 'delete') return role.delete();
+      if (!options.name) throw Object.assign(new Error('roles update requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+      return role.update({ name: options.name });
+    }
     if (command[0] === 'roles' && (command[1] === 'add' || command[1] === 'remove')) {
       if (!options.guild) throw Object.assign(new Error(`roles ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
       if (!options.user) throw Object.assign(new Error(`roles ${command[1]} requires --user <id>.`), { code: 'USER_REQUIRED', exitCode: 2 });

@@ -49,6 +49,9 @@ Role changes require explicit approval:
 ```sh
 npm start -- roles add --guild <guild-id> --user <user-id> --role <role-id> --yes --json
 npm start -- roles remove --guild <guild-id> --user <user-id> --role <role-id> --yes --json
+npm start -- roles create --guild <guild-id> --name "Helper" --yes --json
+npm start -- roles update --guild <guild-id> --role <role-id> --name "Helper" --yes --json
+npm start -- roles delete --guild <guild-id> --role <role-id> --yes --json
 ```
 
 Moderation operations also require explicit approval:
