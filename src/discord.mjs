@@ -50,6 +50,23 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         if (!channel) throw Object.assign(new Error(`Channel not found: ${id}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
         return {
           ...normalizeChannel(channel),
+          threads: {
+            list: () => mapCache(channel.threads?.cache, thread => ({ id: thread.id, name: thread.name, archived: thread.archived ?? false })),
+            create: async (name, operationOptions = {}) => {
+              requireApproval('Creating a thread', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, name, created: true };
+              const thread = await channel.threads.create({ name: String(name) });
+              return { id: thread.id, name: thread.name, created: true };
+            },
+            archive: async (threadId, operationOptions = {}) => {
+              requireApproval('Archiving a thread', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, threadId: String(threadId), archived: true };
+              const thread = channel.threads?.cache?.get(String(threadId));
+              if (!thread) throw Object.assign(new Error(`Thread not found: ${threadId}`), { code: 'THREAD_NOT_FOUND', exitCode: 1 });
+              await thread.setArchived(true);
+              return { id: thread.id, archived: true };
+            },
+          },
           delete: async (operationOptions = {}) => {
             requireChannelPermission(channel.id, 'ManageChannels');
             requireApproval('Deleting a channel', operationOptions);
@@ -170,6 +187,23 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
               if (!channel) throw Object.assign(new Error(`Channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
               return {
                 ...normalizeChannel(channel),
+                threads: {
+                  list: () => mapCache(channel.threads?.cache, thread => ({ id: thread.id, name: thread.name, archived: thread.archived ?? false })),
+                  create: async (name, operationOptions = {}) => {
+                    requireApproval('Creating a thread', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, name, created: true };
+                    const thread = await channel.threads.create({ name: String(name) });
+                    return { id: thread.id, name: thread.name, created: true };
+                  },
+                  archive: async (threadId, operationOptions = {}) => {
+                    requireApproval('Archiving a thread', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, threadId: String(threadId), archived: true };
+                    const thread = channel.threads?.cache?.get(String(threadId));
+                    if (!thread) throw Object.assign(new Error(`Thread not found: ${threadId}`), { code: 'THREAD_NOT_FOUND', exitCode: 1 });
+                    await thread.setArchived(true);
+                    return { id: thread.id, archived: true };
+                  },
+                },
                 send: async (content, operationOptions = {}) => {
                   requireApproval('Sending a message', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, content };

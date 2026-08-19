@@ -160,6 +160,20 @@ async function executeDirectCommand(command, options) {
       if (!options.channel) throw Object.assign(new Error('channels delete requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
       return api.channels.get(options.channel).delete();
     }
+    if (command[0] === 'threads' && command[1] === 'list') {
+      if (!options.channel) throw Object.assign(new Error('threads list requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      return api.channels.get(options.channel).threads.list();
+    }
+    if (command[0] === 'threads' && command[1] === 'create') {
+      if (!options.channel) throw Object.assign(new Error('threads create requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.name) throw Object.assign(new Error('threads create requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+      return api.channels.get(options.channel).threads.create(options.name);
+    }
+    if (command[0] === 'threads' && command[1] === 'archive') {
+      if (!options.channel) throw Object.assign(new Error('threads archive requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.thread) throw Object.assign(new Error('threads archive requires --thread <id>.'), { code: 'THREAD_REQUIRED', exitCode: 2 });
+      return api.channels.get(options.channel).threads.archive(options.thread);
+    }
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
       if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });

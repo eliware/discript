@@ -44,6 +44,14 @@ npm start -- members list --guild <guild-id> --json
 npm start -- roles list --guild <guild-id> --json
 ```
 
+Threads support inspection and guarded lifecycle operations:
+
+```sh
+npm start -- threads list --channel <channel-id> --json
+npm start -- threads create --channel <channel-id> --name "topic" --yes --json
+npm start -- threads archive --channel <channel-id> --thread <thread-id> --yes --json
+```
+
 Role changes require explicit approval:
 
 ```sh
