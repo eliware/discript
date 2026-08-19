@@ -27,4 +27,16 @@ describe('REST Discord API adapter', () => {
     await expect(executeRestOperation(['channels', 'delete'], { channel: '2', yes: true }, { request })).resolves.toEqual({ id: '9' });
     expect(request).toHaveBeenCalledWith('/channels/2', { method: 'DELETE' });
   });
+
+  test('maps additional REST mutations', async () => {
+    const request = jest.fn(async () => ({ ok: true }));
+    await executeRestOperation(['channels', 'update'], { channel: '1', name: 'renamed' }, { request });
+    await executeRestOperation(['messages', 'edit'], { channel: '1', message: '2', content: 'updated' }, { request });
+    await executeRestOperation(['roles', 'delete'], { guild: '1', role: '2', yes: true }, { request });
+    await executeRestOperation(['permissions', 'set'], { channel: '1', target: '2', allow: 'ViewChannel' }, { request });
+    expect(request).toHaveBeenNthCalledWith(1, '/channels/1', { method: 'PATCH', body: { name: 'renamed' } });
+    expect(request).toHaveBeenNthCalledWith(2, '/channels/1/messages/2', { method: 'PATCH', body: { content: 'updated' } });
+    expect(request).toHaveBeenNthCalledWith(3, '/guilds/1/roles/2', { method: 'DELETE' });
+    expect(request).toHaveBeenNthCalledWith(4, '/channels/1/permissions/2', { method: 'PUT', body: { allow: 'ViewChannel', deny: '', type: 0 } });
+  });
 });
