@@ -66,7 +66,7 @@ describe('Discord capability layer', () => {
   });
 
   test('fails closed when Discord permission state is unavailable', async () => {
-    const guild = { id: '1', members: {}, emojis: { cache: new Map(), create: jest.fn() } };
+    const guild = { id: '1', members: { me: undefined }, emojis: { cache: new Map(), create: jest.fn() } };
     const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true });
     await expect(api.guilds.get('1').emojis.create({ name: 'new', attachment: '/tmp/a.png' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
   });

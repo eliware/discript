@@ -137,7 +137,7 @@ export function parse(source) {
     }
     if (token?.type === 'identifier' && token.value === 'await') {
       index += 1;
-      return { type: 'AwaitExpression', argument: parsePrimary() };
+      return { type: 'AwaitExpression', argument: parsePostfix() };
     }
     if (token?.type === 'identifier' && token.value === 'try') {
       index += 1;

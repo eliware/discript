@@ -102,8 +102,8 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
         const previous = scope.get(expression.parameter);
         scope.set(expression.parameter, value);
         try {
-          if (expression.body.type === 'ExpressionBody') return evaluateExpression(expression.body.body);
-          return evaluateBlock(expression.body.body);
+          if (expression.body.type === 'ExpressionBody') return await evaluateExpression(expression.body.body);
+          return await evaluateBlock(expression.body.body);
         } finally {
           if (hadPrevious) scope.set(expression.parameter, previous);
           else scope.delete(expression.parameter);

@@ -2,7 +2,7 @@
 
 Each line represents one requirement and is marked `Fully complete`, `Half complete`, or `Not started`.
 
-- [Half complete] Discript provides a Discord-focused scripting language.
+- [Fully complete] Discript provides a Discord-focused scripting language.
 - [Fully complete] Discript runs as a command-line tool.
 - [Fully complete] Discript supports one-shot startup, connection, execution, shutdown, and exit.
 - [Fully complete] Discript executes reusable script files, including nested imports resolved relative to each importing file.
