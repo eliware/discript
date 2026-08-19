@@ -52,6 +52,13 @@ npm start -- emojis list --guild <guild-id> --json
 npm start -- stickers list --guild <guild-id> --json
 ```
 
+Invite creation and deletion are guarded mutations; use `--yes` (or `-y`) and preview with `--dry-run`:
+
+```sh
+npm start -- invites create --guild <guild-id> --channel <channel-id> --duration 3600 --yes --json
+npm start -- invites delete --guild <guild-id> --invite <invite-code> --yes --json
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
