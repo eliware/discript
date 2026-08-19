@@ -1,6 +1,9 @@
-import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
-
-export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
+export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null } = {}) {
+  let loadedVoiceModule = voiceModule;
+  const loadVoiceModule = async () => {
+    if (!loadedVoiceModule) loadedVoiceModule = await import('@discordjs/voice');
+    return loadedVoiceModule;
+  };
   const mapCache = (cache, mapper) => typeof cache?.map === 'function' ? cache.map(mapper) : [...(cache?.values?.() ?? [])].map(mapper);
   const requireApproval = (action, operationOptions = {}) => {
     if (dryRun || operationOptions.dryRun === true) return;
@@ -37,7 +40,8 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
   };
   return {
     voice: {
-      status: guildId => {
+      status: async guildId => {
+        const { getVoiceConnection } = await loadVoiceModule();
         const connection = getVoiceConnection(String(guildId));
         return connection ? { guildId: String(guildId), status: connection.state?.status ?? 'unknown', connected: true } : { guildId: String(guildId), connected: false };
       },
@@ -49,12 +53,14 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         requireApproval('Joining a voice channel', operationOptions);
         if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, channelId: String(channelId), joined: true };
         if (!guild?.voiceAdapterCreator) throw Object.assign(new Error('Voice adapter is unavailable for this guild.'), { code: 'VOICE_UNSUPPORTED', exitCode: 1 });
+        const { joinVoiceChannel } = await loadVoiceModule();
         const connection = joinVoiceChannel({ channelId: String(channelId), guildId: String(guild.id), adapterCreator: guild.voiceAdapterCreator, selfDeaf: false });
         return { guildId: String(guild.id), channelId: String(channelId), status: connection.state?.status ?? 'connecting', joined: true };
       },
       leave: async (guildId, operationOptions = {}) => {
         requireApproval('Leaving a voice channel', operationOptions);
         if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: String(guildId), left: true };
+        const { getVoiceConnection } = await loadVoiceModule();
         const connection = getVoiceConnection(String(guildId));
         if (connection) connection.destroy();
         return { guildId: String(guildId), left: true };
