@@ -1,5 +1,11 @@
 # Release Notes
 
+## Unreleased
+
+- Added REST-first command execution for read-only operations and selected safe mutations.
+- Added a persistent local Gateway broker with `daemon start|status|stop` and `--broker` command/script execution.
+- Added Gateway startup cleanup, cross-process identify locking, session-limit checks, bounded retry behavior, and reset-aware errors.
+
 ## 1.0.6
 
 - Added user-level `~/.discript.env` configuration with quiet, cross-platform loading and local environment precedence.

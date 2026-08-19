@@ -9,7 +9,7 @@ function channelCollection(entries) {
   return cache;
 }
 
-function directChannels({ channel, guild, client = {} , dryRun = false } = {}) {
+function directChannels({ guild, client = {}, dryRun = false } = {}) {
   return createGuildChannelsApi({
     guild, client, dryRun,
     mapCache: (cache, normalize) => cache ? [...cache.values()].map(normalize) : [],
