@@ -1,4 +1,11 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+
+// Load the project-local file first, then the user-level fallback. dotenv does
+// not overwrite existing values, so shell exports and local configuration win.
+dotenv.config();
+dotenv.config({ path: join(homedir(), '.discript.env') });
 
 
 import { log, registerHandlers, registerSignals } from '@eliware/common';
@@ -35,4 +42,3 @@ export async function run(argv = [], dependencies = {}) {
     errors.removeHandlers();
   }
 }
-
