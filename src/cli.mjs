@@ -4,6 +4,9 @@ import { parseArgs } from './args.mjs';
 import { helpText, VERSION } from './help.mjs';
 import { readSource } from './input.mjs';
 import { writeResult } from './output.mjs';
+import { parse } from './parser.mjs';
+import { evaluate } from './evaluator.mjs';
+import { createDiscordApi } from './discord.mjs';
 
 export async function run(argv = [], dependencies = {}) {
   const { stdout = console.log, stdin = process.stdin } = dependencies;
@@ -27,10 +30,17 @@ export async function run(argv = [], dependencies = {}) {
 
 async function executeInput(input, options, dependencies) {
   if (input.kind === 'command') return executeDirectCommand(input.command, options, dependencies);
-  throw Object.assign(new Error(`Script execution is not implemented yet (${input.origin}).`), {
-    code: 'SCRIPT_RUNTIME_UNAVAILABLE',
-    exitCode: 1,
-  });
+  if (options.dry_run) return { dryRun: true, source: input.source };
+  const { createDiscordRuntime } = await import('./runtime.mjs');
+  const runtime = await createDiscordRuntime();
+  try {
+    return evaluate(parse(input.source), {
+      discord: createDiscordApi(runtime.client),
+      print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
+    });
+  } finally {
+    await runtime.shutdown();
+  }
 }
 
 async function executeDirectCommand(command, options) {
@@ -41,7 +51,7 @@ async function executeDirectCommand(command, options) {
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
   try {
-    return runtime.client.guilds.cache.map(guild => ({ id: guild.id, name: guild.name }));
+    return createDiscordApi(runtime.client).guilds.list();
   } finally {
     await runtime.shutdown();
   }
