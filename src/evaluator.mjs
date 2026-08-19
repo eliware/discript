@@ -2,15 +2,39 @@ export async function evaluate(program, globals = {}) {
   const scope = new Map(Object.entries(globals));
   let result;
   for (const statement of program.body) {
-    if (statement.type === 'Assignment') {
-      result = await evaluateExpression(statement.value);
-      scope.set(statement.name, result);
-    } else result = await evaluateExpression(statement.expression);
+    result = await evaluateStatement(statement);
   }
   return result;
 
+  async function evaluateStatement(statement) {
+    if (statement.type === 'Assignment') {
+      const value = await evaluateExpression(statement.value);
+      scope.set(statement.name, value);
+      return value;
+    }
+    if (statement.type === 'ExpressionStatement') return evaluateExpression(statement.expression);
+    if (statement.type === 'IfStatement') {
+      const branch = await evaluateExpression(statement.test) ? statement.consequent : statement.alternate;
+      let branchResult;
+      for (const nested of branch ?? []) branchResult = await evaluateStatement(nested);
+      return branchResult;
+    }
+    throw runtimeError(`Unsupported statement: ${statement.type}`);
+  }
+
   async function evaluateExpression(expression) {
     if (expression.type === 'Literal') return expression.value;
+    if (expression.type === 'BinaryExpression') {
+      const left = await evaluateExpression(expression.left);
+      const right = await evaluateExpression(expression.right);
+      if (expression.operator === '==') return left === right;
+      if (expression.operator === '!=') return left !== right;
+      if (expression.operator === '>') return left > right;
+      if (expression.operator === '<') return left < right;
+      if (expression.operator === '>=') return left >= right;
+      if (expression.operator === '<=') return left <= right;
+      throw runtimeError(`Unsupported operator: ${expression.operator}`);
+    }
     if (expression.type === 'ArrayExpression') return Promise.all(expression.elements.map(evaluateExpression));
     if (expression.type === 'ObjectExpression') {
       const values = await Promise.all(expression.properties.map(async property => [property.key, await evaluateExpression(property.value)]));

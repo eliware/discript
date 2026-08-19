@@ -1,19 +1,36 @@
-const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|([()[\].,;=:{}`])/y;
+const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(==|!=|>=|<=|>|<)|([()[\].,;=:{}`])/y;
 
 export function parse(source) {
   const tokens = tokenize(source);
   let index = 0;
   const body = [];
 
-  while (!atEnd()) {
-    if (match(';')) continue;
-    const expression = parseExpression();
-    if (expression.type === 'Identifier' && match('=')) {
-      body.push({ type: 'Assignment', name: expression.name, value: parseExpression() });
-    } else body.push({ type: 'ExpressionStatement', expression });
-    match(';');
-  }
+  while (!atEnd()) { if (match(';')) continue; body.push(parseStatement()); match(';'); }
   return { type: 'Program', body };
+
+  function parseStatement() {
+    if (peek()?.type === 'identifier' && peek().value === 'if') {
+      index += 1;
+      consume('(', 'Expected `(` after `if`.');
+      const test = parseExpression();
+      consume(')', 'Expected `)` after the `if` condition.');
+      const consequent = parseBlock();
+      let alternate = null;
+      if (peek()?.type === 'identifier' && peek().value === 'else') { index += 1; alternate = parseBlock(); }
+      return { type: 'IfStatement', test, consequent, alternate };
+    }
+    const expression = parseExpression();
+    if (expression.type === 'Identifier' && match('=')) return { type: 'Assignment', name: expression.name, value: parseExpression() };
+    return { type: 'ExpressionStatement', expression };
+  }
+
+  function parseBlock() {
+    consume('{', 'Expected `{` to begin a block.');
+    const statements = [];
+    while (!atEnd() && !match('}')) { if (match(';')) continue; statements.push(parseStatement()); match(';'); }
+    if (tokens[index - 1]?.value !== '}') throw syntaxError('Expected `}` to close the block.');
+    return statements;
+  }
 
   function parseExpression() {
     let expression = parsePrimary();
@@ -37,13 +54,22 @@ export function parse(source) {
       }
       expression = { type: 'CallExpression', callee: expression, arguments: args };
     }
+    if (peek()?.type === 'operator') {
+      const operator = tokens[index++].value;
+      expression = { type: 'BinaryExpression', operator, left: expression, right: parseExpression() };
+    }
     return expression;
   }
 
   function parsePrimary() {
     const token = peek();
     if (token?.type === 'string' || token?.type === 'number') { index += 1; return { type: 'Literal', value: token.value }; }
-    if (token?.type === 'identifier') { index += 1; return { type: 'Identifier', name: token.value }; }
+    if (token?.type === 'identifier') {
+      index += 1;
+      if (token.value === 'true' || token.value === 'false') return { type: 'Literal', value: token.value === 'true' };
+      if (token.value === 'null') return { type: 'Literal', value: null };
+      return { type: 'Identifier', name: token.value };
+    }
     if (match('[')) {
       const elements = [];
       if (!match(']')) {
@@ -88,7 +114,8 @@ function tokenize(source) {
     if (match[1]) tokens.push({ type: 'string', value: JSON.parse(match[1][0] === '"' ? match[1] : `"${match[1].slice(1, -1)}"`) });
     else if (match[2]) tokens.push({ type: 'number', value: Number(match[2]) });
     else if (match[3]) tokens.push({ type: 'identifier', value: match[3] });
-    else tokens.push({ type: match[4], value: match[4] });
+    else if (match[4]) tokens.push({ type: 'operator', value: match[4] });
+    else tokens.push({ type: match[5], value: match[5] });
   }
   return tokens;
 }
