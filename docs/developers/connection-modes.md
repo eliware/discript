@@ -40,3 +40,5 @@ The Gateway limits helper exposes Discord’s current `remaining`, `reset_after`
 The implementation should select the lightest transport that satisfies the operation. A command must not open Gateway solely because it performs a normal REST mutation.
 
 Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one.
+
+Transient startup contention is retried with bounded exponential backoff. Session-limit errors use Discord’s `reset_after` value when available. Authentication failures, invalid intents, and disallowed intents are reported immediately and are never retried.
