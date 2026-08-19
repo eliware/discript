@@ -2,7 +2,7 @@ export const COMMANDS = [
   'bot get', 'guilds list', 'guilds get', 'members list', 'members get', 'roles list', 'roles get', 'roles create', 'roles update', 'roles delete', 'roles add', 'roles remove',
   'emojis list', 'emojis get', 'emojis create', 'emojis update', 'emojis delete', 'stickers list', 'stickers get', 'stickers create', 'stickers update', 'stickers delete', 'invites list', 'invites create', 'invites delete',
   'events list', 'events create', 'events update', 'events delete', 'voice status', 'voice join', 'voice leave',
-  'channels list', 'channels get', 'channels create', 'channels delete', 'threads list', 'threads create', 'threads archive',
+  'channels list', 'channels get', 'channels create', 'channels update', 'channels delete', 'threads list', 'threads create', 'threads archive',
   'webhooks list', 'webhooks create', 'webhooks delete',
   'permissions list', 'permissions set', 'permissions delete',
   'voice-users status', 'voice-users mute', 'voice-users unmute', 'voice-users deafen', 'voice-users undeafen', 'voice-users disconnect', 'voice-users move',

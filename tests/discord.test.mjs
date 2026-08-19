@@ -14,6 +14,16 @@ describe('Discord capability layer', () => {
     expect(send).not.toHaveBeenCalled();
   });
 
+  test('updates channels with approval and dry-run support', async () => {
+    const edit = jest.fn(async changes => ({ id: '1', name: changes.name, type: 0 }));
+    const channel = { id: '1', name: 'general', type: 0, edit };
+    const api = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    await expect(api.channels.get('1').update({ name: 'renamed' })).resolves.toMatchObject({ updated: true, name: 'renamed' });
+    expect(edit).toHaveBeenCalledWith({ name: 'renamed' }, undefined);
+    const preview = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { dryRun: true });
+    await expect(preview.channels.get('1').update({ topic: 'preview' })).resolves.toMatchObject({ dryRun: true, topic: 'preview' });
+  });
+
   test('supports guarded emoji and sticker lifecycle operations', async () => {
     const emojiEdit = jest.fn(async settings => ({ id: 'e2', name: settings.name, animated: false }));
     const emojiDelete = jest.fn(async () => undefined);
