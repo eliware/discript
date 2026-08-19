@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from '@jest/globals';
-import { createRestDiscordApi, executeRestRead } from '../src/rest-api.mjs';
+import { createRestDiscordApi, executeRestOperation, executeRestRead } from '../src/rest-api.mjs';
 
 describe('REST Discord API adapter', () => {
   test('maps guild listing and channel listing to REST routes', async () => {
@@ -18,5 +18,13 @@ describe('REST Discord API adapter', () => {
     await expect(executeRestRead(['members', 'list'], { guild: '1' }, { request })).resolves.toEqual({ route: '/guilds/1/members' });
     await expect(executeRestRead(['messages', 'get'], { channel: '2', message: '3' }, { request })).resolves.toEqual({ route: '/channels/2/messages/3' });
     await expect(executeRestRead(['webhooks', 'list'], { channel: '2' }, { request })).resolves.toEqual({ route: '/channels/2/webhooks' });
+  });
+
+  test('previews and approves REST mutations', async () => {
+    const request = jest.fn(async () => ({ id: '9' }));
+    await expect(executeRestOperation(['channels', 'create'], { guild: '1', name: 'voice', type: 'voice', dry_run: true }, { request })).resolves.toMatchObject({ dryRun: true, method: 'POST', route: '/guilds/1/channels', body: { type: 2 } });
+    await expect(executeRestOperation(['channels', 'delete'], { channel: '2' }, { request })).rejects.toMatchObject({ code: 'APPROVAL_REQUIRED' });
+    await expect(executeRestOperation(['channels', 'delete'], { channel: '2', yes: true }, { request })).resolves.toEqual({ id: '9' });
+    expect(request).toHaveBeenCalledWith('/channels/2', { method: 'DELETE' });
   });
 });

@@ -33,3 +33,31 @@ export async function executeRestRead(command, options, rest) {
   if (command.join(' ') === 'messages get') return rest.request(`/channels/${channel}/messages/${options.message}`);
   return undefined;
 }
+
+export async function executeRestOperation(command, options, rest) {
+  const key = command.join(' ');
+  const operation = restMutation(key, options);
+  if (!operation) return undefined;
+  if (options.dry_run === true) return { dryRun: true, method: operation.method, route: operation.route, ...(operation.body ? { body: operation.body } : {}) };
+  if (operation.destructive && options.yes !== true) throw Object.assign(new Error(`${key} requires --yes or -y.`), { code: 'APPROVAL_REQUIRED', exitCode: 2 });
+  return rest.request(operation.route, { method: operation.method, ...(operation.body ? { body: operation.body } : {}) });
+}
+
+function restMutation(key, options) {
+  const guild = options.guild;
+  const channel = options.channel;
+  if (key === 'channels create') return { method: 'POST', route: `/guilds/${guild}/channels`, body: { name: options.name, type: channelType(options.type), ...(options.parent ? { parent_id: options.parent } : {}), ...(options.position !== undefined ? { position: Number(options.position) } : {}) } };
+  if (key === 'channels delete') return { method: 'DELETE', route: `/channels/${channel}`, destructive: true };
+  if (key === 'messages send') return { method: 'POST', route: `/channels/${channel}/messages`, body: { content: options.content } };
+  if (key === 'messages delete') return { method: 'DELETE', route: `/channels/${channel}/messages/${options.message}`, destructive: true };
+  if (key === 'roles create') return { method: 'POST', route: `/guilds/${guild}/roles`, body: { name: options.name } };
+  if (key === 'moderation kick') return { method: 'DELETE', route: `/guilds/${guild}/members/${options.user}`, destructive: true };
+  if (key === 'moderation ban') return { method: 'PUT', route: `/guilds/${guild}/bans/${options.user}`, destructive: true, body: {} };
+  return undefined;
+}
+
+function channelType(type) {
+  if (type === 'voice') return 2;
+  if (type === 'category') return 4;
+  return type === undefined || type === 'text' ? 0 : Number(type);
+}

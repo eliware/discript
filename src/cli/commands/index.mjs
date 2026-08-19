@@ -20,7 +20,7 @@ import { createPermissionsHandler } from './permissions.mjs';
 import { createVoiceHandler } from './voice.mjs';
 import { createVoiceUsersHandler } from './voice-users.mjs';
 import { createDiscordRest } from '../../rest.mjs';
-import { createRestDiscordApi, executeRestRead } from '../../rest-api.mjs';
+import { createRestDiscordApi, executeRestOperation, executeRestRead } from '../../rest-api.mjs';
 const handlers = [createBotHandler, createGuildsHandler, createMembersHandler, createRolesHandler, createChannelsHandler, createMessagesHandler, createModerationHandler, createEmojisHandler, createStickersHandler, createEventsHandler, createInvitesHandler, createThreadsHandler, createWebhooksHandler, createPermissionsHandler, createVoiceHandler, createVoiceUsersHandler];
 export async function executeDirectCommand(input, options = {}) {
   const command = normalizeCommand(input);
@@ -45,6 +45,8 @@ export async function executeDirectCommand(input, options = {}) {
   }
   if (options.rest === true) {
     const rest = createDiscordRest();
+    const mutation = await executeRestOperation(command, options, rest);
+    if (mutation !== undefined) return mutation;
     const value = await executeRestRead(command, options, rest);
     if (value !== undefined) return value;
   }
