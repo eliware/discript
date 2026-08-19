@@ -77,6 +77,25 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                   await member.roles.remove(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), removed: true };
                 },
+                ban: async reason => {
+                  requireApproval('Banning a member');
+                  if (dryRun) return { dryRun: true, memberId: member.id, banned: true, reason: reason ?? null };
+                  await member.ban({ reason: reason ?? undefined });
+                  return { memberId: member.id, banned: true };
+                },
+                kick: async reason => {
+                  requireApproval('Kicking a member');
+                  if (dryRun) return { dryRun: true, memberId: member.id, kicked: true, reason: reason ?? null };
+                  await member.kick(reason ?? undefined);
+                  return { memberId: member.id, kicked: true };
+                },
+                timeout: async (durationMs, reason) => {
+                  requireApproval('Timing out a member');
+                  if (!Number.isInteger(Number(durationMs)) || Number(durationMs) < 1) throw Object.assign(new Error('Timeout duration must be a positive number of milliseconds.'), { code: 'INVALID_DURATION', exitCode: 2 });
+                  if (dryRun) return { dryRun: true, memberId: member.id, timeoutMs: Number(durationMs), reason: reason ?? null };
+                  await member.timeout(Number(durationMs), reason ?? undefined);
+                  return { memberId: member.id, timeoutMs: Number(durationMs), timedOut: true };
+                },
               };
             },
           },

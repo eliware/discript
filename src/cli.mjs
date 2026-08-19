@@ -117,6 +117,16 @@ async function executeDirectCommand(command, options) {
       const member = api.guilds.get(options.guild).members.get(options.user);
       return command[1] === 'add' ? member.addRole(options.role) : member.removeRole(options.role);
     }
+    if (command[0] === 'moderation' && ['ban', 'kick', 'timeout'].includes(command[1])) {
+      if (!options.guild) throw Object.assign(new Error(`moderation ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.user) throw Object.assign(new Error(`moderation ${command[1]} requires --user <id>.`), { code: 'USER_REQUIRED', exitCode: 2 });
+      const member = api.guilds.get(options.guild).members.get(options.user);
+      if (command[1] === 'timeout') {
+        if (options.duration === undefined) throw Object.assign(new Error('moderation timeout requires --duration <milliseconds>.'), { code: 'DURATION_REQUIRED', exitCode: 2 });
+        return member.timeout(options.duration, options.reason);
+      }
+      return member[command[1]](options.reason);
+    }
     if (command[0] === 'channels' && command[1] === 'list') {
       const guildId = options.guild;
       if (!guildId) throw Object.assign(new Error('channels list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });

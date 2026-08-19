@@ -51,6 +51,14 @@ npm start -- roles add --guild <guild-id> --user <user-id> --role <role-id> --ye
 npm start -- roles remove --guild <guild-id> --user <user-id> --role <role-id> --yes --json
 ```
 
+Moderation operations also require explicit approval:
+
+```sh
+npm start -- moderation timeout --guild <guild-id> --user <user-id> --duration 3600000 --reason "reason" --yes --json
+npm start -- moderation kick --guild <guild-id> --user <user-id> --reason "reason" --yes --json
+npm start -- moderation ban --guild <guild-id> --user <user-id> --reason "reason" --yes --json
+```
+
 Preview or send a message. Writes require explicit approval:
 
 ```sh
