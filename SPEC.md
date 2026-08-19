@@ -114,6 +114,8 @@ Read operations and mutations should be distinguishable. Destructive actions sho
 
 Authorization failures should fail closed rather than being silently ignored.
 
+Mutating operations should support dry-run previews. Destructive operations require explicit force approval, represented by `--yes` or `-y` in the CLI and an equivalent internal directive in scripts. Scripts must be able to inspect operation exit codes, branch on them, and explicitly terminate with a chosen status.
+
 ## Runtime lifecycle
 
 Connection management and shutdown should be owned by the runtime rather than repeated in every script.
