@@ -9,23 +9,29 @@ export async function createDiscordRuntime({ token = loadConfig().token, client:
   let stopped = false;
   let resolveStopped;
   const stoppedPromise = new Promise(resolve => { resolveStopped = resolve; });
-  await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => onError(Object.assign(new Error(`Discord login timed out after ${loginTimeout}ms.`), { code: 'DISCORD_LOGIN_TIMEOUT', exitCode: 4 })), loginTimeout);
-    const onReady = () => {
-      clearTimeout(timeout);
-      client.off('error', onError);
-      resolve();
-    };
-    const onError = error => {
-      clearTimeout(timeout);
-      client.off('clientReady', onReady);
-      client.off('error', onError);
-      reject(error);
-    };
-    client.once('clientReady', onReady);
-    client.once('error', onError);
-    Promise.resolve().then(() => client.login(token)).catch(onError);
-  });
+  try {
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => onError(Object.assign(new Error(`Discord login timed out after ${loginTimeout}ms.`), { code: 'DISCORD_LOGIN_TIMEOUT', exitCode: 4 })), loginTimeout);
+      const onReady = () => {
+        clearTimeout(timeout);
+        client.off('error', onError);
+        resolve();
+      };
+      const onError = error => {
+        clearTimeout(timeout);
+        client.off('clientReady', onReady);
+        client.off('error', onError);
+        reject(error);
+      };
+      client.once('clientReady', onReady);
+      client.once('error', onError);
+      Promise.resolve().then(() => client.login(token)).catch(onError);
+    });
+  } catch (error) {
+    try { await client.destroy?.(); }
+    catch (shutdownError) { log.warn('Discord startup cleanup failed', { error: shutdownError.message }); }
+    throw error;
+  }
   return {
     client,
     async shutdown() {
