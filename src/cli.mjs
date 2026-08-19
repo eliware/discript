@@ -9,7 +9,7 @@ import { writeResult } from './output.mjs';
 import { parse } from './parser.mjs';
 import { evaluate, ScriptExit } from './evaluator.mjs';
 import { createDiscordApi } from './discord.mjs';
-import { commandCatalog, completionScript, normalizeCommand } from './commands.mjs';
+import { commandCatalog, completionScript, normalizeCommand, suggestCommands } from './commands.mjs';
 
 export async function run(argv = [], dependencies = {}) {
   const { stdout = console.log, stdin = process.stdin } = dependencies;
@@ -304,7 +304,9 @@ async function executeDirectCommand(command, options) {
       if (!options.messages) throw Object.assign(new Error('messages bulk-delete requires --messages <id,id,...>.'), { code: 'MESSAGES_REQUIRED', exitCode: 2 });
       return api.messages.bulkDelete(options.channel, options.messages);
     }
-    throw Object.assign(new Error(`Unknown command: ${command.join(' ')}`), { code: 'UNKNOWN_COMMAND', exitCode: 2 });
+    const unknown = command.join(' ');
+    const suggestions = suggestCommands(unknown);
+    throw Object.assign(new Error(`Unknown command: ${unknown}${suggestions.length ? `. Did you mean: ${suggestions.join(', ')}?` : ''}`), { code: 'UNKNOWN_COMMAND', exitCode: 2, details: suggestions.length ? { suggestions } : undefined });
   } finally {
     await runtime.shutdown();
   }

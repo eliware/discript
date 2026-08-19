@@ -20,6 +20,30 @@ export function commandCatalog() {
   return COMMANDS.map(name => ({ name, aliases: [ALIASES.get(name.split(' ')[0]) ? name.replace(name.split(' ')[0], Object.keys(Object.fromEntries(ALIASES)).find(alias => ALIASES.get(alias) === name.split(' ')[0]) ?? '') : ''].filter(Boolean) }));
 }
 
+export function suggestCommands(input, limit = 3) {
+  const query = String(input).toLowerCase();
+  return COMMANDS
+    .map(name => ({ name, distance: editDistance(query, name) }))
+    .sort((left, right) => left.distance - right.distance || left.name.localeCompare(right.name))
+    .filter(candidate => candidate.distance <= Math.max(3, Math.ceil(query.length / 3)))
+    .slice(0, limit)
+    .map(candidate => candidate.name);
+}
+
+function editDistance(left, right) {
+  const row = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= left.length; i += 1) {
+    let diagonal = row[0];
+    row[0] = i;
+    for (let j = 1; j <= right.length; j += 1) {
+      const above = row[j];
+      row[j] = left[i - 1] === right[j - 1] ? diagonal : 1 + Math.min(diagonal, row[j - 1], above);
+      diagonal = above;
+    }
+  }
+  return row[right.length];
+}
+
 export function completionScript(shell = 'bash') {
   const commands = COMMANDS.map(command => command.replace(' ', '\\ ')).join(' ');
   if (shell === 'bash') return `_discript_complete() { COMPREPLY=( $(compgen -W "${commands}" -- "${'${COMP_WORDS[COMP_CWORD]}'}") ); }; complete -F _discript_complete discript`;

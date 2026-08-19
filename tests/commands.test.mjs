@@ -1,4 +1,4 @@
-import { commandCatalog, completionScript, normalizeCommand } from '../src/commands.mjs';
+import { commandCatalog, completionScript, normalizeCommand, suggestCommands } from '../src/commands.mjs';
 
 describe('command discovery', () => {
   test('normalizes common singular and abbreviated aliases', () => {
@@ -15,5 +15,9 @@ describe('command discovery', () => {
 
   test('rejects unsupported shells', () => {
     expect(() => completionScript('powershell')).toThrow(expect.objectContaining({ code: 'UNSUPPORTED_SHELL' }));
+  });
+
+  test('suggests nearby commands', () => {
+    expect(suggestCommands('messags send')).toContain('messages send');
   });
 });
