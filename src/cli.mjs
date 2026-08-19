@@ -131,6 +131,7 @@ async function executeDirectCommand(command, options) {
   const runtime = await createDiscordRuntime();
   try {
     const api = createDiscordApi(runtime.client, options);
+    if (command[0] === 'bot' && command[1] === 'get') return api.bot.get();
     if (command.join(' ') === 'guilds list') return api.guilds.list();
     if (command[0] === 'guilds' && command[1] === 'get') {
       if (!options.guild) throw Object.assign(new Error('guilds get requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });

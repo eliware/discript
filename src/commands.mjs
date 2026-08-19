@@ -1,5 +1,5 @@
 export const COMMANDS = [
-  'guilds list', 'guilds get', 'members list', 'members get', 'roles list', 'roles get', 'roles create', 'roles update', 'roles delete', 'roles add', 'roles remove',
+  'bot get', 'guilds list', 'guilds get', 'members list', 'members get', 'roles list', 'roles get', 'roles create', 'roles update', 'roles delete', 'roles add', 'roles remove',
   'emojis list', 'stickers list', 'invites list', 'invites create', 'invites delete',
   'events list', 'events create', 'events update', 'events delete', 'voice status', 'voice join', 'voice leave',
   'channels list', 'channels get', 'channels create', 'channels delete', 'threads list', 'threads create', 'threads archive',

@@ -43,6 +43,12 @@ npm start -- completion zsh
 npm start -- completion fish
 ```
 
+Inspect the connected bot identity:
+
+```sh
+npm start -- bot get --json
+```
+
 Common singular and abbreviated resource names are accepted, such as `msg send`, `chan list`, and `guild list`.
 Unknown commands include nearby command suggestions; JSON errors expose them under `details.suggestions`.
 

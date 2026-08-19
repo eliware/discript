@@ -39,6 +39,12 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
     if (botMember?.permissions?.has && !botMember.permissions.has(permission)) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
   };
   return {
+    bot: {
+      get: () => {
+        if (!client.user) throw Object.assign(new Error('Bot identity is unavailable.'), { code: 'BOT_IDENTITY_UNAVAILABLE', exitCode: 1 });
+        return { id: client.user.id, username: client.user.username, tag: client.user.tag ?? null };
+      },
+    },
     voice: {
       status: async guildId => {
         const { getVoiceConnection } = await loadVoiceModule();

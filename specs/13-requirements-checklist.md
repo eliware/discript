@@ -28,6 +28,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript emits opt-in structured JSONL records with `--output jsonl`, including incremental script output.
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
 - [Fully complete] Discript covers threads, invites, emojis, stickers, scheduled events, and guarded voice join/leave/status operations.
+- [Fully complete] Discript exposes normalized bot identity through the API and `bot get` command.
 - [Half complete] Discript enforces Discord permissions and authorization safeguards across current mutation groups.
 - [Fully complete] Discript enforces protected-role, permission, role-hierarchy, and moderation-target safeguards for the current mutation groups.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
