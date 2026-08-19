@@ -12,6 +12,12 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         if (!channel) throw Object.assign(new Error(`Channel not found: ${id}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
         return {
           ...normalizeChannel(channel),
+          delete: async () => {
+            requireApproval('Deleting a channel');
+            if (dryRun) return { dryRun: true, channelId: channel.id, deleted: true };
+            await channel.delete();
+            return { id: channel.id, deleted: true };
+          },
           send: async content => {
             requireApproval('Sending a message');
             if (dryRun) return { dryRun: true, channelId: channel.id, content };

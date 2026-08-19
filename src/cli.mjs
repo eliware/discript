@@ -107,6 +107,10 @@ async function executeDirectCommand(command, options) {
       if (!options.name) throw Object.assign(new Error('channels create requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).channels.create(options.name);
     }
+    if (command[0] === 'channels' && command[1] === 'delete') {
+      if (!options.channel) throw Object.assign(new Error('channels delete requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      return api.channels.get(options.channel).delete();
+    }
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
       if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });

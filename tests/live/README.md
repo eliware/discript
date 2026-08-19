@@ -7,3 +7,7 @@ DISCRIPT_LIVE=1 npm run test:live
 ```
 
 The live suite is scoped to `TEST_GUILD`. Mutation tests require the separate `DISCRIPT_LIVE_MUTATIONS=1` opt-in and must clean up resources they create.
+
+```sh
+DISCRIPT_LIVE=1 DISCRIPT_LIVE_MUTATIONS=1 npm run test:live:mutations
+```
