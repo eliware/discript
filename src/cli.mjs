@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { log, registerHandlers, registerSignals } from '@eliware/common';
 import { parseArgs } from './args.mjs';
 import { helpText, VERSION } from './help.mjs';
@@ -75,6 +75,7 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
       timers.add(timer);
       return { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true };
     };
+    const baseDir = input.origin && !['eval', 'stdin'].includes(input.origin) ? dirname(resolve(input.origin)) : process.cwd();
     const result = await evaluate(parse(input.source), {
       discord: createDiscordApi(runtime.client, options),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
@@ -102,11 +103,12 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
         for (const item of items ?? []) accumulator = await callback(accumulator, item);
         return accumulator;
       },
-      importScript: async (sourcePath, sharedScope) => {
-        const source = await readFile(resolve(process.cwd(), sourcePath), 'utf8');
-        return evaluate(parse(source), {}, { scope: sharedScope });
+      importScript: async (sourcePath, sharedScope, importerBaseDir = baseDir) => {
+        const importedPath = resolve(importerBaseDir, sourcePath);
+        const source = await readFile(importedPath, 'utf8');
+        return evaluate(parse(source), {}, { scope: sharedScope, baseDir: dirname(importedPath) });
       },
-    });
+    }, { baseDir });
     if (handlerCount > 0) await runtime.waitForStop();
     return result;
   } finally {

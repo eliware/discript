@@ -1,4 +1,4 @@
-export async function evaluate(program, globals = {}, { scope: sharedScope } = {}) {
+export async function evaluate(program, globals = {}, { scope: sharedScope, baseDir = process.cwd() } = {}) {
   const scope = sharedScope ?? new Map(Object.entries(globals));
   return evaluateBlock(program.body);
 
@@ -33,7 +33,7 @@ export async function evaluate(program, globals = {}, { scope: sharedScope } = {
     if (statement.type === 'ImportStatement') {
       const load = scope.get('importScript');
       if (typeof load !== 'function') throw runtimeError('Script imports are unavailable in this execution mode.');
-      return load(statement.path, scope);
+      return load(statement.path, scope, baseDir);
     }
     if (statement.type === 'ReturnStatement') throw new ReturnSignal(statement.value === null ? undefined : await evaluateExpression(statement.value));
     if (statement.type === 'Assignment') {
