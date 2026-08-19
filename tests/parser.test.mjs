@@ -56,4 +56,37 @@ describe('parse', () => {
       body: expect.arrayContaining([expect.objectContaining({ type: 'Assignment', name: 'value' })]),
     }));
   });
+
+  test('parses the complete core statement and expression forms', () => {
+    const program = parse(`
+      import "./shared.ds"
+      fn announce(name, suffix) { return name }
+      on("messageCreate") { print(event) }
+      every(1000) { print("tick") }
+      after(10) { print("once") }
+      for (item in items) { print(item) }
+      if (ready) { value = await source.get() } else if (!ready) { value = -1 } else { value = null }
+      while (value < 2) { value = value + 1 }
+      result = try { announce("a", "b") } catch (error) { error }
+      source.method(1)
+      result
+    `);
+    expect(program.type).toBe('Program');
+    expect(program.body).toHaveLength(11);
+  });
+
+  test('rejects malformed core forms', () => {
+    expect(() => parse('fn () {}')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    expect(() => parse('for (item of items) {}')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    expect(() => parse('on("message")')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    expect(() => parse('item => item')).not.toThrow();
+    expect(() => parse('(item + 1) => item')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    expect(() => parse('try {}')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    expect(() => parse('@')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+  });
+
+  test('parses empty and alternate core forms', () => {
+    expect(parse('fn noop() { return }; if (false) {} ; while (false) {} ; [] ; {} ; map([1], item => { return item })')).toMatchObject({ type: 'Program' });
+    expect(parse('value = true; value = false; value = null')).toMatchObject({ type: 'Program' });
+  });
 });

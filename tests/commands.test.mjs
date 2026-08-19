@@ -4,6 +4,8 @@ describe('command discovery', () => {
   test('normalizes common singular and abbreviated aliases', () => {
     expect(normalizeCommand(['msg', 'send'])).toEqual(['messages', 'send']);
     expect(normalizeCommand(['guild', 'list'])).toEqual(['guilds', 'list']);
+    expect(normalizeCommand()).toEqual([]);
+    expect(normalizeCommand(['unknown', 'list'])).toEqual(['unknown', 'list']);
   });
 
   test('exposes catalog and shell completion formats', () => {
@@ -11,6 +13,7 @@ describe('command discovery', () => {
     expect(completionScript('bash')).toContain('complete -F');
     expect(completionScript('zsh')).toContain('#compdef discript');
     expect(completionScript('fish')).toContain('complete -c discript');
+    expect(completionScript()).toContain('complete -F');
   });
 
   test('catalog exposes the major Discord capability families', () => {
