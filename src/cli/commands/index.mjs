@@ -19,11 +19,19 @@ import { createWebhooksHandler } from './webhooks.mjs';
 import { createPermissionsHandler } from './permissions.mjs';
 import { createVoiceHandler } from './voice.mjs';
 import { createVoiceUsersHandler } from './voice-users.mjs';
+import { createDiscordRest } from '../../rest.mjs';
+import { createRestDiscordApi } from '../../rest-api.mjs';
 const handlers = [createBotHandler, createGuildsHandler, createMembersHandler, createRolesHandler, createChannelsHandler, createMessagesHandler, createModerationHandler, createEmojisHandler, createStickersHandler, createEventsHandler, createInvitesHandler, createThreadsHandler, createWebhooksHandler, createPermissionsHandler, createVoiceHandler, createVoiceUsersHandler];
 export async function executeDirectCommand(input, options = {}) {
   const command = normalizeCommand(input);
   const catalog = createCatalogHandler(command, options); if (catalog.handled) return catalog.value;
   const preview = createPreviewHandler(command, options); if (preview.handled) return preview.value;
+  if (isRestOnlyCommand(command)) {
+    const rest = createDiscordRest();
+    const api = createRestDiscordApi(rest);
+    if (command.join(' ') === 'guilds list') return api.guilds.list();
+    if (command.join(' ') === 'guilds get') return api.guilds.get(options.guild).info();
+  }
   const runtime = await createDiscordRuntime();
   try {
     const api = createDiscordApi(runtime.client, { ...options, dryRun: options.dry_run === true });
@@ -32,4 +40,8 @@ export async function executeDirectCommand(input, options = {}) {
     const unknown = command.join(' '); const suggestions = suggestCommands(unknown);
     throw Object.assign(new Error(`Unknown command: ${unknown}${suggestions.length ? `. Did you mean: ${suggestions.join(', ')}?` : ''}`), { code: 'UNKNOWN_COMMAND', exitCode: 2, details: suggestions.length ? { suggestions } : undefined });
   } finally { await runtime.shutdown(); }
+}
+
+function isRestOnlyCommand(command) {
+  return command[0] === 'guilds' && (command[1] === 'list' || command[1] === 'get');
 }
