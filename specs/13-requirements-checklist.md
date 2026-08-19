@@ -15,7 +15,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports explicit async helpers including `sleep` and `parallel`.
 - [Fully complete] Discript supports conditionals, comparisons, arithmetic, bounded `while` loops, and bounded `for-in` loops.
 - [Fully complete] Discript supports arrow callback syntax, callback blocks, and general-purpose async `map`, `filter`, and `reduce` helpers.
-- [Half complete] Discript supports reusable `fn` functions and `return`; imports and reusable script modules remain.
+- [Fully complete] Discript supports reusable `fn` functions, `return`, and shared-scope source imports.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.
 - [Fully complete] Finite CLI executions shut down their Discord client.

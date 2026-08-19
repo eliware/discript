@@ -111,6 +111,13 @@ fn announce(name) {
 print(announce("Discord"))
 ```
 
+Reusable source files can be loaded into the current script scope:
+
+```text
+import "./shared.discript"
+print(announce("Discord"))
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
