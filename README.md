@@ -202,6 +202,12 @@ Direct dry-runs validate command-specific required fields and return a structure
 npm start -- channels create --guild <guild-id> --name preview --dry-run --json
 ```
 
+Add `--validate` to connect, resolve the target, and check permissions while still preventing the mutation:
+
+```sh
+npm start -- channels create --guild <guild-id> --name preview --dry-run --validate --json
+```
+
 Messages can be read or changed with explicit approval for writes:
 
 ```sh

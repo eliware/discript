@@ -120,12 +120,13 @@ async function executeDirectCommand(command, options) {
   if (command.join(' ') === 'commands list') return commandCatalog();
   if (command[0] === 'completion') return completionScript(command[1] ?? 'bash');
   if (options.dry_run) {
-    return previewMutation(command, options);
+    const preview = previewMutation(command, options);
+    if (!options.validate) return preview;
   }
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
   try {
-    const api = createDiscordApi(runtime.client, options);
+    const api = createDiscordApi(runtime.client, { ...options, dryRun: options.dry_run === true });
     if (command[0] === 'bot' && command[1] === 'get') return api.bot.get();
     if (command.join(' ') === 'guilds list') return api.guilds.list();
     if (command[0] === 'guilds' && command[1] === 'get') {

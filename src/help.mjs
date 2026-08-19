@@ -16,6 +16,7 @@ export function helpText() {
     `  --output jsonl       Emit one JSON value per line\n` +
     `  --pretty             Emit human-readable output\n` +
     `  --dry-run            Preview supported mutations\n` +
+    `  --validate           With --dry-run, resolve targets and permissions\n` +
     `  -y, --yes            Approve mutations\n` +
     `  --timeout <ms>       Set an execution timeout\n` +
     `  -h, --help           Show this help\n` +
