@@ -102,6 +102,15 @@ names = map(members, member => member.username)
 active = filter(members, member => member.roles != null)
 ```
 
+Reusable script functions use `fn` and `return`:
+
+```text
+fn announce(name) {
+  return "Hello " + name
+}
+print(announce("Discord"))
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
