@@ -107,6 +107,7 @@ export async function evaluate(program, globals = {}, { scope: sharedScope } = {
         const value = await evaluateBlock(expression.body);
         return { ok: true, exitCode: 0, value };
       } catch (error) {
+        if (error instanceof ScriptExit) throw error;
         scope.set(expression.binding, normalizeError(error));
         await evaluateBlock(expression.handler);
         return { ok: false, exitCode: error?.exitCode ?? 1, error: normalizeError(error) };
