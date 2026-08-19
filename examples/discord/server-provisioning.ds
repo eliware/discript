@@ -1,11 +1,5 @@
 // Repeatable server provisioning template.
 //
-// Current limitation: Discript's channel API creates text channels only and
-// does not yet expose category creation or channel-parent assignment. The
-// channels below are therefore created at the guild root until that capability
-// is added. The rest of the template is intentionally explicit so it can be
-// adapted to category-aware APIs later.
-//
 // Preview by default. To apply, set DISCORD_PROVISION=true and run with a bot
 // that has ManageChannels, ManageRoles, and the required message permissions.
 
@@ -22,6 +16,13 @@ fn options() {
   return {dryRun: true}
 }
 
+fn channelOptions(parent, type) {
+  if (approved == "true") {
+    return {force: true, parent: parent, type: type}
+  }
+  return {dryRun: true, parent: parent, type: type}
+}
+
 fn show(label, result) {
   print({step: label, result: result})
   return result
@@ -36,13 +37,18 @@ adminRole = show("role-admin", guild.roles.create("Server Admin", options()))
 moderatorRole = show("role-moderator", guild.roles.create("Moderator", options()))
 memberRole = show("role-member", guild.roles.create("Member", options()))
 
-// Root-level text channels. These names represent the intended categories.
-rules = show("channel-rules", guild.channels.create("rules", options()))
-welcome = show("channel-welcome", guild.channels.create("welcome", options()))
-announcements = show("channel-announcements", guild.channels.create("announcements", options()))
-general = show("channel-general", guild.channels.create("general", options()))
-support = show("channel-support", guild.channels.create("support", options()))
-modLog = show("channel-mod-log", guild.channels.create("mod-log", options()))
+// Categories and their child channels.
+information = show("category-information", guild.channels.create("Information", channelOptions(null, "category")))
+community = show("category-community", guild.channels.create("Community", channelOptions(null, "category")))
+voiceCategory = show("category-voice", guild.channels.create("Voice", channelOptions(null, "category")))
+
+rules = show("channel-rules", guild.channels.create("rules", channelOptions(information.id, "text")))
+welcome = show("channel-welcome", guild.channels.create("welcome", channelOptions(information.id, "text")))
+announcements = show("channel-announcements", guild.channels.create("announcements", channelOptions(information.id, "text")))
+general = show("channel-general", guild.channels.create("general", channelOptions(community.id, "text")))
+support = show("channel-support", guild.channels.create("support", channelOptions(community.id, "text")))
+modLog = show("channel-mod-log", guild.channels.create("mod-log", channelOptions(information.id, "text")))
+voice = show("channel-voice", guild.channels.create("Lounge", channelOptions(voiceCategory.id, "voice")))
 
 if (approved != "true") {
   print({mode: "preview", next: "set DISCORD_PROVISION=true to apply this plan"})

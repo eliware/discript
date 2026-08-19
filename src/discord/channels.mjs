@@ -6,10 +6,11 @@ export function createChannelsApi({ client, dryRun, mapCache, normalizeChannel, 
         return {
           ...normalizeChannel(channel),
           update: async (settings = {}, operationOptions = {}) => {
-            if (!settings.name && settings.topic === undefined) throw Object.assign(new Error('Channel update requires name or topic.'), { code: 'CHANNEL_FIELDS_REQUIRED', exitCode: 2 });
+            if (!settings.name && settings.topic === undefined && settings.parent === undefined && settings.category === undefined && settings.position === undefined && settings.uncategorized !== true) throw Object.assign(new Error('Channel update requires name, topic, parent, category, position, or uncategorized.'), { code: 'CHANNEL_FIELDS_REQUIRED', exitCode: 2 });
             requireChannelPermission(channel.id, 'ManageChannels');
             requireApproval('Updating a channel', operationOptions);
-            const changes = { ...(settings.name ? { name: String(settings.name) } : {}), ...(settings.topic !== undefined ? { topic: settings.topic === null ? null : String(settings.topic) } : {}) };
+            const parent = settings.uncategorized === true ? null : (settings.parent ?? settings.category);
+            const changes = { ...(settings.name ? { name: String(settings.name) } : {}), ...(settings.topic !== undefined ? { topic: settings.topic === null ? null : String(settings.topic) } : {}), ...(parent !== undefined || settings.uncategorized === true ? { parent: parent || null } : {}), ...(settings.position !== undefined ? { position: Number(settings.position) } : {}) };
             if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, ...changes, updated: true };
             if (!channel.edit) throw Object.assign(new Error('Channel editing is unavailable.'), { code: 'CHANNELS_UNSUPPORTED', exitCode: 1 });
             return { ...normalizeChannel(await channel.edit(changes, operationOptions.reason)), ...changes, updated: true };

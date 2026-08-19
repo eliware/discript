@@ -28,6 +28,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript emits machine-readable JSON results and structured JSON errors on stderr.
 - [Fully complete] Discript emits opt-in structured JSONL records with `--output jsonl`, including incremental script output.
 - [Fully complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
+- [Fully complete] Channel provisioning supports text, voice, and category creation, parent assignment/removal, and explicit position changes through scripts and CLI options.
 - [Fully complete] Discript covers threads, invites, emoji/sticker lifecycle operations, scheduled events, guarded voice join/leave/status operations, and member voice controls.
 - [Fully complete] Discript exposes normalized bot identity through the API and `bot get` command.
 - [Fully complete] Discript enforces Discord permissions and authorization safeguards across current mutation groups, including messages, threads, webhooks, invites, roles, moderation, channels, events, expressions, and voice/member controls.

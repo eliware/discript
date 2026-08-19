@@ -2,10 +2,12 @@ export function createGuildChannelsApi({ guild, client, dryRun, mapCache, normal
   return {
             list: () => guild.channels.cache.map(normalizeChannel),
             create: async (name, operationOptions = {}) => {
+              const type = normalizeChannelType(operationOptions.type);
+              const parent = operationOptions.parent ?? operationOptions.category ?? undefined;
               requirePermission(guild, 'ManageChannels');
               requireApproval('Creating a channel', operationOptions);
-              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, name, type: 0 };
-              return normalizeChannel(await guild.channels.create({ name: String(name), type: 0 }));
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, name, type, ...(parent !== undefined ? { parentId: parent ?? null } : {}), ...(operationOptions.position !== undefined ? { position: Number(operationOptions.position) } : {}) };
+              return normalizeChannel(await guild.channels.create({ name: String(name), type, ...(parent !== undefined ? { parent: parent || null } : {}), ...(operationOptions.position !== undefined ? { position: Number(operationOptions.position) } : {}) }));
             },
             get: channelId => {
               const channel = guild.channels.cache.get(String(channelId));
@@ -13,10 +15,11 @@ export function createGuildChannelsApi({ guild, client, dryRun, mapCache, normal
               return {
                 ...normalizeChannel(channel),
                 update: async (settings = {}, operationOptions = {}) => {
-                  if (!settings.name && settings.topic === undefined) throw Object.assign(new Error('Channel update requires name or topic.'), { code: 'CHANNEL_FIELDS_REQUIRED', exitCode: 2 });
+                  if (!settings.name && settings.topic === undefined && settings.parent === undefined && settings.category === undefined && settings.position === undefined && settings.uncategorized !== true) throw Object.assign(new Error('Channel update requires name, topic, parent, category, position, or uncategorized.'), { code: 'CHANNEL_FIELDS_REQUIRED', exitCode: 2 });
                   requirePermission(guild, 'ManageChannels');
                   requireApproval('Updating a channel', operationOptions);
-                  const changes = { ...(settings.name ? { name: String(settings.name) } : {}), ...(settings.topic !== undefined ? { topic: settings.topic === null ? null : String(settings.topic) } : {}) };
+                  const parent = settings.uncategorized === true ? null : (settings.parent ?? settings.category);
+                  const changes = { ...(settings.name ? { name: String(settings.name) } : {}), ...(settings.topic !== undefined ? { topic: settings.topic === null ? null : String(settings.topic) } : {}), ...(parent !== undefined || settings.uncategorized === true ? { parent: parent || null } : {}), ...(settings.position !== undefined ? { position: Number(settings.position) } : {}) };
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, ...changes, updated: true };
                   if (!channel.edit) throw Object.assign(new Error('Channel editing is unavailable.'), { code: 'CHANNELS_UNSUPPORTED', exitCode: 1 });
                   return { ...normalizeChannel(await channel.edit(changes, operationOptions.reason)), ...changes, updated: true };
@@ -95,4 +98,13 @@ export function createGuildChannelsApi({ guild, client, dryRun, mapCache, normal
               };
             },
           };
+}
+
+function normalizeChannelType(type = 'text') {
+  if (type === undefined || type === null || type === 'text') return 0;
+  if (type === 'voice') return 2;
+  if (type === 'category') return 4;
+  const numeric = Number(type);
+  if ([0, 2, 4].includes(numeric)) return numeric;
+  throw Object.assign(new Error(`Unsupported channel type: ${type}. Use text, voice, or category.`), { code: 'CHANNEL_TYPE_INVALID', exitCode: 2 });
 }
