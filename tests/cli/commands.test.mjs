@@ -4,7 +4,9 @@ import { createDiscordApi } from '../../src/discord.mjs';
 
 
 
-describe('capability lookup', () => {
+// Cross-cutting coverage intentionally stays here because it verifies the
+// normalized relationship between multiple command API domains.
+describe('cross-cutting capability lookup', () => {
   test('returns normalized guild and channel values', () => {
     const channel = { id: '2', name: 'general', type: 0 };
     const guild = { id: '1', name: 'test', channels: { cache: new Map([['2', channel]]) } };
