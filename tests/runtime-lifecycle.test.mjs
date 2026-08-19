@@ -32,4 +32,12 @@ describe('Discord runtime lifecycle', () => {
     expect(client.listenerCount('clientReady')).toBe(0);
     expect(client.listenerCount('error')).toBe(0);
   });
+
+  test('rejects a login that does not become ready before the timeout', async () => {
+    const client = new EventEmitter();
+    client.login = async () => 'pending';
+    await expect(createDiscordRuntime({ token: 'test-token', client, loginTimeout: 1 })).rejects.toMatchObject({ code: 'DISCORD_LOGIN_TIMEOUT', exitCode: 4 });
+    expect(client.listenerCount('clientReady')).toBe(0);
+    expect(client.listenerCount('error')).toBe(0);
+  });
 });
