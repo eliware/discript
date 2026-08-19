@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.0.4
+
+- Decomposed parser, evaluator, Discord API, CLI command, and test modules into focused one-to-one files.
+- Added CLI command handler test coverage and completed 100x4 coverage for evaluator expressions, evaluator control flow, and Discord safety.
+- Added command validation, preview, dispatch, and compatibility-barrel structure for maintainable CLI evolution.
+
 ## 1.0.3
 
 Fix the package-install smoke check on Windows runners by using the platform-specific npm and CLI command names.
