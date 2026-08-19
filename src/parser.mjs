@@ -65,6 +65,16 @@ export function parse(source) {
 
   function parsePrimary() {
     const token = peek();
+    if (token?.type === 'identifier' && token.value === 'try') {
+      index += 1;
+      const body = parseBlock();
+      if (peek()?.type !== 'identifier' || peek().value !== 'catch') throw syntaxError('Expected `catch` after `try` block.');
+      index += 1;
+      consume('(', 'Expected `(` after `catch`.');
+      const binding = consume('identifier', 'Expected a catch variable.');
+      consume(')', 'Expected `)` after catch variable.');
+      return { type: 'TryExpression', body, binding: binding.value, handler: parseBlock() };
+    }
     if (token?.type === 'string' || token?.type === 'number') { index += 1; return { type: 'Literal', value: token.value }; }
     if (token?.type === 'identifier') {
       index += 1;

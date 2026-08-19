@@ -22,7 +22,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript supports dry-run previews for state mutations.
 - [Half complete] Destructive operations require explicit force approval.
 - [Half complete] CLI commands return stable process exit codes.
-- [Half complete] Scripts can capture operation exit codes and branch on them internally.
+- [Fully complete] Scripts can capture operation exit codes and branch on them internally.
 - [Half complete] Scripts can explicitly terminate with a chosen exit code and message.
 - [Half complete] Discript emits machine-readable JSON results.
 - [Not started] Discript emits structured JSONL streams for long-running execution.

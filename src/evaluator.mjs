@@ -1,10 +1,12 @@
 export async function evaluate(program, globals = {}) {
   const scope = new Map(Object.entries(globals));
-  let result;
-  for (const statement of program.body) {
-    result = await evaluateStatement(statement);
+  return evaluateBlock(program.body);
+
+  async function evaluateBlock(statements) {
+    let result;
+    for (const statement of statements) result = await evaluateStatement(statement);
+    return result;
   }
-  return result;
 
   async function evaluateStatement(statement) {
     if (statement.type === 'Assignment') {
@@ -33,6 +35,16 @@ export async function evaluate(program, globals = {}) {
 
   async function evaluateExpression(expression) {
     if (expression.type === 'Literal') return expression.value;
+    if (expression.type === 'TryExpression') {
+      try {
+        const value = await evaluateBlock(expression.body);
+        return { ok: true, exitCode: 0, value };
+      } catch (error) {
+        scope.set(expression.binding, normalizeError(error));
+        await evaluateBlock(expression.handler);
+        return { ok: false, exitCode: error?.exitCode ?? 1, error: normalizeError(error) };
+      }
+    }
     if (expression.type === 'BinaryExpression') {
       const left = await evaluateExpression(expression.left);
       const right = await evaluateExpression(expression.right);
@@ -71,6 +83,10 @@ export async function evaluate(program, globals = {}) {
 }
 
 function runtimeError(message) { return Object.assign(new Error(message), { code: 'RUNTIME_ERROR', exitCode: 1 }); }
+
+function normalizeError(error) {
+  return { code: error?.code ?? 'DISCRIPT_ERROR', message: error?.message ?? String(error), exitCode: error?.exitCode ?? 1 };
+}
 
 export class ScriptExit extends Error {
   constructor(exitCode = 0, message = null) {
