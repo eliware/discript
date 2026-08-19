@@ -152,6 +152,17 @@ on("messageCreate") {
 
 When a script registers one or more handlers, it remains running until a termination signal is received; `--timeout <milliseconds>` can bound that lifetime for automation.
 
+Scripts can read and modify the environment of the running Node process. Use property access or the explicit methods:
+
+```text
+guildId = env.TEST_GUILD
+tokenHint = env.get("DISCRIPT_MODE")
+env.set("DISCRIPT_LAST_RUN", "agent")
+env.clear("DISCRIPT_TEMP")
+```
+
+Environment values are strings; missing variables return `null`. Avoid printing secrets such as `DISCORD_TOKEN`.
+
 Use bounded `for-in` loops to process result collections:
 
 ```text

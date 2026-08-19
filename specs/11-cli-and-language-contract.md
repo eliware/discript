@@ -59,3 +59,5 @@ The CLI is responsible for input selection, option parsing, output formatting, a
 Machine-readable results shall be written to stdout. Diagnostics shall be written to stderr where practical.
 
 Failures shall provide a stable error code, a useful message, and a nonzero exit status. Credentials and other sensitive configuration shall never appear in results, diagnostics, or errors.
+
+Scripts receive a read/write `env` standard-library object backed by the Node process environment. Environment variables may be read with `env.NAME` or `env.get("NAME")`, written with `env.set("NAME", value)` or `env.NAME = value`, and removed with `env.clear("NAME")`. Variable names must be valid environment identifiers.

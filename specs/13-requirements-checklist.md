@@ -10,6 +10,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript accepts source through standard input.
 - [Fully complete] Discript supports direct resource-operation commands.
 - [Fully complete] Discript supports variables and sequential result reuse.
+- [Fully complete] Discript scripts can read, set, and clear Node process environment variables through the `env` standard library object.
 - [Fully complete] Discript supports structured values, arrays, objects, basic collection helpers, and bounded `for-in` iteration.
 - [Fully complete] Discript supports asynchronous operations.
 - [Fully complete] Discript supports explicit async helpers including `sleep` and `parallel`.

@@ -12,6 +12,13 @@ describe('evaluate', () => {
     })).resolves.toEqual({ id: '123' });
   });
 
+  test('supports environment globals supplied by the host', async () => {
+    const values = {};
+    const env = (await import('../src/env.mjs')).createEnvironment(values);
+    await expect(evaluate(parse('env.set("DISCRIPT_TEST", "ok"); env.DISCRIPT_TEST'), { env })).resolves.toBe('ok');
+    expect(values.DISCRIPT_TEST).toBe('ok');
+  });
+
   test('supports asynchronous calls', async () => {
     await expect(evaluate(parse('source.get()'), {
       source: { get: async () => 'ready' },

@@ -1,0 +1,9 @@
+// Environment values come from the Node process running Discript.
+mode = env.get("DISCRIPT_MODE")
+if (mode == null) {
+  env.set("DISCRIPT_MODE", "development")
+}
+
+print({mode: env.DISCRIPT_MODE})
+env.set("DISCRIPT_LAST_RUN", "environment-example")
+env.clear("DISCRIPT_TEMP")
