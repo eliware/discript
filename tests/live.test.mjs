@@ -76,4 +76,18 @@ describe('live Discord integration', () => {
       await runtime.shutdown();
     }
   }, 30000);
+
+  (live ? test : test.skip)('lists channel webhooks without mutation', async () => {
+    const config = loadConfig();
+    const runtime = await createDiscordRuntime({ token: config.token });
+    try {
+      const textChannel = [...runtime.client.channels.cache.values()].find(channel => channel.guild?.id === config.testGuild && channel.type === 0);
+      expect(textChannel).toBeTruthy();
+      const webhooks = await createDiscordApi(runtime.client).channels.get(textChannel.id).webhooks.list();
+      expect(Array.isArray(webhooks)).toBe(true);
+      expect(webhooks.every(webhook => webhook.channelId === textChannel.id)).toBe(true);
+    } finally {
+      await runtime.shutdown();
+    }
+  }, 30000);
 });
