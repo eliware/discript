@@ -6,6 +6,17 @@ Discript has two Discord transport modes:
 
 One-shot commands should use Discord’s HTTP REST API whenever the operation does not need a live event stream. REST mode avoids opening a Gateway session, so repeated commands do not consume Gateway identify capacity or leave WebSocket clients running.
 
+Use `--rest` for supported resource operations:
+
+```bash
+discript --rest guilds list --json
+discript --rest channels list --guild "$TEST_GUILD" --json
+discript --rest messages send --channel "$CHANNEL_ID" --content "hello"
+discript --rest channels delete --channel "$CHANNEL_ID" --yes
+```
+
+REST mutations use the same safety rules as Gateway-backed mutations. `--dry-run` returns the planned HTTP method, route, and body without sending a request; destructive routes require `--yes` or `-y`.
+
 ## Gateway mode
 
 Scripts that register event handlers, use ongoing timers, or explicitly require a live cache use a Discord Gateway client. Gateway connections are persistent and consume session-start capacity when they identify. They must always have a bounded startup timeout and cleanup on every failed startup path.
