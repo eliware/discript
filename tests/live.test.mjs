@@ -1,6 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import { createDiscordRuntime } from '../src/runtime.mjs';
 import { createDiscordApi } from '../src/discord.mjs';
+import { run } from '../src/cli.mjs';
 import { loadConfig, requireTestGuild } from '../src/config.mjs';
 
 const live = process.env.DISCRIPT_LIVE === '1';
@@ -33,5 +34,13 @@ describe('live Discord integration', () => {
     } finally {
       await runtime.shutdown();
     }
+  }, 30000);
+
+  (live ? test : test.skip)('validates a direct dry-run through the CLI without mutation', async () => {
+    const config = loadConfig();
+    const output = [];
+    const result = await run(['channels', 'create', '--guild', requireTestGuild(config), '--name', 'discript-live-preview', '--dry-run', '--validate', '--json'], { stdout: value => output.push(value), stdin: { isTTY: true } });
+    expect(result).toMatchObject({ dryRun: true, guildId: config.testGuild, name: 'discript-live-preview' });
+    expect(output).toHaveLength(1);
   }, 30000);
 });
