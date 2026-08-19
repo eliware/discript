@@ -10,4 +10,9 @@ describe('direct dry-run validation', () => {
   test('reports missing fields in dry-run mode', async () => {
     await expect(run(['messages', 'delete', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'MESSAGE_REQUIRED', exitCode: 2 });
   });
+
+  test('validates emoji and sticker mutation fields in dry-run mode', async () => {
+    await expect(run(['emojis', 'create', '--dry-run', '--guild', '123', '--name', 'wave'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'FILE_REQUIRED', exitCode: 2 });
+    await expect(run(['stickers', 'create', '--dry-run', '--guild', '123', '--name', 'wave', '--file', '/tmp/wave.png'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'TAGS_REQUIRED', exitCode: 2 });
+  });
 });

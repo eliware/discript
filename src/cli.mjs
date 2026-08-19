@@ -152,13 +152,25 @@ async function executeDirectCommand(command, options) {
       if (!options.role) throw Object.assign(new Error('roles get requires --role <id>.'), { code: 'ROLE_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).roles.get(options.role);
     }
-    if (command[0] === 'emojis' && command[1] === 'list') {
+    if (command[0] === 'emojis' && ['list', 'get', 'create', 'update', 'delete'].includes(command[1])) {
       if (!options.guild) throw Object.assign(new Error('emojis list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
-      return api.guilds.get(options.guild).emojis.list();
+      const emojis = api.guilds.get(options.guild).emojis;
+      if (command[1] === 'list') return emojis.list();
+      if (command[1] === 'get') { if (!options.emoji) throw Object.assign(new Error('emojis get requires --emoji <id>.'), { code: 'EMOJI_REQUIRED', exitCode: 2 }); return emojis.get(options.emoji); }
+      if (command[1] === 'create') { if (!options.name || !options.file) throw Object.assign(new Error('emojis create requires --name and --file.'), { code: 'EMOJI_FIELDS_REQUIRED', exitCode: 2 }); return emojis.create({ name: options.name, attachment: options.file }); }
+      if (!options.emoji) throw Object.assign(new Error(`emojis ${command[1]} requires --emoji <id>.`), { code: 'EMOJI_REQUIRED', exitCode: 2 });
+      if (command[1] === 'update') { if (!options.name) throw Object.assign(new Error('emojis update requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 }); return emojis.update(options.emoji, { name: options.name }); }
+      return emojis.delete(options.emoji);
     }
-    if (command[0] === 'stickers' && command[1] === 'list') {
+    if (command[0] === 'stickers' && ['list', 'get', 'create', 'update', 'delete'].includes(command[1])) {
       if (!options.guild) throw Object.assign(new Error('stickers list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
-      return api.guilds.get(options.guild).stickers.list();
+      const stickers = api.guilds.get(options.guild).stickers;
+      if (command[1] === 'list') return stickers.list();
+      if (command[1] === 'get') { if (!options.sticker) throw Object.assign(new Error('stickers get requires --sticker <id>.'), { code: 'STICKER_REQUIRED', exitCode: 2 }); return stickers.get(options.sticker); }
+      if (command[1] === 'create') { if (!options.name || !options.file || !options.tags) throw Object.assign(new Error('stickers create requires --name, --file, and --tags.'), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 }); return stickers.create({ name: options.name, file: options.file, tags: options.tags, description: options.description }); }
+      if (!options.sticker) throw Object.assign(new Error(`stickers ${command[1]} requires --sticker <id>.`), { code: 'STICKER_REQUIRED', exitCode: 2 });
+      if (command[1] === 'update') { if (!options.name && !options.description && !options.tags) throw Object.assign(new Error('stickers update requires --name, --description, or --tags.'), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 }); return stickers.update(options.sticker, { name: options.name, description: options.description, tags: options.tags }); }
+      return stickers.delete(options.sticker);
     }
     if (command[0] === 'events' && command[1] === 'list') {
       if (!options.guild) throw Object.assign(new Error('events list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
@@ -326,6 +338,8 @@ function previewMutation(command, options) {
     if (command[0] === 'channels' && ['create'].includes(command[1])) requireGuild();
     if (command[0] === 'invites' && command[1] === 'create') requireGuild();
     if (command[0] === 'events' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
+    if (command[0] === 'emojis' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
+    if (command[0] === 'stickers' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
   };
   requireMutationTarget();
   if (command[0] === 'roles' && ['add', 'remove'].includes(command[1])) { requireUser(); requireRole(); }
@@ -341,6 +355,12 @@ function previewMutation(command, options) {
   if (command[0] === 'events' && command[1] === 'create') { requireOption('name', 'NAME_REQUIRED'); requireOption('start', 'START_REQUIRED'); }
   if (command[0] === 'events' && command[1] === 'update') { requireEvent(); if (!options.name && !options.description && !options.start) throw Object.assign(new Error(`${action} requires --name, --description, or --start.`), { code: 'EVENT_FIELDS_REQUIRED', exitCode: 2 }); }
   if (command[0] === 'events' && command[1] === 'delete') requireEvent();
+  if (command[0] === 'emojis' && ['get', 'update', 'delete'].includes(command[1])) requireOption('emoji', 'EMOJI_REQUIRED');
+  if (command[0] === 'emojis' && ['create', 'update'].includes(command[1])) requireOption('name', 'NAME_REQUIRED');
+  if (command[0] === 'emojis' && command[1] === 'create') requireOption('file', 'FILE_REQUIRED');
+  if (command[0] === 'stickers' && ['get', 'update', 'delete'].includes(command[1])) requireOption('sticker', 'STICKER_REQUIRED');
+  if (command[0] === 'stickers' && command[1] === 'create') { requireOption('name', 'NAME_REQUIRED'); requireOption('file', 'FILE_REQUIRED'); requireOption('tags', 'TAGS_REQUIRED'); }
+  if (command[0] === 'stickers' && command[1] === 'update' && !options.name && !options.description && !options.tags) throw Object.assign(new Error(`${action} requires --name, --description, or --tags.`), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
   if (command[0] === 'voice' && command[1] === 'join') requireChannel();
   if (command[0] === 'voice' && command[1] === 'leave') requireGuild();
   return { dryRun: true, action, command, parameters: Object.fromEntries(Object.entries(options).filter(([key]) => !['json', 'pretty', 'dry_run', 'yes'].includes(key))) };

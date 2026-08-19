@@ -53,4 +53,15 @@ describe('Discord capability layer', () => {
     expect(emojiCreate).not.toHaveBeenCalled();
     expect(stickerCreate).not.toHaveBeenCalled();
   });
+
+  test('requires ManageExpressions for expression mutations', async () => {
+    const guild = {
+      id: '1', members: { me: { permissions: { has: () => false } } },
+      emojis: { cache: new Map([['e1', { id: 'e1', name: 'old' }]]), create: jest.fn() },
+      stickers: { cache: new Map([['s1', { id: 's1', name: 'old' }]]), create: jest.fn() },
+    };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true });
+    await expect(api.guilds.get('1').emojis.create({ name: 'new', attachment: '/tmp/a.png' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+    await expect(api.guilds.get('1').stickers.create({ name: 'new', file: '/tmp/a.png', tags: '😀' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
 });

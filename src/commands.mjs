@@ -1,6 +1,6 @@
 export const COMMANDS = [
   'bot get', 'guilds list', 'guilds get', 'members list', 'members get', 'roles list', 'roles get', 'roles create', 'roles update', 'roles delete', 'roles add', 'roles remove',
-  'emojis list', 'stickers list', 'invites list', 'invites create', 'invites delete',
+  'emojis list', 'emojis get', 'emojis create', 'emojis update', 'emojis delete', 'stickers list', 'stickers get', 'stickers create', 'stickers update', 'stickers delete', 'invites list', 'invites create', 'invites delete',
   'events list', 'events create', 'events update', 'events delete', 'voice status', 'voice join', 'voice leave',
   'channels list', 'channels get', 'channels create', 'channels delete', 'threads list', 'threads create', 'threads archive',
   'messages send', 'messages get', 'messages edit', 'messages delete', 'messages react', 'messages pin', 'messages unpin', 'messages bulk-delete',
