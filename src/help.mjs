@@ -1,4 +1,7 @@
-export const VERSION = '1.0.0';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+export const VERSION = require('../package.json').version;
 
 export function helpText() {
   return `Usage: discript [options] [script-file]\n\n` +

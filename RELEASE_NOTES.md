@@ -1,5 +1,12 @@
 # Release Notes
 
+## Unreleased
+
+- Added runtime and CLI integration coverage, mutation safety matrix coverage, and complete direct command-handler tests.
+- Added deterministic live smoke coverage against `TEST_GUILD`, including reversible mutation cleanup and bounded Discord login failures.
+- Added documentation drift checks to CI, executable example tests, and npm packaging for the full `docs/` tree.
+- Fixed Windows path handling in documentation, executable-example, and package archive verification checks.
+
 ## 1.0.4
 
 - Decomposed parser, evaluator, Discord API, CLI command, and test modules into focused one-to-one files.
