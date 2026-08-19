@@ -16,6 +16,7 @@ describe('Gateway broker', () => {
     client.destroy = jest.fn(async () => undefined);
     const broker = await startGatewayBroker({ token: 'test', endpoint, runtimeOptions: { client }, limits: { remaining: 1, resetAfter: 0 } });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'status' })).resolves.toEqual({ ok: true, ready: true });
+    await expect(brokerRequest({ token: 'test', endpoint, method: 'command', command: ['unknown'] })).resolves.toMatchObject({ ok: false, code: 'UNKNOWN_COMMAND', exitCode: 2 });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'shutdown' })).resolves.toEqual({ ok: true });
     await broker.close();
   });

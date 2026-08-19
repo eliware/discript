@@ -28,6 +28,7 @@ export async function run(argv = [], dependencies = {}) {
   if (options.help) return stdout(helpText());
   if (options.version) return stdout(VERSION);
   if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
+  if (options.broker && positionals.length > 0) return runBrokerCommand(positionals, options, stdout);
 
   const source = await readSource(positionals, options, stdin);
   validateTimeout(options.timeout);
@@ -44,6 +45,15 @@ export async function run(argv = [], dependencies = {}) {
     shutdownHook?.removeHandlers?.();
     errors.removeHandlers();
   }
+}
+
+async function runBrokerCommand(command, options, stdout) {
+  const token = loadConfig().token;
+  if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
+  const result = await brokerRequest({ token, method: 'command', command, options });
+  if (!result.ok) throw Object.assign(new Error(result.error), { code: result.code, exitCode: result.exitCode ?? 1 });
+  if (result.value !== undefined) stdout(result.value);
+  return result.value;
 }
 
 async function runDaemon(action, options, stdout) {

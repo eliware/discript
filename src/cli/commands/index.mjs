@@ -22,7 +22,7 @@ import { createVoiceUsersHandler } from './voice-users.mjs';
 import { createDiscordRest } from '../../rest.mjs';
 import { createRestDiscordApi, executeRestOperation, executeRestRead } from '../../rest-api.mjs';
 const handlers = [createBotHandler, createGuildsHandler, createMembersHandler, createRolesHandler, createChannelsHandler, createMessagesHandler, createModerationHandler, createEmojisHandler, createStickersHandler, createEventsHandler, createInvitesHandler, createThreadsHandler, createWebhooksHandler, createPermissionsHandler, createVoiceHandler, createVoiceUsersHandler];
-export async function executeDirectCommand(input, options = {}) {
+export async function executeDirectCommand(input, options = {}, dependencies = {}) {
   const command = normalizeCommand(input);
   const catalog = createCatalogHandler(command, options); if (catalog.handled) return catalog.value;
   const preview = createPreviewHandler(command, options); if (preview.handled) return preview.value;
@@ -50,14 +50,15 @@ export async function executeDirectCommand(input, options = {}) {
     const value = await executeRestRead(command, options, rest);
     if (value !== undefined) return value;
   }
-  const runtime = await createDiscordRuntime();
+  const runtime = dependencies.runtime ?? await createDiscordRuntime();
+  const ownsRuntime = !dependencies.runtime;
   try {
     const api = createDiscordApi(runtime.client, { ...options, dryRun: options.dry_run === true });
     const context = { command, options, api };
     for (const handler of handlers) { const result = handler(context); if (result.handled) return await result.value; }
     const unknown = command.join(' '); const suggestions = suggestCommands(unknown);
     throw Object.assign(new Error(`Unknown command: ${unknown}${suggestions.length ? `. Did you mean: ${suggestions.join(', ')}?` : ''}`), { code: 'UNKNOWN_COMMAND', exitCode: 2, details: suggestions.length ? { suggestions } : undefined });
-  } finally { await runtime.shutdown(); }
+  } finally { if (ownsRuntime) await runtime.shutdown(); }
 }
 
 function isRestOnlyCommand(command) {

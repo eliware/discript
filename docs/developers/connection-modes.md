@@ -13,6 +13,7 @@ discript --rest guilds list --json
 discript --rest channels list --guild "$TEST_GUILD" --json
 discript --rest messages send --channel "$CHANNEL_ID" --content "hello"
 discript --rest channels delete --channel "$CHANNEL_ID" --yes
+discript --broker guilds list --json
 ```
 
 REST mutations use the same safety rules as Gateway-backed mutations. `--dry-run` returns the planned HTTP method, route, and body without sending a request; destructive routes require `--yes` or `-y`.
@@ -37,3 +38,5 @@ The Gateway limits helper exposes Discord’s current `remaining`, `reset_after`
 | Timers and loops without events | No Discord transport after startup | No |
 
 The implementation should select the lightest transport that satisfies the operation. A command must not open Gateway solely because it performs a normal REST mutation.
+
+Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one.

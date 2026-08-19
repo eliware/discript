@@ -48,13 +48,18 @@ async function handleBrokerRequest(line, socket, runtime) {
     const request = JSON.parse(line);
     if (request.method === 'status') reply(socket, { ok: true, ready: runtime.client.isReady?.() ?? true });
     else if (request.method === 'shutdown') { reply(socket, { ok: true }); await runtime.shutdown(); }
+    else if (request.method === 'command') {
+      const { executeDirectCommand } = await import('./cli/commands/index.mjs');
+      const value = await executeDirectCommand(request.command, request.options ?? {}, { runtime });
+      reply(socket, { ok: true, value });
+    }
     else reply(socket, { ok: false, error: 'Unknown broker method.' });
-  } catch (error) { reply(socket, { ok: false, error: error.message }); }
+  } catch (error) { reply(socket, { ok: false, error: error.message, code: error.code, exitCode: error.exitCode }); }
 }
 
 function reply(socket, value) { socket.write(`${JSON.stringify(value)}\n`); }
 
-export async function brokerRequest({ token, endpoint = brokerEndpoint(token), method, timeout = 5000 } = {}) {
+export async function brokerRequest({ token, endpoint = brokerEndpoint(token), method, timeout = 5000, ...payload } = {}) {
   return await new Promise((resolve, reject) => {
     const socket = net.createConnection(endpoint);
     let buffer = '';
@@ -62,6 +67,6 @@ export async function brokerRequest({ token, endpoint = brokerEndpoint(token), m
     socket.setEncoding('utf8');
     socket.on('data', data => { buffer += data; const newline = buffer.indexOf('\n'); if (newline < 0) return; clearTimeout(timer); socket.end(); resolve(JSON.parse(buffer.slice(0, newline))); });
     socket.on('error', error => { clearTimeout(timer); reject(Object.assign(new Error(`Gateway broker is unavailable: ${error.message}`), { code: 'BROKER_UNAVAILABLE', exitCode: 1, cause: error })); });
-    socket.on('connect', () => socket.write(`${JSON.stringify({ method })}\n`));
+    socket.on('connect', () => socket.write(`${JSON.stringify({ method, ...payload })}\n`));
   });
 }
