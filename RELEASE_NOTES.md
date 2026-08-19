@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 1.0.5
 
 - Added runtime and CLI integration coverage, mutation safety matrix coverage, and complete direct command-handler tests.
 - Added deterministic live smoke coverage against `TEST_GUILD`, including reversible mutation cleanup and bounded Discord login failures.
