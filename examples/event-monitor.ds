@@ -1,0 +1,9 @@
+on("messageCreate") {
+  if (event.author.bot != true) {
+    print({channelId: event.channelId, content: event.content})
+  }
+}
+
+every(60000) {
+  print({status: "monitoring"})
+}

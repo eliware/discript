@@ -250,6 +250,8 @@ Run a script file:
 npm start -- examples/list-guilds.ds --json
 ```
 
+More agent-oriented templates are included in `examples/`: `safe-channel-workflow.ds` demonstrates preview/force/try/exit handling, and `event-monitor.ds` demonstrates persistent event and timer handlers.
+
 The current language slice supports literals, variables, property access, function calls, and sequential statements. The CLI and language runtime use the same Discord capability layer.
 
 ## Development

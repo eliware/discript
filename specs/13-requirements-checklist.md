@@ -38,5 +38,5 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript provides agent-oriented structured errors and diagnostics.
 - [Fully complete] Discript provides command discovery, common aliases, typo suggestions, and Bash/Zsh/Fish shell completions.
 - [Half complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
-- [Half complete] Discript has agent-focused examples and usage documentation.
+- [Fully complete] Discript has agent-focused examples and usage documentation covering discovery, guarded mutation workflows, exit handling, events, timers, callbacks, imports, and JSONL output.
 - [Half complete] Discript is packaged as a private installable CLI through Git SSH or `npm pack`; public publishing remains intentionally unset.
