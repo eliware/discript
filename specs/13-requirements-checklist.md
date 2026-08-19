@@ -11,7 +11,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports direct resource-operation commands.
 - [Fully complete] Discript supports variables and sequential result reuse.
 - [Fully complete] Discript supports structured values, arrays, objects, basic collection helpers, and bounded `for-in` iteration.
-- [Half complete] Discript supports asynchronous operations.
+- [Fully complete] Discript supports asynchronous operations.
 - [Fully complete] Discript supports explicit async helpers including `sleep` and `parallel`.
 - [Fully complete] Discript supports conditionals, comparisons, arithmetic, bounded `while` loops, and bounded `for-in` loops.
 - [Fully complete] Discript supports arrow callback syntax, callback blocks, and general-purpose async `map`, `filter`, and `reduce` helpers.

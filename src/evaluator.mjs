@@ -1,6 +1,17 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+
 export async function evaluate(program, globals = {}, { scope: sharedScope, baseDir = process.cwd() } = {}) {
-  const scope = sharedScope ?? new Map(Object.entries(globals));
-  return evaluateBlock(program.body);
+  const baseScope = sharedScope ?? new Map(Object.entries(globals));
+  const scopeContext = new AsyncLocalStorage();
+  const scope = new Proxy(baseScope, {
+    get(target, property) {
+      const current = scopeContext.getStore() ?? target;
+      const value = Reflect.get(current, property);
+      return typeof value === 'function' ? value.bind(current) : value;
+    },
+    set(target, property, value) { return Reflect.set(scopeContext.getStore() ?? target, property, value); },
+  });
+  return scopeContext.run(baseScope, () => evaluateBlock(program.body));
 
   async function evaluateBlock(statements) {
     let result;
@@ -11,21 +22,15 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
   async function evaluateStatement(statement) {
     if (statement.type === 'FunctionDeclaration') {
       const closure = async (...values) => {
-        const previous = new Map();
-        for (const [index, parameter] of statement.parameters.entries()) {
-          previous.set(parameter, { exists: scope.has(parameter), value: scope.get(parameter) });
-          scope.set(parameter, values[index]);
-        }
-        try { return await evaluateBlock(statement.body); }
-        catch (error) {
-          if (error instanceof ReturnSignal) return error.value;
-          throw error;
-        } finally {
-          for (const [parameter, state] of previous) {
-            if (state.exists) scope.set(parameter, state.value);
-            else scope.delete(parameter);
+        const localScope = new Map(scope);
+        for (const [index, parameter] of statement.parameters.entries()) localScope.set(parameter, values[index]);
+        return scopeContext.run(localScope, async () => {
+          try { return await evaluateBlock(statement.body); }
+          catch (error) {
+            if (error instanceof ReturnSignal) return error.value;
+            throw error;
           }
-        }
+        });
       };
       scope.set(statement.name, closure);
       return closure;
@@ -98,16 +103,11 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
     }
     if (expression.type === 'ArrowExpression') {
       return async value => {
-        const hadPrevious = scope.has(expression.parameter);
-        const previous = scope.get(expression.parameter);
-        scope.set(expression.parameter, value);
-        try {
-          if (expression.body.type === 'ExpressionBody') return await evaluateExpression(expression.body.body);
-          return await evaluateBlock(expression.body.body);
-        } finally {
-          if (hadPrevious) scope.set(expression.parameter, previous);
-          else scope.delete(expression.parameter);
-        }
+        const localScope = new Map(scope);
+        localScope.set(expression.parameter, value);
+        return scopeContext.run(localScope, async () => expression.body.type === 'ExpressionBody'
+          ? evaluateExpression(expression.body.body)
+          : evaluateBlock(expression.body.body));
       };
     }
     if (expression.type === 'TryExpression') {

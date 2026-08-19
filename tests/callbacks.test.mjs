@@ -18,4 +18,12 @@ describe('callbacks', () => {
       map: async (items, callback) => Promise.all(items.map(item => callback(item))),
     })).resolves.toEqual([1]);
   });
+
+  test('isolates callback bindings during concurrent async work', async () => {
+    const result = await evaluate(parse('map([1, 2], item => source.delayed(item))'), {
+      map: async (items, callback) => Promise.all(items.map(item => callback(item))),
+      source: { delayed: async item => new Promise(resolve => setTimeout(() => resolve(item), item === 1 ? 10 : 0)) },
+    });
+    expect(result).toEqual([1, 2]);
+  });
 });
