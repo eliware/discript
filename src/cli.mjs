@@ -19,12 +19,15 @@ import { writeResult } from './output.mjs';
 
 import { withTimeout, validateTimeout } from "./cli/lifecycle.mjs";
 import { executeInput } from './cli/script.mjs';
+import { brokerRequest, startGatewayBroker } from './broker.mjs';
+import { loadConfig } from './config.mjs';
 
 export async function run(argv = [], dependencies = {}) {
   const { stdout = console.log, stdin = process.stdin } = dependencies;
   const { positionals, options } = parseArgs(argv);
   if (options.help) return stdout(helpText());
   if (options.version) return stdout(VERSION);
+  if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
 
   const source = await readSource(positionals, options, stdin);
   validateTimeout(options.timeout);
@@ -41,4 +44,17 @@ export async function run(argv = [], dependencies = {}) {
     shutdownHook?.removeHandlers?.();
     errors.removeHandlers();
   }
+}
+
+async function runDaemon(action, options, stdout) {
+  const token = loadConfig().token;
+  if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
+  if (action === 'start') {
+    const broker = await startGatewayBroker({ token });
+    stdout({ started: true, endpoint: broker.endpoint });
+    return broker;
+  }
+  const result = await brokerRequest({ token, method: action === 'stop' ? 'shutdown' : 'status' });
+  stdout(result);
+  return result;
 }
