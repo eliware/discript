@@ -12,4 +12,10 @@ describe('voice operations', () => {
     const api = createDiscordApi({ channels: { cache: new Map() } }, { voiceModule: { getVoiceConnection: () => undefined } });
     await expect(api.voice.status('1')).resolves.toEqual({ guildId: '1', connected: false });
   });
+
+  test('requires Connect permission to join voice', async () => {
+    const channel = { id: '2', type: 'voice', guild: { id: '1', members: { me: { permissions: { has: () => false } } } } };
+    const api = createDiscordApi({ channels: { cache: new Map([['2', channel]]) } }, { yes: true, voiceModule: {} });
+    await expect(api.voice.join('2')).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
 });

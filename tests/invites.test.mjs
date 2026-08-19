@@ -29,4 +29,12 @@ describe('invite operations', () => {
     expect(createInvite).not.toHaveBeenCalled();
     expect(deleteInvite).not.toHaveBeenCalled();
   });
+
+  test('requires ManageGuild permission to delete invites', async () => {
+    const deleteInvite = jest.fn();
+    const guild = { id: '1', members: { me: { permissions: { has: () => false } } } };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) }, invites: { delete: deleteInvite } }, { yes: true });
+    await expect(api.guilds.get('1').invites.delete('old'))
+      .rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
 });

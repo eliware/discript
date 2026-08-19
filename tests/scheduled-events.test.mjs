@@ -34,4 +34,15 @@ describe('scheduled events', () => {
     expect(edit).not.toHaveBeenCalled();
     expect(remove).not.toHaveBeenCalled();
   });
+
+  test('requires ManageEvents for event creation', async () => {
+    const guild = {
+      id: '1',
+      scheduledEvents: { cache: new Map(), create: jest.fn() },
+      members: { me: { permissions: { has: () => false } } },
+    };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true });
+    await expect(api.guilds.get('1').scheduledEvents.create({ name: 'Launch' }))
+      .rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
 });
