@@ -1,8 +1,8 @@
 export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
   const mapCache = (cache, mapper) => typeof cache?.map === 'function' ? cache.map(mapper) : [...(cache?.values?.() ?? [])].map(mapper);
-  const requireApproval = action => {
-    if (dryRun) return;
-    if (!yes) throw Object.assign(new Error(`${action} requires --yes.`), { code: 'CONFIRMATION_REQUIRED', exitCode: 2 });
+  const requireApproval = (action, operationOptions = {}) => {
+    if (dryRun || operationOptions.dryRun === true) return;
+    if (!yes && operationOptions.force !== true) throw Object.assign(new Error(`${action} requires --yes or force: true.`), { code: 'CONFIRMATION_REQUIRED', exitCode: 2 });
   };
   const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
   const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
@@ -15,14 +15,14 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
   return {
     messages: {
       get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
-      edit: async (channelId, messageId, content) => {
-        requireApproval('Editing a message');
-        if (dryRun) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), content };
+      edit: async (channelId, messageId, content, operationOptions = {}) => {
+        requireApproval('Editing a message', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), content };
         return normalizeMessage(await (await resolveMessage(channelId, messageId)).edit(String(content)));
       },
-      delete: async (channelId, messageId) => {
-        requireApproval('Deleting a message');
-        if (dryRun) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), deleted: true };
+      delete: async (channelId, messageId, operationOptions = {}) => {
+        requireApproval('Deleting a message', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), deleted: true };
         await (await resolveMessage(channelId, messageId)).delete();
         return { id: String(messageId), deleted: true };
       },
@@ -65,15 +65,15 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                 username: member.user?.username ?? null,
                 displayName: member.displayName ?? null,
                 roles: mapCache(member.roles?.cache, role => ({ id: role.id, name: role.name })),
-                addRole: async roleId => {
-                  requireApproval('Adding a role');
-                  if (dryRun) return { dryRun: true, memberId: member.id, roleId: String(roleId), added: true };
+                addRole: async (roleId, operationOptions = {}) => {
+                  requireApproval('Adding a role', operationOptions);
+                  if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, roleId: String(roleId), added: true };
                   await member.roles.add(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), added: true };
                 },
-                removeRole: async roleId => {
-                  requireApproval('Removing a role');
-                  if (dryRun) return { dryRun: true, memberId: member.id, roleId: String(roleId), removed: true };
+                removeRole: async (roleId, operationOptions = {}) => {
+                  requireApproval('Removing a role', operationOptions);
+                  if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, roleId: String(roleId), removed: true };
                   await member.roles.remove(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), removed: true };
                 },

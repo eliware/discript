@@ -19,4 +19,11 @@ describe('message capabilities', () => {
     await expect(apiFor(message).messages.delete('1', '2')).resolves.toEqual({ id: '2', deleted: true });
     expect(message.delete).toHaveBeenCalled();
   });
+
+  test('accepts script-level force and dry-run options', async () => {
+    const message = { id: '2', channelId: '1', content: 'old', delete: jest.fn() };
+    const api = createDiscordApi({ channels: { cache: new Map([['1', { messages: { fetch: jest.fn(async () => message) } }]]) } });
+    await expect(api.messages.delete('1', '2', { dryRun: true })).resolves.toMatchObject({ dryRun: true });
+    await expect(api.messages.delete('1', '2', { force: true })).resolves.toEqual({ id: '2', deleted: true });
+  });
 });

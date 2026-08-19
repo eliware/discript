@@ -5,7 +5,7 @@ import { helpText, VERSION } from './help.mjs';
 import { readSource } from './input.mjs';
 import { writeResult } from './output.mjs';
 import { parse } from './parser.mjs';
-import { evaluate } from './evaluator.mjs';
+import { evaluate, ScriptExit } from './evaluator.mjs';
 import { createDiscordApi } from './discord.mjs';
 
 export async function run(argv = [], dependencies = {}) {
@@ -65,6 +65,7 @@ async function executeInput(input, options, dependencies) {
       discord: createDiscordApi(runtime.client, options),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
       filter: (items, property, expected) => (items ?? []).filter(item => item?.[property] === expected),
+      exit: (exitCode = 0, message = null) => { throw new ScriptExit(exitCode, message); },
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
     });
     return result;
