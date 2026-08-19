@@ -5,7 +5,8 @@
   "main": "bin/discript.mjs",
   "scripts": {
     "start": "node bin/discript.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
+    "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
     "lint": "npx oxlint ."
   },
   "repository": {
@@ -27,6 +28,7 @@
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
+    "jest": "^30.4.2",
     "oxlint": "^1.79.0"
   }
 }
