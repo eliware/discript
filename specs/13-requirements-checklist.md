@@ -32,10 +32,10 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript enforces protected-role, permission, role-hierarchy, and moderation-target safeguards for the current mutation groups.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
 - [Fully complete] Discript has a `TEST_GUILD` configuration value.
-- [Fully complete] Discript has gated read-only live Discord tests.
-- [Fully complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD`.
+- [Fully complete] Discript has gated read-only live Discord tests, currently passing against `TEST_GUILD`.
+- [Fully complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD`, currently passing with cleanup.
 - [Half complete] Discript provides agent-oriented structured errors and diagnostics.
 - [Fully complete] Discript provides command discovery, common aliases, typo suggestions, and Bash/Zsh/Fish shell completions.
 - [Half complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
 - [Half complete] Discript has agent-focused examples and usage documentation.
-- [Not started] Discript is packaged and published as a finished CLI product.
+- [Half complete] Discript is packaged as a private installable CLI through Git SSH or `npm pack`; public publishing remains intentionally unset.
