@@ -90,4 +90,18 @@ describe('live Discord integration', () => {
       await runtime.shutdown();
     }
   }, 30000);
+
+  (live ? test : test.skip)('lists channel permission overwrites without mutation', async () => {
+    const config = loadConfig();
+    const runtime = await createDiscordRuntime({ token: config.token });
+    try {
+      const textChannel = [...runtime.client.channels.cache.values()].find(channel => channel.guild?.id === config.testGuild && channel.type === 0);
+      expect(textChannel).toBeTruthy();
+      const overwrites = createDiscordApi(runtime.client).channels.get(textChannel.id).permissions.list();
+      expect(Array.isArray(overwrites)).toBe(true);
+      expect(overwrites.every(overwrite => overwrite.id)).toBe(true);
+    } finally {
+      await runtime.shutdown();
+    }
+  }, 30000);
 });
