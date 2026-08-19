@@ -1,0 +1,3 @@
+fn formatGuild(guild) {
+  return {id: guild.id, label: guild.name}
+}

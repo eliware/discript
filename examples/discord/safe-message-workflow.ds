@@ -1,0 +1,16 @@
+channelId = "<channel-id>"
+content = "Automated status update"
+
+preview = discord.channels.get(channelId).send(content, {dryRun: true})
+print(preview)
+
+approval = try {
+  discord.channels.get(channelId).send(content, {force: true})
+} catch (error) {
+  {ok: false, error: error}
+}
+
+if (approval.ok == false) {
+  exit(approval.error.exitCode, "message was not sent")
+}
+approval

@@ -1,0 +1,8 @@
+// Run with: discript examples/agent/jsonl-monitor.ds --output jsonl
+on("messageCreate") {
+  print({kind: "message", id: event.id, channelId: event.channelId, content: event.content})
+}
+
+every(60000) {
+  print({kind: "heartbeat", status: "waiting"})
+}

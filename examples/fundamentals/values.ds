@@ -1,0 +1,7 @@
+name = "Discript"
+version = 1
+enabled = true
+empty = null
+profile = {name: name, version: version, enabled: enabled}
+values = [name, version, enabled, empty, profile]
+values

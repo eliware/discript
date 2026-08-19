@@ -1,0 +1,11 @@
+guildId = "<guild-id>"
+channelId = "<channel-id>"
+content = "agent validation message"
+
+guild = discord.guilds.get(guildId)
+channel = discord.channels.get(channelId)
+if (guild.id != guildId || channel.id != channelId) {
+  exit(2, "target validation failed")
+}
+
+discord.channels.get(channelId).send(content, {dryRun: true})

@@ -1,0 +1,6 @@
+numbers = [1, 2, 3, 4]
+doubled = map(numbers, number => number * 2)
+large = filter(doubled, number => number > 4)
+total = large.length
+
+{doubled: doubled, large: large, total: total}

@@ -1,0 +1,3 @@
+// The smallest useful Discript program.
+message = "Hello from Discript"
+print(message)

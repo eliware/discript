@@ -1,0 +1,7 @@
+on("guildMemberUpdate") {
+  print({event: "member-update", userId: event.user.id, timestamp: event.joinedAt})
+}
+
+every(60000) {
+  print({status: "audit-monitoring"})
+}

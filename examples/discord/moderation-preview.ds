@@ -1,0 +1,5 @@
+guildId = "<guild-id>"
+userId = "<user-id>"
+
+preview = discord.guilds.get(guildId).members.get(userId).timeout(3600000, "review required", {dryRun: true})
+print(preview)

@@ -1,0 +1,6 @@
+import "../shared/format.ds"
+
+guilds = discord.guilds.list()
+for (guild in guilds) {
+  print(formatGuild(guild))
+}

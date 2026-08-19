@@ -1,0 +1,4 @@
+// Safe preview: no Discord mutation is made.
+guildId = "<guild-id>"
+preview = discord.guilds.get(guildId).channels.create("agent-preview", {dryRun: true})
+print(preview)

@@ -1,0 +1,7 @@
+guildId = "<guild-id>"
+guild = discord.guilds.get(guildId)
+members = guild.members.list()
+roles = guild.roles.list()
+channels = guild.channels.list()
+
+{guild: {id: guild.id, name: guild.name}, memberCount: members.length, roleCount: roles.length, channelCount: channels.length}

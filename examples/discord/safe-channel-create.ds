@@ -1,0 +1,13 @@
+guildId = "<guild-id>"
+channelName = "agent-created-channel"
+
+preview = discord.guilds.get(guildId).channels.create(channelName, {dryRun: true})
+print(preview)
+
+result = try {
+  discord.guilds.get(guildId).channels.create(channelName, {force: true})
+} catch (error) {
+  print({error: error.message, code: error.code, exitCode: error.exitCode})
+  error
+}
+result

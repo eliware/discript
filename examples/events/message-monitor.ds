@@ -1,0 +1,5 @@
+on("messageCreate") {
+  if (event.author.bot != true) {
+    print({channelId: event.channelId, authorId: event.author.id, content: event.content})
+  }
+}

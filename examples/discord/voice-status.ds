@@ -1,0 +1,7 @@
+guildId = "<guild-id>"
+voice = discord.voice.status(guildId)
+print(voice)
+
+memberId = "<user-id>"
+memberVoice = discord.guilds.get(guildId).members.get(memberId).voice.status()
+memberVoice

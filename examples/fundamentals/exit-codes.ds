@@ -1,0 +1,12 @@
+fn check(value) {
+  if (value == null) {
+    return {ok: false, exitCode: 2}
+  }
+  return {ok: true, exitCode: 0, value: value}
+}
+
+result = check("ready")
+if (result.exitCode != 0) {
+  exit(result.exitCode, "validation failed")
+}
+result

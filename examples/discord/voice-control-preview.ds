@@ -1,0 +1,6 @@
+guildId = "<guild-id>"
+userId = "<user-id>"
+channelId = "<voice-channel-id>"
+
+preview = discord.guilds.get(guildId).members.get(userId).voice.move(channelId, {dryRun: true})
+preview

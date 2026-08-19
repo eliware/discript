@@ -1,0 +1,10 @@
+result = try {
+  missing.value
+} catch (error) {
+  print({message: error.message, code: error.code})
+  error
+}
+
+if (result.ok == false) {
+  exit(result.exitCode, "the lookup failed")
+}

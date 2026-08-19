@@ -1,0 +1,3 @@
+channelId = "<channel-id>"
+preview = discord.channels.get(channelId).send("This message is only a preview", {dryRun: true})
+preview

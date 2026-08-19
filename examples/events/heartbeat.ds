@@ -1,0 +1,8 @@
+after(1000) {
+  print({status: "started"})
+}
+
+every(30000) {
+  bot = discord.bot.get()
+  print({status: "healthy", bot: bot.username})
+}

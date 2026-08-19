@@ -1,0 +1,3 @@
+// Read-only bot identity lookup.
+bot = discord.bot.get()
+print({id: bot.id, username: bot.username})

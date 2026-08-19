@@ -1,0 +1,6 @@
+guildId = "<guild-id>"
+members = discord.guilds.get(guildId).members.list()
+
+for (member in members) {
+  print({id: member.id, name: member.username, bot: member.bot})
+}

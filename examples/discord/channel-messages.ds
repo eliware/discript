@@ -1,0 +1,4 @@
+channelId = "<channel-id>"
+messageId = "<message-id>"
+message = discord.messages.get(channelId, messageId)
+print({id: message.id, author: message.author, content: message.content})

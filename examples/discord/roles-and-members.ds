@@ -1,0 +1,9 @@
+guildId = "<guild-id>"
+roles = discord.guilds.get(guildId).roles.list()
+for (role in roles) {
+  print({id: role.id, name: role.name, position: role.position})
+}
+
+memberId = "<user-id>"
+member = discord.guilds.get(guildId).members.get(memberId)
+member

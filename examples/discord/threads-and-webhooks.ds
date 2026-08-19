@@ -1,0 +1,4 @@
+channelId = "<channel-id>"
+threads = discord.channels.get(channelId).threads.list()
+webhooks = discord.channels.get(channelId).webhooks.list()
+{threads: threads, webhooks: webhooks}

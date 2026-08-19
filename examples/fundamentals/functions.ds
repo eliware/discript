@@ -1,0 +1,8 @@
+fn greet(name, punctuation) {
+  return "Hello, " + name + punctuation
+}
+
+first = greet("Discord", "!")
+second = greet("agent", ".")
+print(first)
+second

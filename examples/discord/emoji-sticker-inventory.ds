@@ -1,0 +1,5 @@
+guildId = "<guild-id>"
+emojis = discord.guilds.get(guildId).emojis.list()
+stickers = discord.guilds.get(guildId).stickers.list()
+
+{emojiCount: emojis.length, stickerCount: stickers.length, emojis: emojis, stickers: stickers}

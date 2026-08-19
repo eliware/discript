@@ -1,0 +1,6 @@
+guilds = discord.guilds.list()
+for (guild in guilds) {
+  print({guildId: guild.id, name: guild.name})
+  channels = discord.guilds.get(guild.id).channels.list()
+  print({guildId: guild.id, channels: channels})
+}

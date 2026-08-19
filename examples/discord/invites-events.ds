@@ -1,0 +1,4 @@
+guildId = "<guild-id>"
+invites = discord.guilds.get(guildId).invites.list()
+events = discord.guilds.get(guildId).scheduledEvents.list()
+{invites: invites, scheduledEvents: events}

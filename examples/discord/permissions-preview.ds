@@ -1,0 +1,5 @@
+channelId = "<channel-id>"
+targetId = "<role-or-user-id>"
+
+preview = discord.channels.get(channelId).permissions.set(targetId, {allow: ["ViewChannel", "SendMessages"], deny: ["ManageMessages"], dryRun: true})
+preview
