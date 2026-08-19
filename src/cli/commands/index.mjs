@@ -27,6 +27,7 @@ export async function executeDirectCommand(input, options = {}) {
   const catalog = createCatalogHandler(command, options); if (catalog.handled) return catalog.value;
   const preview = createPreviewHandler(command, options); if (preview.handled) return preview.value;
   if (isRestOnlyCommand(command)) {
+    if (command[1] === 'get' && !options.guild) throw Object.assign(new Error('guilds get requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
     const rest = createDiscordRest();
     const api = createRestDiscordApi(rest);
     if (command.join(' ') === 'guilds list') return api.guilds.list();
