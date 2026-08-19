@@ -19,6 +19,15 @@ export async function evaluate(program, globals = {}) {
       for (const nested of branch ?? []) branchResult = await evaluateStatement(nested);
       return branchResult;
     }
+    if (statement.type === 'WhileStatement') {
+      let iterations = 0;
+      let loopResult;
+      while (await evaluateExpression(statement.test)) {
+        if (++iterations > 10000) throw Object.assign(new Error('Loop exceeded the 10000 iteration limit.'), { code: 'LOOP_LIMIT', exitCode: 1 });
+        for (const nested of statement.body) loopResult = await evaluateStatement(nested);
+      }
+      return loopResult;
+    }
     throw runtimeError(`Unsupported statement: ${statement.type}`);
   }
 
@@ -33,6 +42,10 @@ export async function evaluate(program, globals = {}) {
       if (expression.operator === '<') return left < right;
       if (expression.operator === '>=') return left >= right;
       if (expression.operator === '<=') return left <= right;
+      if (expression.operator === '+') return left + right;
+      if (expression.operator === '-') return left - right;
+      if (expression.operator === '*') return left * right;
+      if (expression.operator === '/') return left / right;
       throw runtimeError(`Unsupported operator: ${expression.operator}`);
     }
     if (expression.type === 'ArrayExpression') return Promise.all(expression.elements.map(evaluateExpression));

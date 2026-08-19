@@ -1,4 +1,4 @@
-const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(==|!=|>=|<=|>|<)|([()[\].,;=:{}`])/y;
+const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(==|!=|>=|<=|>|<|\+|-|\*|\/)|([()[\].,;=:{}`])/y;
 
 export function parse(source) {
   const tokens = tokenize(source);
@@ -9,12 +9,14 @@ export function parse(source) {
   return { type: 'Program', body };
 
   function parseStatement() {
-    if (peek()?.type === 'identifier' && peek().value === 'if') {
+    if (peek()?.type === 'identifier' && (peek().value === 'if' || peek().value === 'while')) {
+      const keyword = peek().value;
       index += 1;
       consume('(', 'Expected `(` after `if`.');
       const test = parseExpression();
       consume(')', 'Expected `)` after the `if` condition.');
       const consequent = parseBlock();
+      if (keyword === 'while') return { type: 'WhileStatement', test, body: consequent };
       let alternate = null;
       if (peek()?.type === 'identifier' && peek().value === 'else') { index += 1; alternate = parseBlock(); }
       return { type: 'IfStatement', test, consequent, alternate };
