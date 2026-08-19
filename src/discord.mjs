@@ -22,15 +22,22 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
     const highest = guild.members?.me?.roles?.highest;
     if (highest?.position !== undefined && role?.position !== undefined && role.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this role change.'), { code: 'ROLE_HIERARCHY', exitCode: 5 });
   };
+  const requireChannelPermission = (channelId, permission) => {
+    const channel = client.channels.cache.get(String(channelId));
+    const botMember = channel?.guild?.members?.me;
+    if (botMember?.permissions?.has && !botMember.permissions.has(permission)) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
+  };
   return {
     messages: {
       get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
       edit: async (channelId, messageId, content, operationOptions = {}) => {
+        requireChannelPermission(channelId, 'ManageMessages');
         requireApproval('Editing a message', operationOptions);
         if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), content };
         return normalizeMessage(await (await resolveMessage(channelId, messageId)).edit(String(content)));
       },
       delete: async (channelId, messageId, operationOptions = {}) => {
+        requireChannelPermission(channelId, 'ManageMessages');
         requireApproval('Deleting a message', operationOptions);
         if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), deleted: true };
         await (await resolveMessage(channelId, messageId)).delete();
@@ -44,6 +51,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         return {
           ...normalizeChannel(channel),
           delete: async (operationOptions = {}) => {
+            requireChannelPermission(channel.id, 'ManageChannels');
             requireApproval('Deleting a channel', operationOptions);
             if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, deleted: true };
             await channel.delete();
