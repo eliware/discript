@@ -90,6 +90,14 @@ npm start -- stickers create --guild <guild-id> --name wave --file ./wave.png --
 npm start -- stickers delete --guild <guild-id> --sticker <sticker-id> --yes --json
 ```
 
+Channel webhooks support guarded listing, creation, and deletion:
+
+```sh
+npm start -- webhooks list --channel <channel-id> --json
+npm start -- webhooks create --channel <channel-id> --name automation --yes --json
+npm start -- webhooks delete --channel <channel-id> --webhook <webhook-id> --yes --json
+```
+
 Invite creation and deletion are guarded mutations; use `--yes` (or `-y`) and preview with `--dry-run`:
 
 ```sh

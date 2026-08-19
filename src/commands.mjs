@@ -3,6 +3,7 @@ export const COMMANDS = [
   'emojis list', 'emojis get', 'emojis create', 'emojis update', 'emojis delete', 'stickers list', 'stickers get', 'stickers create', 'stickers update', 'stickers delete', 'invites list', 'invites create', 'invites delete',
   'events list', 'events create', 'events update', 'events delete', 'voice status', 'voice join', 'voice leave',
   'channels list', 'channels get', 'channels create', 'channels delete', 'threads list', 'threads create', 'threads archive',
+  'webhooks list', 'webhooks create', 'webhooks delete',
   'messages send', 'messages get', 'messages edit', 'messages delete', 'messages react', 'messages pin', 'messages unpin', 'messages bulk-delete',
   'moderation ban', 'moderation kick', 'moderation timeout',
 ];

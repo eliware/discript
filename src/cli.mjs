@@ -278,6 +278,14 @@ async function executeDirectCommand(command, options) {
       if (!options.thread) throw Object.assign(new Error('threads archive requires --thread <id>.'), { code: 'THREAD_REQUIRED', exitCode: 2 });
       return api.channels.get(options.channel).threads.archive(options.thread);
     }
+    if (command[0] === 'webhooks' && ['list', 'create', 'delete'].includes(command[1])) {
+      if (!options.channel) throw Object.assign(new Error(`webhooks ${command[1]} requires --channel <id>.`), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      const webhooks = api.channels.get(options.channel).webhooks;
+      if (command[1] === 'list') return webhooks.list();
+      if (command[1] === 'create') { if (!options.name) throw Object.assign(new Error('webhooks create requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 }); return webhooks.create(options.name, { reason: options.reason }); }
+      if (!options.webhook) throw Object.assign(new Error('webhooks delete requires --webhook <id>.'), { code: 'WEBHOOK_REQUIRED', exitCode: 2 });
+      return webhooks.delete(options.webhook, { reason: options.reason });
+    }
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
       if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
@@ -340,6 +348,7 @@ function previewMutation(command, options) {
     if (command[0] === 'events' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
     if (command[0] === 'emojis' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
     if (command[0] === 'stickers' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
+    if (command[0] === 'webhooks' && ['create', 'delete'].includes(command[1])) requireChannel();
   };
   requireMutationTarget();
   if (command[0] === 'roles' && ['add', 'remove'].includes(command[1])) { requireUser(); requireRole(); }
@@ -361,6 +370,7 @@ function previewMutation(command, options) {
   if (command[0] === 'stickers' && ['get', 'update', 'delete'].includes(command[1])) requireOption('sticker', 'STICKER_REQUIRED');
   if (command[0] === 'stickers' && command[1] === 'create') { requireOption('name', 'NAME_REQUIRED'); requireOption('file', 'FILE_REQUIRED'); requireOption('tags', 'TAGS_REQUIRED'); }
   if (command[0] === 'stickers' && command[1] === 'update' && !options.name && !options.description && !options.tags) throw Object.assign(new Error(`${action} requires --name, --description, or --tags.`), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
+  if (command[0] === 'webhooks') { requireChannel(); if (command[1] === 'create') requireOption('name', 'NAME_REQUIRED'); if (command[1] === 'delete') requireOption('webhook', 'WEBHOOK_REQUIRED'); }
   if (command[0] === 'voice' && command[1] === 'join') requireChannel();
   if (command[0] === 'voice' && command[1] === 'leave') requireGuild();
   return { dryRun: true, action, command, parameters: Object.fromEntries(Object.entries(options).filter(([key]) => !['json', 'pretty', 'dry_run', 'yes'].includes(key))) };

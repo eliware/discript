@@ -15,4 +15,9 @@ describe('direct dry-run validation', () => {
     await expect(run(['emojis', 'create', '--dry-run', '--guild', '123', '--name', 'wave'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'FILE_REQUIRED', exitCode: 2 });
     await expect(run(['stickers', 'create', '--dry-run', '--guild', '123', '--name', 'wave', '--file', '/tmp/wave.png'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'TAGS_REQUIRED', exitCode: 2 });
   });
+
+  test('validates webhook mutation fields in dry-run mode', async () => {
+    await expect(run(['webhooks', 'create', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'NAME_REQUIRED', exitCode: 2 });
+    await expect(run(['webhooks', 'delete', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'WEBHOOK_REQUIRED', exitCode: 2 });
+  });
 });
