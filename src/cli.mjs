@@ -62,8 +62,16 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
   onRuntime(runtime);
+  const timers = new Set();
   try {
     let handlerCount = 0;
+    const registerTimer = (delay, callback, repeating) => {
+      const milliseconds = Number(delay);
+      if (!Number.isInteger(milliseconds) || milliseconds < 1) throw Object.assign(new Error('Timer delay must be a positive integer in milliseconds.'), { code: 'INVALID_TIMER', exitCode: 2 });
+      const timer = repeating ? setInterval(() => { void callback(); }, milliseconds) : setTimeout(() => { void callback(); }, milliseconds);
+      timers.add(timer);
+      return { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true };
+    };
     const result = await evaluate(parse(input.source), {
       discord: createDiscordApi(runtime.client, options),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
@@ -75,10 +83,15 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
         handlerCount += 1;
         return { event: eventName, registered: true };
       },
+      every: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, true); },
+      after: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, false); },
+      sleep: delay => new Promise(resolve => setTimeout(resolve, Number(delay))),
+      parallel: (...operations) => Promise.all(operations),
     });
     if (handlerCount > 0) await runtime.waitForStop();
     return result;
   } finally {
+    for (const timer of timers) { clearTimeout(timer); clearInterval(timer); }
     await runtime.shutdown();
   }
 }

@@ -16,6 +16,14 @@ export function parse(source) {
       consume(')', 'Expected `)` after the event name.');
       return { type: 'EventStatement', event: event.value, body: parseBlock() };
     }
+    if (peek()?.type === 'identifier' && (peek().value === 'every' || peek().value === 'after')) {
+      const keyword = peek().value;
+      index += 1;
+      consume('(', `Expected \`(\` after \`${keyword}\`.`);
+      const delay = parseExpression();
+      consume(')', `Expected \`)\` after the \`${keyword}\` delay.`);
+      return { type: keyword === 'every' ? 'EveryStatement' : 'AfterStatement', delay, body: parseBlock() };
+    }
     if (peek()?.type === 'identifier' && peek().value === 'for') {
       index += 1;
       consume('(', 'Expected `(` after `for`.');

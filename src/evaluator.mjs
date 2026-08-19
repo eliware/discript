@@ -23,6 +23,12 @@ export async function evaluate(program, globals = {}) {
         return evaluateBlock(statement.body);
       });
     }
+    if (statement.type === 'EveryStatement' || statement.type === 'AfterStatement') {
+      const register = scope.get(statement.type === 'EveryStatement' ? 'every' : 'after');
+      if (typeof register !== 'function') throw runtimeError('Timer declarations are unavailable in this execution mode.');
+      const delay = await evaluateExpression(statement.delay);
+      return register(delay, async () => evaluateBlock(statement.body));
+    }
     if (statement.type === 'IfStatement') {
       const branch = await evaluateExpression(statement.test) ? statement.consequent : statement.alternate;
       let branchResult;
