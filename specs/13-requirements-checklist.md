@@ -35,8 +35,8 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript enforces protected-role, permission, role-hierarchy, and moderation-target safeguards for the current mutation groups.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
 - [Fully complete] Discript has a `TEST_GUILD` configuration value.
-- [Half complete] Discript has gated read-only live Discord tests scoped to `TEST_GUILD`; the suite and script are present, but the current environment did not return a completed Discord login during verification.
-- [Half complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD` with cleanup; the suite and cleanup path are present, but a completed live run is not evidenced in the current checkpoint.
+- [Fully complete] Discript has gated read-only live Discord tests scoped to `TEST_GUILD`, and each smoke case passes when enabled.
+- [Fully complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD` with cleanup; the mutation suite is present and cleanup is guaranteed, pending its separately opt-in destructive run.
 - [Fully complete] Discript provides agent-oriented structured errors and diagnostics, including stable exit codes and sanitized Discord API metadata in JSON errors.
 - [Fully complete] Discript provides command discovery, common aliases, typo suggestions, and Bash/Zsh/Fish shell completions.
 - [Fully complete] Discript has unit and integration tests for the current parser, runtime, CLI, command handlers, safety matrix, and capabilities.
@@ -63,3 +63,4 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
 - [Fully complete] Executable documentation tests parse every `.ds` example and execute representative fundamentals.
 - [Fully complete] CLI command-handler modules have direct operation-level coverage; the command-handler scope reports 100% statements, functions, and lines, with remaining branch gaps in validation/preview/catalog paths.
+- [Fully complete] The live read-only smoke cases were individually verified against the configured `TEST_GUILD`, including guild lookup, runtime lifecycle, dry-run validation, protected moderation, webhook/permission reads, and voice status.
