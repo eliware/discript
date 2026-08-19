@@ -1,0 +1,15 @@
+// Find channels that expose the most useful automation surfaces.
+channelId = env.DISCORD_CHANNEL_ID
+if (channelId == null) {
+  exit(2, "set DISCORD_CHANNEL_ID")
+}
+
+channel = discord.channels.get(channelId)
+print({
+  id: channel.id,
+  name: channel.name,
+  type: channel.type,
+  threads: channel.threads.list(),
+  webhooks: channel.webhooks.list(),
+  permissions: channel.permissions.list()
+})

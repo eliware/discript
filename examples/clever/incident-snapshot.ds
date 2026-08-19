@@ -1,0 +1,17 @@
+// Produce a compact incident snapshot for an agent or ticket.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD before collecting an incident snapshot")
+}
+
+guild = discord.guilds.get(guildId)
+channels = guild.channels.list()
+members = guild.members.list()
+roles = guild.roles.list()
+print({
+  kind: "incident-snapshot",
+  guild: {id: guild.id, name: guild.name},
+  counts: {channels: channels.length, members: members.length, roles: roles.length},
+  channels: channels,
+  roles: roles
+})

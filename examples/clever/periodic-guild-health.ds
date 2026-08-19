@@ -1,0 +1,12 @@
+// Emit a lightweight heartbeat that can be consumed as JSONL.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+
+every(60000) {
+  guild = discord.guilds.get(guildId)
+  channels = guild.channels.list()
+  members = guild.members.list()
+  print({kind: "guild-health", guildId: guildId, channelCount: channels.length, memberCount: members.length})
+}

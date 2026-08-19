@@ -1,0 +1,20 @@
+// Create a temporary channel, inspect the result, and clean it up only when approved.
+guildId = env.TEST_GUILD
+channelName = env.DISCORD_TEMP_CHANNEL
+approved = env.DISCORD_APPROVED
+if (guildId == null || channelName == null) {
+  exit(2, "set TEST_GUILD and DISCORD_TEMP_CHANNEL")
+}
+
+preview = discord.guilds.get(guildId).channels.create(channelName, {dryRun: true})
+print({phase: "create-preview", result: preview})
+if (approved != "true") {
+  exit(0, "temporary channel was not created")
+}
+
+created = discord.guilds.get(guildId).channels.create(channelName, {force: true})
+print({phase: "created", result: created})
+if (env.DISCORD_CLEANUP == "true") {
+  deleted = discord.channels.get(created.id).delete({force: true})
+  print({phase: "cleaned-up", result: deleted})
+}

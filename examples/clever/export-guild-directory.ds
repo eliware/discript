@@ -1,0 +1,15 @@
+// Emit a directory-shaped object suitable for another program to consume.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+
+guild = discord.guilds.get(guildId)
+directory = {
+  guild: {id: guild.id, name: guild.name},
+  channels: guild.channels.list(),
+  roles: guild.roles.list(),
+  events: guild.scheduledEvents.list(),
+  invites: guild.invites.list()
+}
+print(directory)

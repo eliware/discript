@@ -1,0 +1,18 @@
+// Validate a moderation target and return a decision without mutating Discord.
+guildId = env.TEST_GUILD
+userId = env.DISCORD_TARGET_USER
+if (guildId == null || userId == null) {
+  exit(2, "set TEST_GUILD and DISCORD_TARGET_USER")
+}
+
+member = discord.guilds.get(guildId).members.get(userId)
+decision = {
+  target: {id: member.id, username: member.username, bot: member.bot},
+  allowed: member.bot != true
+}
+if (member.bot == true) {
+  decision = {target: decision.target, allowed: false, reason: "bot-account"}
+} else {
+  decision = {target: decision.target, allowed: true, reason: "eligible-for-human-review"}
+}
+print(decision)

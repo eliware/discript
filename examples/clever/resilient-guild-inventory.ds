@@ -1,0 +1,11 @@
+// Keep collecting inventory when one guild lookup fails.
+guilds = discord.guilds.list()
+for (guild in guilds) {
+  result = try {
+    live = discord.guilds.get(guild.id)
+    {ok: true, id: live.id, name: live.name, channels: live.channels.list()}
+  } catch (error) {
+    {ok: false, id: guild.id, error: {code: error.code, message: error.message}}
+  }
+  print(result)
+}

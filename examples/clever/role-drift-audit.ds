@@ -1,0 +1,15 @@
+// Compare a configured role name against the live guild state.
+guildId = env.TEST_GUILD
+expectedRole = env.DISCORD_AUTOMATION_ROLE
+if (guildId == null || expectedRole == null) {
+  exit(2, "set TEST_GUILD and DISCORD_AUTOMATION_ROLE")
+}
+
+roles = discord.guilds.get(guildId).roles.list()
+matches = filter(roles, role => role.name == expectedRole)
+if (matches.length == 0) {
+  print({ok: false, code: "ROLE_MISSING", expected: expectedRole})
+  exit(1, "configured role was not found")
+}
+
+print({ok: true, matches: matches})

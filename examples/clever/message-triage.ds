@@ -1,0 +1,13 @@
+// Turn a message event into a small machine-readable triage record.
+on("messageCreate") {
+  if (event.author.bot != true) {
+    urgent = event.content != null && event.content != "" && event.content
+    print({
+      kind: "triage",
+      messageId: event.id,
+      channelId: event.channelId,
+      authorId: event.author.id,
+      urgent: urgent
+    })
+  }
+}

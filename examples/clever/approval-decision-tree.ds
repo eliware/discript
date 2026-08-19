@@ -1,0 +1,17 @@
+// Preview first, then choose whether to perform a guarded operation.
+channelId = env.DISCORD_CHANNEL_ID
+message = env.DISCORD_ANNOUNCEMENT
+approved = env.DISCORD_APPROVED
+if (channelId == null || message == null) {
+  exit(2, "set DISCORD_CHANNEL_ID and DISCORD_ANNOUNCEMENT")
+}
+
+preview = discord.channels.get(channelId).send(message, {dryRun: true})
+print({phase: "preview", result: preview})
+if (approved != "true") {
+  print({phase: "decision", approved: false, reason: "DISCORD_APPROVED is not true"})
+  exit(0, "preview only")
+}
+
+sent = discord.channels.get(channelId).send(message, {force: true})
+print({phase: "mutation", approved: true, result: sent})
