@@ -40,3 +40,14 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
 - [Fully complete] Discript has agent-focused examples and usage documentation covering discovery, guarded mutation workflows, exit handling, events, timers, callbacks, imports, and JSONL output.
 - [Fully complete] Discript is packaged as a public installable CLI through npm, Git SSH, or `npm pack`, with an automated isolated tarball-install smoke check and tag-triggered provenance publishing.
+
+## Release and project completion status
+
+- [Fully complete] Repository visibility is public on GitHub.
+- [Fully complete] Main-branch CI passes on Ubuntu and Windows for the last pushed checkpoint.
+- [Half complete] The latest local commits have not yet been pushed or validated by GitHub Actions.
+- [Half complete] `@eliware/discript@1.0.3` was accepted by the npm publish workflow, but anonymous npm registry verification still returns 404.
+- [Not started] Resolve public npm registry visibility for the published scoped package.
+- [Not started] Run release validation for the post-1.0.3 local changes.
+- [Not started] Push the accumulated local release-ready commits after approval.
+- [Not started] Publish and verify the next npm patch release after npm visibility is resolved.
