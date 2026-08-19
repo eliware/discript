@@ -258,9 +258,73 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
           },
           emojis: {
             list: () => mapCache(guild.emojis?.cache, emoji => ({ id: emoji.id, name: emoji.name, animated: emoji.animated ?? false })),
+            get: id => {
+              const emoji = guild.emojis?.cache?.get(String(id));
+              if (!emoji) throw Object.assign(new Error(`Emoji not found: ${id}`), { code: 'EMOJI_NOT_FOUND', exitCode: 1 });
+              return { id: emoji.id, name: emoji.name, animated: emoji.animated ?? false };
+            },
+            create: async (settings = {}, operationOptions = {}) => {
+              if (!settings.name || !settings.attachment) throw Object.assign(new Error('Emoji creation requires name and attachment.'), { code: 'EMOJI_FIELDS_REQUIRED', exitCode: 2 });
+              requirePermission(guild, 'ManageExpressions');
+              requireApproval('Creating an emoji', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, settings };
+              const emoji = await guild.emojis.create({ attachment: settings.attachment, name: String(settings.name), reason: settings.reason });
+              return { id: emoji.id, name: emoji.name, animated: emoji.animated ?? false, created: true };
+            },
+            update: async (id, settings = {}, operationOptions = {}) => {
+              const emoji = guild.emojis?.cache?.get(String(id));
+              if (!emoji) throw Object.assign(new Error(`Emoji not found: ${id}`), { code: 'EMOJI_NOT_FOUND', exitCode: 1 });
+              if (!settings.name) throw Object.assign(new Error('Emoji update requires name.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+              requirePermission(guild, 'ManageExpressions');
+              requireApproval('Updating an emoji', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, id: emoji.id, settings };
+              const updated = await emoji.edit({ name: String(settings.name), reason: settings.reason });
+              return { id: updated.id, name: updated.name, animated: updated.animated ?? false, updated: true };
+            },
+            delete: async (id, operationOptions = {}) => {
+              const emoji = guild.emojis?.cache?.get(String(id));
+              if (!emoji) throw Object.assign(new Error(`Emoji not found: ${id}`), { code: 'EMOJI_NOT_FOUND', exitCode: 1 });
+              requirePermission(guild, 'ManageExpressions');
+              requireApproval('Deleting an emoji', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, id: emoji.id, deleted: true };
+              await emoji.delete(settingsReason(operationOptions));
+              return { id: emoji.id, deleted: true };
+            },
           },
           stickers: {
             list: () => mapCache(guild.stickers?.cache, sticker => ({ id: sticker.id, name: sticker.name, description: sticker.description ?? null })),
+            get: id => {
+              const sticker = guild.stickers?.cache?.get(String(id));
+              if (!sticker) throw Object.assign(new Error(`Sticker not found: ${id}`), { code: 'STICKER_NOT_FOUND', exitCode: 1 });
+              return { id: sticker.id, name: sticker.name, description: sticker.description ?? null };
+            },
+            create: async (settings = {}, operationOptions = {}) => {
+              if (!settings.name || !settings.file || !settings.tags) throw Object.assign(new Error('Sticker creation requires name, file, and tags.'), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
+              requirePermission(guild, 'ManageExpressions');
+              requireApproval('Creating a sticker', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, settings };
+              const sticker = await guild.stickers.create({ file: settings.file, name: String(settings.name), description: settings.description, tags: String(settings.tags), reason: settings.reason });
+              return { id: sticker.id, name: sticker.name, description: sticker.description ?? null, created: true };
+            },
+            update: async (id, settings = {}, operationOptions = {}) => {
+              const sticker = guild.stickers?.cache?.get(String(id));
+              if (!sticker) throw Object.assign(new Error(`Sticker not found: ${id}`), { code: 'STICKER_NOT_FOUND', exitCode: 1 });
+              if (!settings.name && !settings.description && !settings.tags) throw Object.assign(new Error('Sticker update requires name, description, or tags.'), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
+              requirePermission(guild, 'ManageExpressions');
+              requireApproval('Updating a sticker', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, id: sticker.id, settings };
+              const updated = await sticker.edit({ name: settings.name, description: settings.description, tags: settings.tags, reason: settings.reason });
+              return { id: updated.id, name: updated.name, description: updated.description ?? null, updated: true };
+            },
+            delete: async (id, operationOptions = {}) => {
+              const sticker = guild.stickers?.cache?.get(String(id));
+              if (!sticker) throw Object.assign(new Error(`Sticker not found: ${id}`), { code: 'STICKER_NOT_FOUND', exitCode: 1 });
+              requirePermission(guild, 'ManageExpressions');
+              requireApproval('Deleting a sticker', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, id: sticker.id, deleted: true };
+              await sticker.delete(settingsReason(operationOptions));
+              return { id: sticker.id, deleted: true };
+            },
           },
           scheduledEvents: {
             list: () => mapCache(guild.scheduledEvents?.cache, event => ({ id: event.id, name: event.name, status: event.status ?? null, scheduledStartAt: event.scheduledStartAt?.toISOString?.() ?? event.scheduledStartAt ?? null, scheduledEndAt: event.scheduledEndAt?.toISOString?.() ?? event.scheduledEndAt ?? null })),
@@ -366,4 +430,8 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
       },
     },
   };
+
+  function settingsReason(operationOptions) {
+    return operationOptions?.reason === undefined ? undefined : String(operationOptions.reason);
+  }
 }
