@@ -89,6 +89,7 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
 
   async function evaluateExpression(expression) {
     if (expression.type === 'Literal') return expression.value;
+    if (expression.type === 'AwaitExpression') return evaluateExpression(expression.argument);
     if (expression.type === 'UnaryExpression') {
       const value = await evaluateExpression(expression.argument);
       if (expression.operator === '!') return !value;

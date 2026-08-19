@@ -15,6 +15,12 @@ describe('evaluate', () => {
     })).resolves.toBe('ready');
   });
 
+  test('supports explicit await expressions', async () => {
+    await expect(evaluate(parse('await source.get()'), {
+      source: { get: async () => 'ready' },
+    })).resolves.toBe('ready');
+  });
+
   test('evaluates unary expressions', async () => {
     await expect(evaluate(parse('value = -4; !false; value'))).resolves.toBe(-4);
   });

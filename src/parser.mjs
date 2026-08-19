@@ -135,6 +135,10 @@ export function parse(source) {
       consume(')', 'Expected `)` after grouped expression.');
       return expression;
     }
+    if (token?.type === 'identifier' && token.value === 'await') {
+      index += 1;
+      return { type: 'AwaitExpression', argument: parsePrimary() };
+    }
     if (token?.type === 'identifier' && token.value === 'try') {
       index += 1;
       const body = parseBlock();
