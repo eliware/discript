@@ -30,6 +30,13 @@ List channels in a guild:
 npm start -- channels list --guild <guild-id> --json
 ```
 
+Look up a guild or channel:
+
+```sh
+npm start -- guilds get --guild <guild-id> --json
+npm start -- channels get --channel <channel-id> --json
+```
+
 Preview or send a message. Writes require explicit approval:
 
 ```sh

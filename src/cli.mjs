@@ -85,10 +85,20 @@ async function executeDirectCommand(command, options) {
   try {
     const api = createDiscordApi(runtime.client, options);
     if (command.join(' ') === 'guilds list') return api.guilds.list();
+    if (command[0] === 'guilds' && command[1] === 'get') {
+      if (!options.guild) throw Object.assign(new Error('guilds get requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      const guild = api.guilds.get(options.guild);
+      return { id: guild.id, name: guild.name };
+    }
     if (command[0] === 'channels' && command[1] === 'list') {
       const guildId = options.guild;
       if (!guildId) throw Object.assign(new Error('channels list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(guildId).channels.list();
+    }
+    if (command[0] === 'channels' && command[1] === 'get') {
+      if (!options.channel) throw Object.assign(new Error('channels get requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      const channel = api.channels.get(options.channel);
+      return { id: channel.id, name: channel.name, type: channel.type };
     }
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
