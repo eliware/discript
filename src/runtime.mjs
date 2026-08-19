@@ -4,7 +4,8 @@ import { loadConfig } from './config.mjs';
 
 export async function createDiscordRuntime({ token = loadConfig().token, client: suppliedClient, loginTimeout = 15000 } = {}) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
-  const client = suppliedClient ?? new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
+  const configured = loadConfig();
+  const client = suppliedClient ?? new Client({ intents: resolveGatewayIntentBits(configured.intents) });
   let stopped = false;
   let resolveStopped;
   const stoppedPromise = new Promise(resolve => { resolveStopped = resolve; });
@@ -36,4 +37,11 @@ export async function createDiscordRuntime({ token = loadConfig().token, client:
     },
     waitForStop() { return stoppedPromise; },
   };
+}
+
+export function resolveGatewayIntentBits(names) {
+  const resolved = names.map(name => GatewayIntentBits[name]);
+  const invalid = names.find((name, index) => resolved[index] === undefined);
+  if (invalid) throw Object.assign(new Error(`DISCRIPT_INTENTS contains unknown gateway intent: ${invalid}.`), { code: 'DISCRIPT_INTENTS_INVALID', exitCode: 2 });
+  return resolved;
 }

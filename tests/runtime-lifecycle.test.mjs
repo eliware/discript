@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { describe, expect, jest, test } from '@jest/globals';
-import { createDiscordRuntime } from '../src/runtime.mjs';
+import { createDiscordRuntime, resolveGatewayIntentBits } from '../src/runtime.mjs';
+import { GatewayIntentBits } from 'discord.js';
 
 function clientFixture() {
   const client = new EventEmitter();
@@ -10,6 +11,10 @@ function clientFixture() {
 }
 
 describe('Discord runtime lifecycle', () => {
+  test('resolves configured gateway intent names', () => {
+    expect(resolveGatewayIntentBits(['Guilds', 'MessageContent'])).toEqual([GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent]);
+    expect(() => resolveGatewayIntentBits(['NotAnIntent'])).toThrow('unknown gateway intent');
+  });
   test('logs in, exposes a stop promise, and destroys the client once', async () => {
     const client = clientFixture();
     const runtime = await createDiscordRuntime({ token: 'test-token', client });
