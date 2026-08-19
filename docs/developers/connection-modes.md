@@ -41,4 +41,6 @@ The implementation should select the lightest transport that satisfies the opera
 
 Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one.
 
+Starting a second daemon for the same token is rejected with `BROKER_ALREADY_RUNNING`; the existing broker endpoint is never removed during startup. A stale endpoint is cleaned up only after no active broker can connect, and bind-time races are reported as the same duplicate-start error.
+
 Transient startup contention is retried with bounded exponential backoff. Session-limit errors use Discord’s `reset_after` value when available. Authentication failures, invalid intents, and disallowed intents are reported immediately and are never retried.

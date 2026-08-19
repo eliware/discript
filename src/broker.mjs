@@ -14,6 +14,7 @@ export function brokerEndpoint(token, home = homedir(), os = platform()) {
 export async function startGatewayBroker({ token, endpoint = brokerEndpoint(token), runtimeOptions = {}, enforceSessionLimit = true, limits } = {}) {
   const sessionLimits = limits ?? (!runtimeOptions.client && enforceSessionLimit ? await getGatewaySessionLimits({ token }) : null);
   if (sessionLimits && shouldWaitForGatewayStart(sessionLimits)) throw Object.assign(new Error(`Discord Gateway session-start limit exhausted; retry after ${sessionLimits.resetAfter}ms.`), { code: 'GATEWAY_SESSION_LIMIT', exitCode: 6, resetAfter: sessionLimits.resetAfter });
+  if (await brokerEndpointIsActive(endpoint)) throw brokerAlreadyRunningError(endpoint);
   const runtime = await createDiscordRuntime({ token, ...runtimeOptions });
   const server = net.createServer(socket => {
     let buffer = '';
@@ -28,7 +29,13 @@ export async function startGatewayBroker({ token, endpoint = brokerEndpoint(toke
     });
   });
   await unlink(endpoint).catch(error => { if (error.code !== 'ENOENT') throw error; });
-  await new Promise((resolve, reject) => { server.once('error', reject); server.listen(endpoint, resolve); });
+  try {
+    await new Promise((resolve, reject) => { server.once('error', reject); server.listen(endpoint, resolve); });
+  } catch (error) {
+    await runtime.shutdown().catch(() => undefined);
+    if (error.code === 'EADDRINUSE' || error.code === 'EPIPE') throw brokerAlreadyRunningError(endpoint);
+    throw error;
+  }
   let closed = false;
   return {
     endpoint,
@@ -41,6 +48,27 @@ export async function startGatewayBroker({ token, endpoint = brokerEndpoint(toke
       await unlink(endpoint).catch(() => undefined);
     },
   };
+}
+
+function brokerAlreadyRunningError(endpoint) {
+  return Object.assign(new Error(`Gateway broker is already running at ${endpoint}.`), { code: 'BROKER_ALREADY_RUNNING', exitCode: 1 });
+}
+
+async function brokerEndpointIsActive(endpoint, timeout = 250) {
+  return await new Promise(resolve => {
+    const socket = net.createConnection(endpoint);
+    let settled = false;
+    const finish = active => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      socket.destroy();
+      resolve(active);
+    };
+    const timer = setTimeout(() => finish(false), timeout);
+    socket.once('connect', () => finish(true));
+    socket.once('error', () => finish(false));
+  });
 }
 
 async function handleBrokerRequest(line, socket, runtime) {
