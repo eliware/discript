@@ -18,9 +18,10 @@ export async function run(argv = [], dependencies = {}) {
   validateTimeout(options.timeout);
   const errors = registerHandlers({ log });
   let shutdownHook;
+  let activeRuntime;
   try {
-    shutdownHook = registerSignals({ log, exit: false, shutdownHook: async () => {} });
-    const result = await withTimeout(executeInput(source, options, dependencies), options.timeout);
+    shutdownHook = registerSignals({ log, exit: false, shutdownHook: async signal => activeRuntime?.shutdown(signal) });
+    const result = await withTimeout(executeInput(source, options, dependencies, runtime => { activeRuntime = runtime; }), options.timeout);
     if (result !== undefined) writeResult(result, options, stdout);
     return result;
   } finally {
@@ -55,19 +56,27 @@ function validateTimeout(timeout) {
   return timeoutMs;
 }
 
-async function executeInput(input, options, dependencies) {
+async function executeInput(input, options, dependencies, onRuntime = () => {}) {
   if (input.kind === 'command') return executeDirectCommand(input.command, options, dependencies);
   if (options.dry_run) return { dryRun: true, source: input.source };
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
+  onRuntime(runtime);
   try {
+    let handlerCount = 0;
     const result = await evaluate(parse(input.source), {
       discord: createDiscordApi(runtime.client, options),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
       filter: (items, property, expected) => (items ?? []).filter(item => item?.[property] === expected),
       exit: (exitCode = 0, message = null) => { throw new ScriptExit(exitCode, message); },
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
+      on: (eventName, handler) => {
+        runtime.client.on(eventName, handler);
+        handlerCount += 1;
+        return { event: eventName, registered: true };
+      },
     });
+    if (handlerCount > 0) await runtime.waitForStop();
     return result;
   } finally {
     await runtime.shutdown();

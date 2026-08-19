@@ -6,6 +6,8 @@ export async function createDiscordRuntime({ token = loadConfig().token } = {}) 
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers] });
   let stopped = false;
+  let resolveStopped;
+  const stoppedPromise = new Promise(resolve => { resolveStopped = resolve; });
   await new Promise((resolve, reject) => {
     const onReady = () => {
       client.off('error', onError);
@@ -26,6 +28,8 @@ export async function createDiscordRuntime({ token = loadConfig().token } = {}) 
       stopped = true;
       try { await client.destroy(); }
       catch (error) { log.warn('Discord shutdown failed', { error: error.message }); }
+      resolveStopped();
     },
+    waitForStop() { return stoppedPromise; },
   };
 }
