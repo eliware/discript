@@ -23,7 +23,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Destructive operations require explicit `--yes`/`-y` CLI approval or `force: true` inside scripts across the current mutation surface.
 - [Fully complete] CLI commands return stable process exit codes, including structured invalid-input failures on stderr.
 - [Fully complete] Scripts can capture operation exit codes and branch on them internally.
-- [Half complete] Scripts can explicitly terminate with a chosen exit code and message.
+- [Fully complete] Scripts can explicitly terminate with a chosen exit code and message, including termination that cannot be swallowed by `try` recovery.
 - [Fully complete] Discript emits machine-readable JSON results and structured JSON errors on stderr.
 - [Fully complete] Discript emits opt-in structured JSONL records with `--output jsonl`, including incremental script output.
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
