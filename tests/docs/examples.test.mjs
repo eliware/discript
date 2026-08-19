@@ -1,11 +1,12 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from '@jest/globals';
 import { evaluate } from '../../src/evaluator.mjs';
 import { parse } from '../../src/parser/index.mjs';
 import { createEnvironment } from '../../src/env.mjs';
 
-const root = resolve(new URL('../..', import.meta.url).pathname);
+const root = fileURLToPath(new URL('../..', import.meta.url));
 const examples = join(root, 'examples');
 
 async function filesUnder(directory) {
