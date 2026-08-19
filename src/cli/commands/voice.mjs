@@ -1,0 +1,2 @@
+import { required } from './validation.mjs';
+export function createVoiceHandler({command,options,api}) { if(command[0]!=='voice'||!['status','join','leave'].includes(command[1])) return {handled:false}; if(command[1]==='join') return {handled:true,value:api.voice.join(required(options,'channel','voice join requires --channel <id>.','CHANNEL_REQUIRED'))}; const guild=required(options,'guild',`voice ${command[1]} requires --guild <id>.`,'GUILD_REQUIRED'); return {handled:true,value:api.voice[command[1]](guild)}; }
