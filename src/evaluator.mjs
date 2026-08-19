@@ -1,5 +1,6 @@
 import { createScope } from './evaluator/scope.mjs';
 import { normalizeError, runtimeError, ScriptExit } from './evaluator/errors.mjs';
+import { ReturnSignal, createClosure } from './evaluator/functions.mjs';
 
 export { ScriptExit } from './evaluator/errors.mjs';
 
@@ -15,17 +16,7 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
 
   async function evaluateStatement(statement) {
     if (statement.type === 'FunctionDeclaration') {
-      const closure = async (...values) => {
-        const localScope = new Map(scope);
-        for (const [index, parameter] of statement.parameters.entries()) localScope.set(parameter, values[index]);
-        return scopeContext.run(localScope, async () => {
-          try { return await evaluateBlock(statement.body); }
-          catch (error) {
-            if (error instanceof ReturnSignal) return error.value;
-            throw error;
-          }
-        });
-      };
+      const closure = createClosure(statement, { scope, scopeContext, evaluateBlock });
       scope.set(statement.name, closure);
       return closure;
     }
@@ -152,8 +143,4 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
     }
     throw runtimeError(`Unsupported expression: ${expression.type}`);
   }
-}
-
-class ReturnSignal {
-  constructor(value) { this.value = value; }
 }
