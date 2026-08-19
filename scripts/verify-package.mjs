@@ -13,7 +13,11 @@ try {
   if (!tarball) throw new Error('npm pack did not produce a tarball.');
   execFileSync(npmCommand, ['install', '--ignore-scripts', '--no-audit', '--no-fund', tarball], { ...spawnOptions, cwd: directory });
   const binary = join(directory, 'node_modules', '.bin', process.platform === 'win32' ? 'discript.cmd' : 'discript');
-  const help = execFileSync(binary, ['--help'], { cwd: directory, encoding: 'utf8' });
+  const help = execFileSync(binary, ['--help'], {
+    ...spawnOptions,
+    cwd: directory,
+    encoding: 'utf8'
+  });
   if (!help.includes('Usage: discript')) throw new Error('Packaged CLI did not return help output.');
   console.log('Package install smoke check passed.');
 } finally {
