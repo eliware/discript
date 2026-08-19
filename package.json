@@ -13,6 +13,7 @@
         "pack": "npm pack --dry-run",
         "pack:check": "npm run package:check",
         "package:check": "node scripts/verify-package.mjs",
+        "docs:check": "node scripts/check-docs.mjs",
         "lint": "npx oxlint ."
     },
     "repository": {
