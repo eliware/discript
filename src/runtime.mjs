@@ -3,7 +3,7 @@ import { log } from '@eliware/common';
 
 export async function createDiscordRuntime({ token = process.env.DISCORD_TOKEN } = {}) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
-  const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+  const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
   let stopped = false;
   await new Promise((resolve, reject) => {
     const onReady = () => {
