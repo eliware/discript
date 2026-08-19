@@ -75,9 +75,9 @@ describe('live Discord integration', () => {
       const botMember = [...runtime.client.guilds.cache.get(config.testGuild).members.cache.values()].find(member => member.user?.bot);
       expect(botMember).toBeTruthy();
       await expect(guild.members.get(botMember.id).timeout(1000)).rejects.toMatchObject({ code: 'MEMBER_PROTECTED', exitCode: 5 });
-      const category = [...runtime.client.channels.cache.values()].find(channel => channel.guild?.id === config.testGuild && channel.type === 4);
-      expect(category).toBeTruthy();
-      await expect(api.voice.join(category.id)).rejects.toMatchObject({ code: 'VOICE_CHANNEL_REQUIRED', exitCode: 2 });
+      const textChannel = [...runtime.client.channels.cache.values()].find(channel => channel.guild?.id === config.testGuild && channel.type === 0);
+      expect(textChannel).toBeTruthy();
+      await expect(api.voice.join(textChannel.id)).rejects.toMatchObject({ code: 'VOICE_CHANNEL_REQUIRED', exitCode: 2 });
     } finally {
       await runtime.shutdown();
     }
