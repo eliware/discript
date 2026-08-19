@@ -88,6 +88,12 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
 
   async function evaluateExpression(expression) {
     if (expression.type === 'Literal') return expression.value;
+    if (expression.type === 'UnaryExpression') {
+      const value = await evaluateExpression(expression.argument);
+      if (expression.operator === '!') return !value;
+      if (expression.operator === '-') return -value;
+      throw runtimeError(`Unsupported unary operator: ${expression.operator}`);
+    }
     if (expression.type === 'ArrowExpression') {
       return async value => {
         const hadPrevious = scope.has(expression.parameter);

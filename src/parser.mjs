@@ -1,4 +1,4 @@
-const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(=>|==|!=|>=|<=|>|<|\+|-|\*|\/)|([()[\].,;=:{}`])/y;
+const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(=>|==|!=|>=|<=|>|<|\+|-|\*|\/|!)|([()[\].,;=:{}`])/y;
 
 export function parse(source) {
   const tokens = tokenize(source);
@@ -115,6 +115,10 @@ export function parse(source) {
 
   function parsePrimary() {
     const token = peek();
+    if (token?.type === 'operator' && (token.value === '!' || token.value === '-')) {
+      index += 1;
+      return { type: 'UnaryExpression', operator: token.value, argument: parsePrimary() };
+    }
     if (match('(')) {
       const expression = parseExpression();
       consume(')', 'Expected `)` after grouped expression.');
