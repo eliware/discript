@@ -78,6 +78,15 @@ on("messageCreate") {
 
 When a script registers one or more handlers, it remains running until a termination signal is received; `--timeout <milliseconds>` can bound that lifetime for automation.
 
+Use bounded `for-in` loops to process result collections:
+
+```text
+members = discord.guilds.get("<guild-id>").members.list()
+for (member in members) {
+  print(member.username)
+}
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh

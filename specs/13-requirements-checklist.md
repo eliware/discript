@@ -10,10 +10,10 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript accepts source through standard input.
 - [Fully complete] Discript supports direct resource-operation commands.
 - [Fully complete] Discript supports variables and sequential result reuse.
-- [Half complete] Discript supports structured values, arrays, objects, and basic collection helpers.
+- [Fully complete] Discript supports structured values, arrays, objects, basic collection helpers, and bounded `for-in` iteration.
 - [Half complete] Discript supports asynchronous operations.
 - [Not started] Discript supports explicit concurrency primitives.
-- [Half complete] Discript supports conditionals, comparisons, arithmetic, and bounded `while` loops.
+- [Fully complete] Discript supports conditionals, comparisons, arithmetic, bounded `while` loops, and bounded `for-in` loops.
 - [Not started] Discript supports callback syntax and general-purpose collection callbacks.
 - [Not started] Discript supports imports and reusable script modules.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
