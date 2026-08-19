@@ -1,0 +1,19 @@
+// Create a category and voice channel, move the voice channel, then remove both.
+if (env.DISCRIPT_LIVE_MUTATIONS != "1") {
+  exit(2, "set DISCRIPT_LIVE_MUTATIONS=1 before running live mutations")
+}
+
+guildId = env.TEST_GUILD
+runId = env.DISCRIPT_RUN_ID
+if (guildId == null || runId == null) {
+  exit(2, "set TEST_GUILD and DISCRIPT_RUN_ID")
+}
+
+guild = discord.guilds.get(guildId)
+category = guild.channels.create("discript-category-" + runId, {force: true, type: "category"})
+voice = guild.channels.create("discript-voice-" + runId, {force: true, type: "voice", parent: category.id, position: 1})
+moved = discord.channels.get(voice.id).update({uncategorized: true, position: 2}, {force: true})
+deletedVoice = discord.channels.get(voice.id).delete({force: true})
+deletedCategory = discord.channels.get(category.id).delete({force: true})
+
+{category: category, voice: voice, moved: moved, deletedVoice: deletedVoice, deletedCategory: deletedCategory}

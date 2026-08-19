@@ -9,7 +9,7 @@ import { createEnvironment } from "../env.mjs";
 export async function executeInput(input, options, dependencies, onRuntime = () => {}) {
   if (input.kind === 'command') return executeDirectCommand(input.command, options, dependencies);
   if (options.dry_run) return { dryRun: true, source: input.source };
-  const { createDiscordRuntime } = await import('./runtime.mjs');
+  const { createDiscordRuntime } = await import('../runtime.mjs');
   const runtime = await createDiscordRuntime();
   onRuntime(runtime);
   const timers = new Set();

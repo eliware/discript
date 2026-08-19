@@ -1,0 +1,18 @@
+// Create a temporary channel, set an overwrite, remove it, then delete the channel.
+if (env.DISCRIPT_LIVE_MUTATIONS != "1") {
+  exit(2, "set DISCRIPT_LIVE_MUTATIONS=1 before running live mutations")
+}
+
+guildId = env.TEST_GUILD
+runId = env.DISCRIPT_RUN_ID
+targetId = env.DISCORD_PERMISSION_TARGET
+if (guildId == null || runId == null || targetId == null) {
+  exit(2, "set TEST_GUILD, DISCRIPT_RUN_ID, and DISCORD_PERMISSION_TARGET")
+}
+
+channel = discord.guilds.get(guildId).channels.create("discript-permissions-" + runId, {force: true})
+overwrite = discord.channels.get(channel.id).permissions.set(targetId, {allow: ["ViewChannel", "ReadMessageHistory"]}, {force: true})
+removed = discord.channels.get(channel.id).permissions.delete(targetId, {force: true})
+deleted = discord.channels.get(channel.id).delete({force: true})
+
+{channel: channel, overwrite: overwrite, removed: removed, deleted: deleted}

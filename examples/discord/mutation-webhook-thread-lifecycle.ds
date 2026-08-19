@@ -1,0 +1,20 @@
+// Live webhook/thread lifecycle. Requires a text channel with the matching permissions.
+if (env.DISCRIPT_LIVE_MUTATIONS != "1") {
+  exit(2, "set DISCRIPT_LIVE_MUTATIONS=1 before running live mutations")
+}
+
+channelId = env.DISCORD_CHANNEL_ID
+runId = env.DISCRIPT_RUN_ID
+if (channelId == null || runId == null) {
+  exit(2, "set DISCORD_CHANNEL_ID and DISCRIPT_RUN_ID")
+}
+
+channel = discord.channels.get(channelId)
+thread = channel.threads.create("discript-thread-" + runId, {force: true})
+updatedThread = channel.threads.update(thread.id, {name: "discript-thread-updated-" + runId}, {force: true})
+deletedThread = channel.threads.delete(thread.id, {force: true})
+webhook = channel.webhooks.create("discript-webhook-" + runId, {force: true})
+updatedWebhook = channel.webhooks.update(webhook.id, {name: "discript-webhook-updated-" + runId}, {force: true})
+deletedWebhook = channel.webhooks.delete(webhook.id, {force: true})
+
+{thread: {created: thread, updated: updatedThread, deleted: deletedThread}, webhook: {created: webhook, updated: updatedWebhook, deleted: deletedWebhook}}

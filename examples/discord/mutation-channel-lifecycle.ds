@@ -1,0 +1,20 @@
+// Live, reversible mutation example. Run only with:
+// DISCRIPT_LIVE_MUTATIONS=1 discript examples/discord/mutation-channel-lifecycle.ds
+if (env.DISCRIPT_LIVE_MUTATIONS != "1") {
+  exit(2, "set DISCRIPT_LIVE_MUTATIONS=1 before running live mutations")
+}
+
+guildId = env.TEST_GUILD
+name = "discript-example-" + env.DISCRIPT_RUN_ID
+if (guildId == null || env.DISCRIPT_RUN_ID == null) {
+  exit(2, "set TEST_GUILD and DISCRIPT_RUN_ID")
+}
+
+guild = discord.guilds.get(guildId)
+created = guild.channels.create(name, {force: true, type: "text"})
+message = discord.channels.get(created.id).send("initial content", {force: true})
+edited = discord.messages.edit(created.id, message.id, "edited content", {force: true})
+deletedMessage = discord.messages.delete(created.id, message.id, {force: true})
+deletedChannel = discord.channels.get(created.id).delete({force: true})
+
+{created: created, edited: edited, deletedMessage: deletedMessage, deletedChannel: deletedChannel}

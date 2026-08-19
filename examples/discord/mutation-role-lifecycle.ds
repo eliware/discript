@@ -1,0 +1,17 @@
+// Live role CRUD with cleanup. The role is created, renamed, and deleted.
+if (env.DISCRIPT_LIVE_MUTATIONS != "1") {
+  exit(2, "set DISCRIPT_LIVE_MUTATIONS=1 before running live mutations")
+}
+
+guildId = env.TEST_GUILD
+runId = env.DISCRIPT_RUN_ID
+if (guildId == null || runId == null) {
+  exit(2, "set TEST_GUILD and DISCRIPT_RUN_ID")
+}
+
+guild = discord.guilds.get(guildId)
+created = guild.roles.create("discript-role-" + runId, {force: true})
+updated = guild.roles.get(created.id).update({name: "discript-role-updated-" + runId}, {force: true})
+deleted = guild.roles.get(created.id).delete({force: true})
+
+{created: created, updated: updated, deleted: deleted}
