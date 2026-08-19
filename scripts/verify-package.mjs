@@ -12,7 +12,8 @@ try {
   const tarball = tarballName ? join(directory, tarballName) : '';
   if (!tarball) throw new Error('npm pack did not produce a tarball.');
   const archiveFiles = execFileSync('tar', ['-tf', tarball], { encoding: 'utf8' });
-  if (!archiveFiles.split('\n').some(file => file === 'package/docs/README.md')) throw new Error('Packaged documentation is missing docs/README.md.');
+  const normalizedArchiveFiles = archiveFiles.split(/\r?\n/).map(file => file.trim().replaceAll('\\', '/'));
+  if (!normalizedArchiveFiles.includes('package/docs/README.md')) throw new Error('Packaged documentation is missing docs/README.md.');
   execFileSync(npmCommand, ['install', '--ignore-scripts', '--no-audit', '--no-fund', tarball], { ...spawnOptions, cwd: directory });
   const binary = join(directory, 'node_modules', '.bin', process.platform === 'win32' ? 'discript.cmd' : 'discript');
   const help = execFileSync(binary, ['--help'], {
