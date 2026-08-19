@@ -20,4 +20,9 @@ describe('direct dry-run validation', () => {
     await expect(run(['webhooks', 'create', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'NAME_REQUIRED', exitCode: 2 });
     await expect(run(['webhooks', 'delete', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'WEBHOOK_REQUIRED', exitCode: 2 });
   });
+
+  test('validates permission overwrite fields in dry-run mode', async () => {
+    await expect(run(['permissions', 'set', '--dry-run', '--channel', '123', '--target', '456'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
+    await expect(run(['permissions', 'delete', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'TARGET_REQUIRED', exitCode: 2 });
+  });
 });

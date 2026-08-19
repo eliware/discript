@@ -98,6 +98,14 @@ npm start -- webhooks create --channel <channel-id> --name automation --yes --js
 npm start -- webhooks delete --channel <channel-id> --webhook <webhook-id> --yes --json
 ```
 
+Channel permission overwrites can be inspected or changed with comma-separated Discord permission names:
+
+```sh
+npm start -- permissions list --channel <channel-id> --json
+npm start -- permissions set --channel <channel-id> --target <role-or-user-id> --allow ViewChannel,SendMessages --deny ManageMessages --yes --json
+npm start -- permissions delete --channel <channel-id> --target <role-or-user-id> --yes --json
+```
+
 Invite creation and deletion are guarded mutations; use `--yes` (or `-y`) and preview with `--dry-run`:
 
 ```sh

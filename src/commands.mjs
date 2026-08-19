@@ -4,6 +4,7 @@ export const COMMANDS = [
   'events list', 'events create', 'events update', 'events delete', 'voice status', 'voice join', 'voice leave',
   'channels list', 'channels get', 'channels create', 'channels delete', 'threads list', 'threads create', 'threads archive',
   'webhooks list', 'webhooks create', 'webhooks delete',
+  'permissions list', 'permissions set', 'permissions delete',
   'messages send', 'messages get', 'messages edit', 'messages delete', 'messages react', 'messages pin', 'messages unpin', 'messages bulk-delete',
   'moderation ban', 'moderation kick', 'moderation timeout',
 ];

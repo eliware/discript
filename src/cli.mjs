@@ -286,6 +286,15 @@ async function executeDirectCommand(command, options) {
       if (!options.webhook) throw Object.assign(new Error('webhooks delete requires --webhook <id>.'), { code: 'WEBHOOK_REQUIRED', exitCode: 2 });
       return webhooks.delete(options.webhook, { reason: options.reason });
     }
+    if (command[0] === 'permissions' && ['list', 'set', 'delete'].includes(command[1])) {
+      if (!options.channel) throw Object.assign(new Error(`permissions ${command[1]} requires --channel <id>.`), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      const permissions = api.channels.get(options.channel).permissions;
+      if (command[1] === 'list') return permissions.list();
+      if (!options.target) throw Object.assign(new Error(`permissions ${command[1]} requires --target <id>.`), { code: 'TARGET_REQUIRED', exitCode: 2 });
+      if (command[1] === 'delete') return permissions.delete(options.target, { reason: options.reason });
+      if (options.allow === undefined && options.deny === undefined) throw Object.assign(new Error('permissions set requires --allow and/or --deny.'), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
+      return permissions.set(options.target, { ...(options.allow !== undefined ? { allow: options.allow.split(',').filter(Boolean) } : {}), ...(options.deny !== undefined ? { deny: options.deny.split(',').filter(Boolean) } : {}) }, { reason: options.reason });
+    }
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
       if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
@@ -349,6 +358,7 @@ function previewMutation(command, options) {
     if (command[0] === 'emojis' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
     if (command[0] === 'stickers' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
     if (command[0] === 'webhooks' && ['create', 'delete'].includes(command[1])) requireChannel();
+    if (command[0] === 'permissions' && ['set', 'delete'].includes(command[1])) requireChannel();
   };
   requireMutationTarget();
   if (command[0] === 'roles' && ['add', 'remove'].includes(command[1])) { requireUser(); requireRole(); }
@@ -371,6 +381,7 @@ function previewMutation(command, options) {
   if (command[0] === 'stickers' && command[1] === 'create') { requireOption('name', 'NAME_REQUIRED'); requireOption('file', 'FILE_REQUIRED'); requireOption('tags', 'TAGS_REQUIRED'); }
   if (command[0] === 'stickers' && command[1] === 'update' && !options.name && !options.description && !options.tags) throw Object.assign(new Error(`${action} requires --name, --description, or --tags.`), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
   if (command[0] === 'webhooks') { requireChannel(); if (command[1] === 'create') requireOption('name', 'NAME_REQUIRED'); if (command[1] === 'delete') requireOption('webhook', 'WEBHOOK_REQUIRED'); }
+  if (command[0] === 'permissions') { requireChannel(); if (command[1] !== 'list') requireOption('target', 'TARGET_REQUIRED'); if (command[1] === 'set' && options.allow === undefined && options.deny === undefined) throw Object.assign(new Error(`${action} requires --allow and/or --deny.`), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 }); }
   if (command[0] === 'voice' && command[1] === 'join') requireChannel();
   if (command[0] === 'voice' && command[1] === 'leave') requireGuild();
   return { dryRun: true, action, command, parameters: Object.fromEntries(Object.entries(options).filter(([key]) => !['json', 'pretty', 'dry_run', 'yes'].includes(key))) };
