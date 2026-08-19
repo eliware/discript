@@ -57,8 +57,8 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 
 ## Current verification evidence
 
-- [Fully complete] `npm test -- --runInBand` passes with 266 tests passed and 9 skipped.
-- [Fully complete] `npm run docs:check` passes with 106 Markdown files, 66 CLI commands, and 65 parsed examples.
+- [Fully complete] `npm test -- --runInBand` passes with 305 tests passed and 9 skipped.
+- [Fully complete] `npm run docs:check` passes with 107 Markdown files, 66 CLI commands, and 65 parsed examples.
 - [Fully complete] `npm run package:check` passes with an isolated tarball install and packaged `docs/README.md` assertion.
 - [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
 - [Fully complete] Executable documentation tests parse every `.ds` example and execute representative fundamentals.

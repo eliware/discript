@@ -22,7 +22,7 @@ REST mutations use the same safety rules as Gateway-backed mutations. `--dry-run
 
 Scripts that register event handlers, use ongoing timers, or explicitly require a live cache use a Discord Gateway client. Gateway connections are persistent and consume session-start capacity when they identify. They must always have a bounded startup timeout and cleanup on every failed startup path.
 
-Discord also limits concurrent Identify requests. Multiple independent Discript processes should not all start Gateway clients simultaneously; a future broker or startup lock must coordinate them. Gateway reconnects should resume when possible instead of repeatedly identifying.
+Discord also limits concurrent Identify requests. Discript serializes Gateway startup through its lock, checks the session-start budget, and supports a persistent broker so multiple commands can share one Gateway client. Gateway reconnects should resume when possible instead of repeatedly identifying.
 
 The Gateway limits helper exposes Discord’s current `remaining`, `reset_after`, `max_concurrency`, and shard values. A broker or launcher should inspect these values before scheduling fresh Identify requests and wait for the reset window when the remaining count is exhausted.
 
@@ -39,7 +39,7 @@ The Gateway limits helper exposes Discord’s current `remaining`, `reset_after`
 
 The implementation should select the lightest transport that satisfies the operation. A command must not open Gateway solely because it performs a normal REST mutation.
 
-Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one.
+Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands or scripts to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one. Broker requests have a bounded timeout and return structured `BROKER_TIMEOUT` or `BROKER_UNAVAILABLE` errors.
 
 Starting a second daemon for the same token is rejected with `BROKER_ALREADY_RUNNING`; the existing broker endpoint is never removed during startup. A stale endpoint is cleaned up only after no active broker can connect, and bind-time races are reported as the same duplicate-start error.
 

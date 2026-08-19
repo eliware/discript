@@ -12,7 +12,8 @@ export function helpText() {
     `  discript <script-file>           Run a script file\n` +
     `  cat script.ds | discript          Read source from stdin\n` +
     `  discript commands list            List supported direct commands\n` +
-    `  discript completion bash          Generate shell completion\n\n` +
+    `  discript completion bash          Generate shell completion\n` +
+    `  discript daemon start             Start the shared Gateway broker\n\n` +
     `Options:\n` +
     `  -e, --eval <source>  Evaluate source\n` +
     `  --json               Emit machine-readable JSON\n` +
@@ -21,6 +22,8 @@ export function helpText() {
     `  --dry-run            Preview supported mutations\n` +
     `  --validate           With --dry-run, resolve targets and permissions\n` +
     `  -y, --yes            Approve mutations\n` +
+    `  --rest               Use REST for supported operations\n` +
+    `  --broker             Use the persistent local Gateway broker\n` +
     `  --timeout <ms>       Set an execution timeout\n` +
     `  -h, --help           Show this help\n` +
     `  -v, --version        Show the installed version`;
