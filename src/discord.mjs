@@ -21,7 +21,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
   };
   const requirePermission = (guild, permission) => {
     const botMember = guild?.members?.me;
-    if (botMember?.permissions?.has && !botMember.permissions.has(permission)) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
+    if (guild?.members && (!botMember?.permissions?.has || !botMember.permissions.has(permission))) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
   };
   const requireManageableRole = (guild, roleId) => {
     const role = guild.roles.cache.get(String(roleId));
@@ -38,7 +38,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
   const requireChannelPermission = (channelId, permission) => {
     const channel = client.channels.cache.get(String(channelId));
     const botMember = channel?.guild?.members?.me;
-    if (botMember?.permissions?.has && !botMember.permissions.has(permission)) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
+    if (channel?.guild?.members && (!botMember?.permissions?.has || !botMember.permissions.has(permission))) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
   };
   return {
     bot: {

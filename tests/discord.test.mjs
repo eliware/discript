@@ -65,6 +65,12 @@ describe('Discord capability layer', () => {
     await expect(api.guilds.get('1').stickers.create({ name: 'new', file: '/tmp/a.png', tags: '😀' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
   });
 
+  test('fails closed when Discord permission state is unavailable', async () => {
+    const guild = { id: '1', members: {}, emojis: { cache: new Map(), create: jest.fn() } };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true });
+    await expect(api.guilds.get('1').emojis.create({ name: 'new', attachment: '/tmp/a.png' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
+
   test('supports guarded channel webhook operations', async () => {
     const createWebhook = jest.fn(async settings => ({ id: 'w2', name: settings.name, channelId: '1', delete: jest.fn() }));
     const fetchedWebhook = { id: 'w1', name: 'old', channelId: '1', delete: jest.fn(async () => undefined) };
