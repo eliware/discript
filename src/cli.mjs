@@ -195,6 +195,15 @@ async function executeDirectCommand(command, options) {
       if (!options.message) throw Object.assign(new Error('messages delete requires --message <id>.'), { code: 'MESSAGE_REQUIRED', exitCode: 2 });
       return api.messages.delete(options.channel, options.message);
     }
+    if (command[0] === 'messages' && ['react', 'pin', 'unpin'].includes(command[1])) {
+      if (!options.channel) throw Object.assign(new Error(`messages ${command[1]} requires --channel <id>.`), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (!options.message) throw Object.assign(new Error(`messages ${command[1]} requires --message <id>.`), { code: 'MESSAGE_REQUIRED', exitCode: 2 });
+      if (command[1] === 'react') {
+        if (!options.emoji) throw Object.assign(new Error('messages react requires --emoji <emoji>.'), { code: 'EMOJI_REQUIRED', exitCode: 2 });
+        return api.messages.react(options.channel, options.message, options.emoji);
+      }
+      return api.messages[command[1]](options.channel, options.message);
+    }
     throw Object.assign(new Error(`Unknown command: ${command.join(' ')}`), { code: 'UNKNOWN_COMMAND', exitCode: 2 });
   } finally {
     await runtime.shutdown();

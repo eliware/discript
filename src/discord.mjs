@@ -43,6 +43,27 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         await (await resolveMessage(channelId, messageId)).delete();
         return { id: String(messageId), deleted: true };
       },
+      react: async (channelId, messageId, emoji, operationOptions = {}) => {
+        requireChannelPermission(channelId, 'AddReactions');
+        requireApproval('Reacting to a message', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), emoji };
+        await (await resolveMessage(channelId, messageId)).react(String(emoji));
+        return { id: String(messageId), reacted: true, emoji };
+      },
+      pin: async (channelId, messageId, operationOptions = {}) => {
+        requireChannelPermission(channelId, 'ManageMessages');
+        requireApproval('Pinning a message', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), pinned: true };
+        await (await resolveMessage(channelId, messageId)).pin();
+        return { id: String(messageId), pinned: true };
+      },
+      unpin: async (channelId, messageId, operationOptions = {}) => {
+        requireChannelPermission(channelId, 'ManageMessages');
+        requireApproval('Unpinning a message', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: String(channelId), messageId: String(messageId), pinned: false };
+        await (await resolveMessage(channelId, messageId)).unpin();
+        return { id: String(messageId), pinned: false };
+      },
     },
     channels: {
       get: id => {

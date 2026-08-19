@@ -90,6 +90,9 @@ Messages can be read or changed with explicit approval for writes:
 npm start -- messages get --channel <channel-id> --message <message-id> --json
 npm start -- messages edit --channel <channel-id> --message <message-id> --content "Updated" --yes --json
 npm start -- messages delete --channel <channel-id> --message <message-id> --yes --json
+npm start -- messages react --channel <channel-id> --message <message-id> --emoji "👍" --yes --json
+npm start -- messages pin --channel <channel-id> --message <message-id> --yes --json
+npm start -- messages unpin --channel <channel-id> --message <message-id> --yes --json
 ```
 
 Evaluate source inline:
