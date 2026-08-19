@@ -16,6 +16,16 @@ cp .env.example .env
 # edit .env with a private Discord bot token
 ```
 
+For local or private installation, use the Git SSH URL or build a tarball:
+
+```sh
+npm install git+ssh://git@github.com/eliware/discript.git
+npm pack
+npm install ./discript-1.0.0.tgz
+```
+
+The package is currently marked private and is not publishable to npm.
+
 ## Usage
 
 List guilds with a direct CLI command:

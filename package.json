@@ -2,6 +2,7 @@
   "name": "discript",
   "version": "1.0.0",
   "description": "Discord scripting language and automation CLI for developers and AI agents.",
+  "private": true,
   "main": "bin/discript.mjs",
   "scripts": {
     "start": "node bin/discript.mjs",
@@ -30,8 +31,7 @@
     "examples",
     "README.md",
     "SPEC.md",
-    "specs",
-    "LICENSE"
+    "specs"
   ],
   "bin": {
     "discript": "bin/discript.mjs"
