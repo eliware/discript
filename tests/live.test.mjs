@@ -59,4 +59,21 @@ describe('live Discord integration', () => {
       await runtime.shutdown();
     }
   }, 30000);
+
+  (live ? test : test.skip)('validates protected moderation and invalid voice targets', async () => {
+    const config = loadConfig();
+    const runtime = await createDiscordRuntime({ token: config.token });
+    try {
+      const api = createDiscordApi(runtime.client, { dryRun: true });
+      const guild = api.guilds.get(requireTestGuild(config));
+      const botMember = [...runtime.client.guilds.cache.get(config.testGuild).members.cache.values()].find(member => member.user?.bot);
+      expect(botMember).toBeTruthy();
+      await expect(guild.members.get(botMember.id).timeout(1000)).rejects.toMatchObject({ code: 'MEMBER_PROTECTED', exitCode: 5 });
+      const category = [...runtime.client.channels.cache.values()].find(channel => channel.guild?.id === config.testGuild && channel.type === 4);
+      expect(category).toBeTruthy();
+      await expect(api.voice.join(category.id)).rejects.toMatchObject({ code: 'VOICE_CHANNEL_REQUIRED', exitCode: 2 });
+    } finally {
+      await runtime.shutdown();
+    }
+  }, 30000);
 });
