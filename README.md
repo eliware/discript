@@ -68,6 +68,14 @@ npm start -- events update --guild <guild-id> --event <event-id> --name "Updated
 npm start -- events delete --guild <guild-id> --event <event-id> --yes --json
 ```
 
+Voice connections support guarded join/leave and status inspection:
+
+```sh
+npm start -- voice status --guild <guild-id> --json
+npm start -- voice join --channel <voice-channel-id> --yes --json
+npm start -- voice leave --guild <guild-id> --yes --json
+```
+
 Scripts can declare event handlers. The incoming Discord payload is available as `event` inside the handler:
 
 ```text

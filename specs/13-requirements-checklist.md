@@ -27,7 +27,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript emits machine-readable JSON results.
 - [Fully complete] Discript emits opt-in structured JSONL records with `--output jsonl`, including incremental script output.
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
-- [Half complete] Discript covers threads, invites, emojis, stickers, scheduled events, and voice operations. Scheduled events are now implemented; voice operations remain outstanding.
+- [Fully complete] Discript covers threads, invites, emojis, stickers, scheduled events, and guarded voice join/leave/status operations.
 - [Half complete] Discript enforces Discord permissions and authorization safeguards across current mutation groups.
 - [Half complete] Discript enforces protected-role, permission, and basic role-hierarchy checks; complete protected-target checks remain.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
