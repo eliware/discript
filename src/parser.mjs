@@ -16,6 +16,16 @@ export function parse(source) {
       consume(')', 'Expected `)` after the event name.');
       return { type: 'EventStatement', event: event.value, body: parseBlock() };
     }
+    if (peek()?.type === 'identifier' && peek().value === 'for') {
+      index += 1;
+      consume('(', 'Expected `(` after `for`.');
+      const binding = consume('identifier', 'Expected a loop variable after `for(`.');
+      if (peek()?.type !== 'identifier' || peek().value !== 'in') throw syntaxError('Expected `in` after the loop variable.');
+      index += 1;
+      const iterable = parseExpression();
+      consume(')', 'Expected `)` after the `for` collection.');
+      return { type: 'ForInStatement', binding: binding.value, iterable, body: parseBlock() };
+    }
     if (peek()?.type === 'identifier' && (peek().value === 'if' || peek().value === 'while')) {
       const keyword = peek().value;
       index += 1;

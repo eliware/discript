@@ -38,6 +38,18 @@ export async function evaluate(program, globals = {}) {
       }
       return loopResult;
     }
+    if (statement.type === 'ForInStatement') {
+      const iterable = await evaluateExpression(statement.iterable);
+      const values = Array.isArray(iterable) ? iterable : iterable?.values ? [...iterable.values()] : iterable && typeof iterable === 'object' ? Object.values(iterable) : null;
+      if (!values) throw runtimeError('The `for` collection must be an array or object.');
+      if (values.length > 10000) throw Object.assign(new Error('Loop exceeded the 10000 item limit.'), { code: 'LOOP_LIMIT', exitCode: 1 });
+      let loopResult;
+      for (const value of values) {
+        scope.set(statement.binding, value);
+        for (const nested of statement.body) loopResult = await evaluateStatement(nested);
+      }
+      return loopResult;
+    }
     throw runtimeError(`Unsupported statement: ${statement.type}`);
   }
 
