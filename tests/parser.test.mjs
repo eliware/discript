@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
+import { readFile } from 'node:fs/promises';
 import { parse, precedence } from '../src/parser.mjs';
 
 describe('parse', () => {
@@ -96,5 +97,15 @@ describe('parse', () => {
   test('covers block and expression termination errors', () => {
     expect(() => parse('if (true) { value = 1')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
     expect(parse('if (true) {}')).toMatchObject({ type: 'Program' });
+  });
+});
+
+
+describe('agent examples', () => {
+  test('all packaged examples parse successfully', async () => {
+    for (const file of ['list-guilds.ds', 'safe-channel-workflow.ds', 'event-monitor.ds']) {
+      const source = await readFile(new URL(`../examples/${file}`, import.meta.url), 'utf8');
+      expect(() => parse(source)).not.toThrow();
+    }
   });
 });
