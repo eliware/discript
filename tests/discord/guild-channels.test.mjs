@@ -297,4 +297,17 @@ describe('channel organization and types', () => {
     await target.threads.update('t', { name: 'x' }, {});
     expect(edit).toHaveBeenCalled();
   });
+
+  test('covers omitted arguments and explicit fallback branches directly', async () => {
+    const channel = { id: '10', type: 0, edit: jest.fn(async changes => ({ id: '10', ...changes })), guild: {}, permissionOverwrites: { cache: new Map() }, threads: { cache: new Map() } };
+    const guild = { id: '1', channels: { cache: new Map([['10', channel]]), create: jest.fn(async settings => settings) } };
+    const client = { fetchWebhook: jest.fn(async () => ({ edit: jest.fn(), delete: jest.fn() })) };
+    const api = directChannels({ guild, client, dryRun: true });
+    await expect(api.create('null-parent', { parent: null })).resolves.toMatchObject({ dryRun: true, parentId: null });
+    const target = api.get('10');
+    await expect(target.update({ name: 'x', topic: 'plain' })).resolves.toMatchObject({ topic: 'plain' });
+    await expect(target.update()).rejects.toMatchObject({ code: 'CHANNEL_FIELDS_REQUIRED' });
+    await expect(target.webhooks.update('w')).rejects.toMatchObject({ code: 'NAME_REQUIRED' });
+    await expect(target.threads.update('t')).rejects.toMatchObject({ code: 'NAME_REQUIRED' });
+  });
 });
