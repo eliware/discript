@@ -61,12 +61,13 @@ async function executeInput(input, options, dependencies) {
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
   try {
-    return evaluate(parse(input.source), {
+    const result = await evaluate(parse(input.source), {
       discord: createDiscordApi(runtime.client, options),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
       filter: (items, property, expected) => (items ?? []).filter(item => item?.[property] === expected),
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
     });
+    return result;
   } finally {
     await runtime.shutdown();
   }
