@@ -11,6 +11,11 @@ export async function evaluate(program, globals = {}) {
 
   async function evaluateExpression(expression) {
     if (expression.type === 'Literal') return expression.value;
+    if (expression.type === 'ArrayExpression') return Promise.all(expression.elements.map(evaluateExpression));
+    if (expression.type === 'ObjectExpression') {
+      const values = await Promise.all(expression.properties.map(async property => [property.key, await evaluateExpression(property.value)]));
+      return Object.fromEntries(values);
+    }
     if (expression.type === 'Identifier') {
       if (!scope.has(expression.name)) throw runtimeError(`Unknown variable: ${expression.name}`);
       return scope.get(expression.name);

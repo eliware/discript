@@ -36,6 +36,8 @@ async function executeInput(input, options, dependencies) {
   try {
     return evaluate(parse(input.source), {
       discord: createDiscordApi(runtime.client, options),
+      find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
+      filter: (items, property, expected) => (items ?? []).filter(item => item?.[property] === expected),
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
     });
   } finally {

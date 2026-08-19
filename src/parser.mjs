@@ -1,4 +1,4 @@
-const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|([().,;=])/y;
+const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|([()[\].,;=:{}`])/y;
 
 export function parse(source) {
   const tokens = tokenize(source);
@@ -44,6 +44,26 @@ export function parse(source) {
     const token = peek();
     if (token?.type === 'string' || token?.type === 'number') { index += 1; return { type: 'Literal', value: token.value }; }
     if (token?.type === 'identifier') { index += 1; return { type: 'Identifier', name: token.value }; }
+    if (match('[')) {
+      const elements = [];
+      if (!match(']')) {
+        do elements.push(parseExpression()); while (match(','));
+        consume(']', 'Expected `]` after array elements.');
+      }
+      return { type: 'ArrayExpression', elements };
+    }
+    if (match('{')) {
+      const properties = [];
+      if (!match('}')) {
+        do {
+          const key = consume('identifier', 'Expected an object property name.');
+          consume(':', 'Expected `:` after object property name.');
+          properties.push({ key: key.value, value: parseExpression() });
+        } while (match(','));
+        consume('}', 'Expected `}` after object properties.');
+      }
+      return { type: 'ObjectExpression', properties };
+    }
     throw syntaxError('Expected an expression.');
   }
 

@@ -31,4 +31,11 @@ describe('parse', () => {
   test('rejects invalid source', () => {
     expect(() => parse('guilds =')).toThrow('Expected an expression');
   });
+
+  test('parses arrays and objects', () => {
+    expect(parse('value = [{name: "one"}, {name: "two"}]; value')).toEqual(expect.objectContaining({
+      type: 'Program',
+      body: expect.arrayContaining([expect.objectContaining({ type: 'Assignment', name: 'value' })]),
+    }));
+  });
 });
