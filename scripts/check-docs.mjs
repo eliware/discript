@@ -1,9 +1,10 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { COMMANDS } from '../src/commands.mjs';
 import { parse } from '../src/parser/index.mjs';
 
-const root = resolve(new URL('..', import.meta.url).pathname);
+const root = fileURLToPath(new URL('..', import.meta.url));
 const docsRoot = join(root, 'docs');
 const markdownFiles = filesUnder(docsRoot, '.md');
 const failures = [];
