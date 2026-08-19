@@ -38,7 +38,8 @@
         "examples",
         "README.md",
         "SPEC.md",
-        "specs"
+        "specs",
+        "docs"
     ],
     "bin": {
         "discript": "bin/discript.mjs"
