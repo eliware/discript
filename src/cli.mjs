@@ -119,6 +119,24 @@ async function executeDirectCommand(command, options) {
       if (!options.guild) throw Object.assign(new Error('stickers list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).stickers.list();
     }
+    if (command[0] === 'events' && command[1] === 'list') {
+      if (!options.guild) throw Object.assign(new Error('events list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).scheduledEvents.list();
+    }
+    if (command[0] === 'events' && command[1] === 'create') {
+      if (!options.guild) throw Object.assign(new Error('events create requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.name) throw Object.assign(new Error('events create requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+      if (!options.start) throw Object.assign(new Error('events create requires --start <ISO-8601 time>.'), { code: 'START_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).scheduledEvents.create({ name: options.name, scheduledStartTime: options.start, description: options.description, entityType: options.event_type ? Number(options.event_type) : 3, entityMetadata: options.location ? { location: options.location } : undefined });
+    }
+    if (command[0] === 'events' && (command[1] === 'update' || command[1] === 'delete')) {
+      if (!options.guild) throw Object.assign(new Error(`events ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.event) throw Object.assign(new Error(`events ${command[1]} requires --event <id>.`), { code: 'EVENT_REQUIRED', exitCode: 2 });
+      const event = api.guilds.get(options.guild).scheduledEvents.get(options.event);
+      if (command[1] === 'delete') return event.delete();
+      if (!options.name && !options.description && !options.start) throw Object.assign(new Error('events update requires --name, --description, or --start.'), { code: 'EVENT_FIELDS_REQUIRED', exitCode: 2 });
+      return event.update({ ...(options.name ? { name: options.name } : {}), ...(options.description ? { description: options.description } : {}), ...(options.start ? { scheduledStartTime: options.start } : {}) });
+    }
     if (command[0] === 'invites' && command[1] === 'list') {
       if (!options.guild) throw Object.assign(new Error('invites list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).invites.list();
