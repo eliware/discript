@@ -39,4 +39,4 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript provides command discovery, common aliases, typo suggestions, and Bash/Zsh/Fish shell completions.
 - [Half complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
 - [Fully complete] Discript has agent-focused examples and usage documentation covering discovery, guarded mutation workflows, exit handling, events, timers, callbacks, imports, and JSONL output.
-- [Fully complete] Discript is packaged as a private installable CLI through Git SSH or `npm pack`, with an automated isolated tarball-install smoke check; public publishing remains intentionally unset.
+- [Fully complete] Discript is packaged as a public installable CLI through npm, Git SSH, or `npm pack`, with an automated isolated tarball-install smoke check and tag-triggered provenance publishing.
