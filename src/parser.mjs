@@ -9,6 +9,21 @@ export function parse(source) {
   return { type: 'Program', body };
 
   function parseStatement() {
+    if (peek()?.type === 'identifier' && peek().value === 'fn') {
+      index += 1;
+      const name = consume('identifier', 'Expected a function name after `fn`.');
+      consume('(', 'Expected `(` after the function name.');
+      const parameters = [];
+      if (!match(')')) {
+        do parameters.push(consume('identifier', 'Expected a function parameter.').value); while (match(','));
+        consume(')', 'Expected `)` after function parameters.');
+      }
+      return { type: 'FunctionDeclaration', name: name.value, parameters, body: parseBlock() };
+    }
+    if (peek()?.type === 'identifier' && peek().value === 'return') {
+      index += 1;
+      return { type: 'ReturnStatement', value: peek()?.value === ';' || peek()?.value === '}' ? null : parseExpression() };
+    }
     if (peek()?.type === 'identifier' && peek().value === 'on') {
       index += 1;
       consume('(', 'Expected `(` after `on`.' ) ;

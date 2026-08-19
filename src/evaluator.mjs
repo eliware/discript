@@ -9,6 +9,28 @@ export async function evaluate(program, globals = {}) {
   }
 
   async function evaluateStatement(statement) {
+    if (statement.type === 'FunctionDeclaration') {
+      const closure = async (...values) => {
+        const previous = new Map();
+        for (const [index, parameter] of statement.parameters.entries()) {
+          previous.set(parameter, { exists: scope.has(parameter), value: scope.get(parameter) });
+          scope.set(parameter, values[index]);
+        }
+        try { return await evaluateBlock(statement.body); }
+        catch (error) {
+          if (error instanceof ReturnSignal) return error.value;
+          throw error;
+        } finally {
+          for (const [parameter, state] of previous) {
+            if (state.exists) scope.set(parameter, state.value);
+            else scope.delete(parameter);
+          }
+        }
+      };
+      scope.set(statement.name, closure);
+      return closure;
+    }
+    if (statement.type === 'ReturnStatement') throw new ReturnSignal(statement.value === null ? undefined : await evaluateExpression(statement.value));
     if (statement.type === 'Assignment') {
       const value = await evaluateExpression(statement.value);
       scope.set(statement.name, value);
@@ -123,6 +145,10 @@ export async function evaluate(program, globals = {}) {
 }
 
 function runtimeError(message) { return Object.assign(new Error(message), { code: 'RUNTIME_ERROR', exitCode: 1 }); }
+
+class ReturnSignal {
+  constructor(value) { this.value = value; }
+}
 
 function normalizeError(error) {
   return { code: error?.code ?? 'DISCRIPT_ERROR', message: error?.message ?? String(error), exitCode: error?.exitCode ?? 1 };
