@@ -6,7 +6,7 @@ import { createGuildScheduledEventsApi } from './guild-scheduledEvents.mjs';
 import { createGuildInvitesApi } from './guild-invites.mjs';
 import { createGuildChannelsApi } from './guild-channels.mjs';
 
-export function createGuildsApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission, settingsReason }) {
+export function createGuildsApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
   return {
       list: () => client.guilds.cache.map(guild => ({ id: guild.id, name: guild.name })),
       get: id => {

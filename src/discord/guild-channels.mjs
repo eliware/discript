@@ -1,4 +1,4 @@
-export function createGuildChannelsApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildChannelsApi({ guild, client, dryRun, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, requireApproval, requirePermission, requireChannelPermission }) {
   return {
             list: () => guild.channels.cache.map(normalizeChannel),
             create: async (name, operationOptions = {}) => {

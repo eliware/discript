@@ -1,4 +1,4 @@
-export function createGuildScheduledEventsApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildScheduledEventsApi({ guild, dryRun, mapCache, requireApproval, requirePermission }) {
   return {
             list: () => mapCache(guild.scheduledEvents?.cache, event => ({ id: event.id, name: event.name, status: event.status ?? null, scheduledStartAt: event.scheduledStartAt?.toISOString?.() ?? event.scheduledStartAt ?? null, scheduledEndAt: event.scheduledEndAt?.toISOString?.() ?? event.scheduledEndAt ?? null })),
             create: async (settings = {}, operationOptions = {}) => {

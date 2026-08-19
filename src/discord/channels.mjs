@@ -1,4 +1,4 @@
-export function createChannelsApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission, settingsReason }) {
+export function createChannelsApi({ client, dryRun, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, requireApproval, requireChannelPermission }) {
   return {
       get: id => {
         const channel = client.channels.cache.get(String(id));

@@ -1,4 +1,4 @@
-export function createMessagesApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission, settingsReason }) {
+export function createMessagesApi({ client, dryRun, normalizeMessage, resolveMessage, requireApproval, requireChannelPermission }) {
   return {
       get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
       edit: async (channelId, messageId, content, operationOptions = {}) => {

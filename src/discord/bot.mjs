@@ -1,4 +1,4 @@
-export function createBotApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission, settingsReason }) {
+export function createBotApi({ client }) {
   return {
       get: () => {
         if (!client.user) throw Object.assign(new Error('Bot identity is unavailable.'), { code: 'BOT_IDENTITY_UNAVAILABLE', exitCode: 1 });

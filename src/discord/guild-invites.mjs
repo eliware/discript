@@ -1,4 +1,4 @@
-export function createGuildInvitesApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildInvitesApi({ guild, client, dryRun, mapCache, requireApproval, requirePermission }) {
   return {
             list: async () => {
               if (!guild.invites?.fetch) throw Object.assign(new Error('Invite listing is unavailable.'), { code: 'INVITES_UNSUPPORTED', exitCode: 1 });

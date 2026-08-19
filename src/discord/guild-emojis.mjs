@@ -1,4 +1,4 @@
-export function createGuildEmojisApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildEmojisApi({ guild, dryRun, mapCache, settingsReason, requireApproval, requirePermission }) {
   return {
             list: () => mapCache(guild.emojis?.cache, emoji => ({ id: emoji.id, name: emoji.name, animated: emoji.animated ?? false })),
             get: id => {

@@ -1,4 +1,4 @@
-export function createGuildStickersApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildStickersApi({ guild, dryRun, mapCache, settingsReason, requireApproval, requirePermission }) {
   return {
             list: () => mapCache(guild.stickers?.cache, sticker => ({ id: sticker.id, name: sticker.name, description: sticker.description ?? null })),
             get: id => {

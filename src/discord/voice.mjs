@@ -1,4 +1,4 @@
-export function createVoiceApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission, settingsReason }) {
+export function createVoiceApi({ client, dryRun, loadVoiceModule, requireApproval, requireChannelPermission }) {
   return {
       status: async guildId => {
         const { getVoiceConnection } = await loadVoiceModule();

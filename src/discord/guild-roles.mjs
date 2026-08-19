@@ -1,4 +1,4 @@
-export function createGuildRolesApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildRolesApi({ guild, dryRun, mapCache, requireApproval, requirePermission, requireManageableRole }) {
   return {
             list: () => mapCache(guild.roles.cache, role => ({ id: role.id, name: role.name, position: role.position, managed: role.managed })),
             create: async (name, operationOptions = {}) => {

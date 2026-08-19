@@ -1,4 +1,4 @@
-export function createGuildMembersApi({ guild, client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }) {
+export function createGuildMembersApi({ guild, dryRun, mapCache, requireApproval, requirePermission, requireManageableRole, requireManageableMember }) {
   return {
             list: () => mapCache(guild.members.cache, member => ({ id: member.id, username: member.user?.username ?? null, displayName: member.displayName ?? null })),
             get: id => {
