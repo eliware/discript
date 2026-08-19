@@ -19,7 +19,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.
 - [Fully complete] Finite CLI executions shut down their Discord client.
-- [Half complete] Discript supports dry-run previews for state mutations.
+- [Half complete] Discript supports API-level and direct CLI dry-run previews with command-field validation; remote target and permission validation still require a Discord connection.
 - [Half complete] Destructive operations require explicit force approval.
 - [Half complete] CLI commands return stable process exit codes.
 - [Fully complete] Scripts can capture operation exit codes and branch on them internally.

@@ -196,6 +196,12 @@ npm start -- channels create --guild "$TEST_GUILD" --name discript-test --dry-ru
 npm start -- channels create --guild "$TEST_GUILD" --name discript-test --yes --json
 ```
 
+Direct dry-runs validate command-specific required fields and return a structured preview without connecting to Discord:
+
+```sh
+npm start -- channels create --guild <guild-id> --name preview --dry-run --json
+```
+
 Messages can be read or changed with explicit approval for writes:
 
 ```sh
