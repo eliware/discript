@@ -23,6 +23,8 @@ Scripts that register event handlers, use ongoing timers, or explicitly require 
 
 Discord also limits concurrent Identify requests. Multiple independent Discript processes should not all start Gateway clients simultaneously; a future broker or startup lock must coordinate them. Gateway reconnects should resume when possible instead of repeatedly identifying.
 
+The Gateway limits helper exposes Discord’s current `remaining`, `reset_after`, `max_concurrency`, and shard values. A broker or launcher should inspect these values before scheduling fresh Identify requests and wait for the reset window when the remaining count is exhausted.
+
 ## Operation classification
 
 | Operation | Default transport | Gateway required |
