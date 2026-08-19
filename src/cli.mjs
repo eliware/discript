@@ -120,12 +120,7 @@ async function executeDirectCommand(command, options) {
   if (command.join(' ') === 'commands list') return commandCatalog();
   if (command[0] === 'completion') return completionScript(command[1] ?? 'bash');
   if (options.dry_run) {
-    if (command[0] === 'messages' && command[1] === 'send') {
-      if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
-      if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
-      return { dryRun: true, action: 'messages.send', channelId: options.channel, content: options.content };
-    }
-    return { dryRun: true, command };
+    return previewMutation(command, options);
   }
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
@@ -311,4 +306,41 @@ async function executeDirectCommand(command, options) {
   } finally {
     await runtime.shutdown();
   }
+}
+
+function previewMutation(command, options) {
+  const action = `${command[0]}.${command[1] ?? 'run'}`;
+  const requireOption = (name, code = `${name.toUpperCase()}_REQUIRED`) => {
+    if (options[name] === undefined || options[name] === '') throw Object.assign(new Error(`${action} requires --${name.replaceAll('_', '-')} <value>.`), { code, exitCode: 2 });
+  };
+  const requireGuild = () => requireOption('guild', 'GUILD_REQUIRED');
+  const requireChannel = () => requireOption('channel', 'CHANNEL_REQUIRED');
+  const requireRole = () => requireOption('role', 'ROLE_REQUIRED');
+  const requireUser = () => requireOption('user', 'USER_REQUIRED');
+  const requireMessage = () => requireOption('message', 'MESSAGE_REQUIRED');
+  const requireEvent = () => requireOption('event', 'EVENT_REQUIRED');
+  const requireMutationTarget = () => {
+    if (command[0] === 'roles' && ['create', 'update', 'delete', 'add', 'remove'].includes(command[1])) requireGuild();
+    if (command[0] === 'moderation') requireGuild();
+    if (command[0] === 'channels' && ['create'].includes(command[1])) requireGuild();
+    if (command[0] === 'invites' && command[1] === 'create') requireGuild();
+    if (command[0] === 'events' && ['create', 'update', 'delete'].includes(command[1])) requireGuild();
+  };
+  requireMutationTarget();
+  if (command[0] === 'roles' && ['add', 'remove'].includes(command[1])) { requireUser(); requireRole(); }
+  if (command[0] === 'roles' && ['create', 'update'].includes(command[1])) requireOption('name', 'NAME_REQUIRED');
+  if (command[0] === 'roles' && command[1] === 'delete') requireRole();
+  if (command[0] === 'moderation') { requireUser(); if (command[1] === 'timeout') requireOption('duration', 'DURATION_REQUIRED'); }
+  if (command[0] === 'channels' && command[1] === 'create') requireOption('name', 'NAME_REQUIRED');
+  if (command[0] === 'channels' && command[1] === 'delete') requireChannel();
+  if (command[0] === 'threads') { requireChannel(); if (command[1] === 'create') requireOption('name', 'NAME_REQUIRED'); if (command[1] === 'archive') requireOption('thread', 'THREAD_REQUIRED'); }
+  if (command[0] === 'messages') { requireChannel(); if (['get', 'edit', 'delete', 'react', 'pin', 'unpin'].includes(command[1])) requireMessage(); if (['send', 'edit'].includes(command[1])) requireOption('content', 'CONTENT_REQUIRED'); if (command[1] === 'react') requireOption('emoji', 'EMOJI_REQUIRED'); if (command[1] === 'bulk-delete') requireOption('messages', 'MESSAGES_REQUIRED'); }
+  if (command[0] === 'invites' && command[1] === 'create') requireChannel();
+  if (command[0] === 'invites' && command[1] === 'delete') requireOption('invite', 'INVITE_REQUIRED');
+  if (command[0] === 'events' && command[1] === 'create') { requireOption('name', 'NAME_REQUIRED'); requireOption('start', 'START_REQUIRED'); }
+  if (command[0] === 'events' && command[1] === 'update') { requireEvent(); if (!options.name && !options.description && !options.start) throw Object.assign(new Error(`${action} requires --name, --description, or --start.`), { code: 'EVENT_FIELDS_REQUIRED', exitCode: 2 }); }
+  if (command[0] === 'events' && command[1] === 'delete') requireEvent();
+  if (command[0] === 'voice' && command[1] === 'join') requireChannel();
+  if (command[0] === 'voice' && command[1] === 'leave') requireGuild();
+  return { dryRun: true, action, command, parameters: Object.fromEntries(Object.entries(options).filter(([key]) => !['json', 'pretty', 'dry_run', 'yes'].includes(key))) };
 }
