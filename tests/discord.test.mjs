@@ -24,6 +24,12 @@ describe('Discord capability layer', () => {
     await expect(preview.channels.get('1').update({ topic: 'preview' })).resolves.toMatchObject({ dryRun: true, topic: 'preview' });
   });
 
+  test('guards channel updates with ManageChannels', async () => {
+    const channel = { id: '1', name: 'general', type: 0, guild: { members: { me: { permissions: { has: () => false } } } }, edit: jest.fn() };
+    const api = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    await expect(api.channels.get('1').update({ name: 'blocked' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
+
   test('supports guarded emoji and sticker lifecycle operations', async () => {
     const emojiEdit = jest.fn(async settings => ({ id: 'e2', name: settings.name, animated: false }));
     const emojiDelete = jest.fn(async () => undefined);
