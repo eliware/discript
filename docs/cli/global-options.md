@@ -9,7 +9,7 @@
 | `--validate` | With dry-run, resolve targets and validate required inputs. |
 | `--yes`, `-y` | Approve a mutation. Required for guarded and destructive operations. |
 | `--timeout <ms>` | Bound a script or event process lifetime. |
+| `--rest` | Use REST for a supported read-only command instead of starting a Gateway client. |
 | `-e`, `--eval <source>` | Evaluate inline Discript source. |
 
 Options apply to direct commands. Script code can pass `{dryRun: true}` or `{force: true}` to API methods, allowing approval to be part of the script itself.
-

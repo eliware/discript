@@ -33,6 +33,16 @@ export async function executeDirectCommand(input, options = {}) {
     if (command.join(' ') === 'guilds list') return api.guilds.list();
     if (command.join(' ') === 'guilds get') return api.guilds.get(options.guild).info();
   }
+  if (command[0] === 'channels' && (command[1] === 'list' || command[1] === 'get') && options.rest === true) {
+    const rest = createDiscordRest();
+    const api = createRestDiscordApi(rest);
+    if (command[1] === 'list') {
+      if (!options.guild) throw Object.assign(new Error('channels list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).channels();
+    }
+    if (!options.channel) throw Object.assign(new Error('channels get requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+    return api.channels.get(options.channel);
+  }
   const runtime = await createDiscordRuntime();
   try {
     const api = createDiscordApi(runtime.client, { ...options, dryRun: options.dry_run === true });

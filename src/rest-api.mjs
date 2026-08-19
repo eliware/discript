@@ -5,6 +5,9 @@ export function createRestDiscordApi(rest) {
     async channels() { return rest.request(`/guilds/${guildId}/channels`); },
   });
   return {
+    channels: {
+      async get(channelId) { return rest.request(`/channels/${channelId}`); },
+    },
     guilds: {
       async list() { return rest.request('/users/@me/guilds'); },
       get: guild,
