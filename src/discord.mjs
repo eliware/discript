@@ -33,15 +33,15 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
         if (!channel) throw Object.assign(new Error(`Channel not found: ${id}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
         return {
           ...normalizeChannel(channel),
-          delete: async () => {
-            requireApproval('Deleting a channel');
-            if (dryRun) return { dryRun: true, channelId: channel.id, deleted: true };
+          delete: async (operationOptions = {}) => {
+            requireApproval('Deleting a channel', operationOptions);
+            if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, deleted: true };
             await channel.delete();
             return { id: channel.id, deleted: true };
           },
-          send: async content => {
-            requireApproval('Sending a message');
-            if (dryRun) return { dryRun: true, channelId: channel.id, content };
+          send: async (content, operationOptions = {}) => {
+            requireApproval('Sending a message', operationOptions);
+            if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, content };
             return normalizeMessage(await channel.send(String(content)));
           },
         };
@@ -77,22 +77,22 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                   await member.roles.remove(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), removed: true };
                 },
-                ban: async reason => {
-                  requireApproval('Banning a member');
-                  if (dryRun) return { dryRun: true, memberId: member.id, banned: true, reason: reason ?? null };
+                ban: async (reason, operationOptions = {}) => {
+                  requireApproval('Banning a member', operationOptions);
+                  if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, banned: true, reason: reason ?? null };
                   await member.ban({ reason: reason ?? undefined });
                   return { memberId: member.id, banned: true };
                 },
-                kick: async reason => {
-                  requireApproval('Kicking a member');
-                  if (dryRun) return { dryRun: true, memberId: member.id, kicked: true, reason: reason ?? null };
+                kick: async (reason, operationOptions = {}) => {
+                  requireApproval('Kicking a member', operationOptions);
+                  if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, kicked: true, reason: reason ?? null };
                   await member.kick(reason ?? undefined);
                   return { memberId: member.id, kicked: true };
                 },
-                timeout: async (durationMs, reason) => {
-                  requireApproval('Timing out a member');
+                timeout: async (durationMs, reason, operationOptions = {}) => {
+                  requireApproval('Timing out a member', operationOptions);
                   if (!Number.isInteger(Number(durationMs)) || Number(durationMs) < 1) throw Object.assign(new Error('Timeout duration must be a positive number of milliseconds.'), { code: 'INVALID_DURATION', exitCode: 2 });
-                  if (dryRun) return { dryRun: true, memberId: member.id, timeoutMs: Number(durationMs), reason: reason ?? null };
+                  if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, timeoutMs: Number(durationMs), reason: reason ?? null };
                   await member.timeout(Number(durationMs), reason ?? undefined);
                   return { memberId: member.id, timeoutMs: Number(durationMs), timedOut: true };
                 },
@@ -109,9 +109,9 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
           },
           channels: {
             list: () => guild.channels.cache.map(normalizeChannel),
-            create: async name => {
-              requireApproval('Creating a channel');
-              if (dryRun) return { dryRun: true, guildId: guild.id, name, type: 0 };
+            create: async (name, operationOptions = {}) => {
+              requireApproval('Creating a channel', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, name, type: 0 };
               return normalizeChannel(await guild.channels.create({ name: String(name), type: 0 }));
             },
             get: channelId => {
@@ -119,9 +119,9 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
               if (!channel) throw Object.assign(new Error(`Channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
               return {
                 ...normalizeChannel(channel),
-                send: async content => {
-                  requireApproval('Sending a message');
-                  if (dryRun) return { dryRun: true, channelId: channel.id, content };
+                send: async (content, operationOptions = {}) => {
+                  requireApproval('Sending a message', operationOptions);
+                  if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, content };
                   return normalizeMessage(await channel.send(String(content)));
                 },
               };
