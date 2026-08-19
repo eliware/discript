@@ -227,6 +227,47 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
                 username: member.user?.username ?? null,
                 displayName: member.displayName ?? null,
                 roles: mapCache(member.roles?.cache, role => ({ id: role.id, name: role.name })),
+                voice: {
+                  status: () => ({ memberId: member.id, channelId: member.voice?.channelId ?? member.voice?.channel?.id ?? null, muted: member.voice?.serverMute ?? false, deafened: member.voice?.serverDeaf ?? false }),
+                  mute: async (muted = true, operationOptions = {}) => {
+                    requireManageableMember(guild, member);
+                    requirePermission(guild, 'MuteMembers');
+                    requireApproval(`${muted ? 'Muting' : 'Unmuting'} a member`, operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, muted: Boolean(muted) };
+                    if (!member.voice?.setMute) throw Object.assign(new Error('Member voice controls are unavailable.'), { code: 'VOICE_UNSUPPORTED', exitCode: 1 });
+                    await member.voice.setMute(Boolean(muted), operationOptions.reason);
+                    return { memberId: member.id, muted: Boolean(muted) };
+                  },
+                  deafen: async (deafened = true, operationOptions = {}) => {
+                    requireManageableMember(guild, member);
+                    requirePermission(guild, 'DeafenMembers');
+                    requireApproval(`${deafened ? 'Deafening' : 'Undeafening'} a member`, operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, deafened: Boolean(deafened) };
+                    if (!member.voice?.setDeaf) throw Object.assign(new Error('Member voice controls are unavailable.'), { code: 'VOICE_UNSUPPORTED', exitCode: 1 });
+                    await member.voice.setDeaf(Boolean(deafened), operationOptions.reason);
+                    return { memberId: member.id, deafened: Boolean(deafened) };
+                  },
+                  disconnect: async (operationOptions = {}) => {
+                    requireManageableMember(guild, member);
+                    requirePermission(guild, 'MoveMembers');
+                    requireApproval('Disconnecting a member from voice', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, disconnected: true };
+                    if (!member.voice?.setChannel) throw Object.assign(new Error('Member voice controls are unavailable.'), { code: 'VOICE_UNSUPPORTED', exitCode: 1 });
+                    await member.voice.setChannel(null, operationOptions.reason);
+                    return { memberId: member.id, disconnected: true };
+                  },
+                  move: async (channelId, operationOptions = {}) => {
+                    requireManageableMember(guild, member);
+                    requirePermission(guild, 'MoveMembers');
+                    const channel = guild.channels?.cache?.get(String(channelId));
+                    if (!channel || (!channel.isVoiceBased?.() && !['voice', 'stage'].includes(channel.type))) throw Object.assign(new Error(`Voice channel not found: ${channelId}`), { code: 'VOICE_CHANNEL_REQUIRED', exitCode: 2 });
+                    requireApproval('Moving a member to voice', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, channelId: String(channelId), moved: true };
+                    if (!member.voice?.setChannel) throw Object.assign(new Error('Member voice controls are unavailable.'), { code: 'VOICE_UNSUPPORTED', exitCode: 1 });
+                    await member.voice.setChannel(String(channelId), operationOptions.reason);
+                    return { memberId: member.id, channelId: String(channelId), moved: true };
+                  },
+                },
                 addRole: async (roleId, operationOptions = {}) => {
                   requireManageableRole(guild, roleId);
                   requirePermission(guild, 'ManageRoles');
