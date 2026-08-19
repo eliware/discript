@@ -20,7 +20,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.
 - [Fully complete] Finite CLI executions shut down their Discord client.
 - [Fully complete] Discript supports API-level and direct CLI dry-run previews with command-field validation, plus opt-in connected target/permission validation via `--validate`; no mutation is made.
-- [Half complete] Destructive operations require explicit force approval.
+- [Fully complete] Destructive operations require explicit `--yes`/`-y` CLI approval or `force: true` inside scripts across the current mutation surface.
 - [Fully complete] CLI commands return stable process exit codes, including structured invalid-input failures on stderr.
 - [Fully complete] Scripts can capture operation exit codes and branch on them internally.
 - [Half complete] Scripts can explicitly terminate with a chosen exit code and message.
