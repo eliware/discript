@@ -38,6 +38,24 @@ List guilds with a direct CLI command:
 npm start -- guilds list --json
 ```
 
+Read-only commands and supported one-shot mutations can use REST without opening a Gateway session:
+
+```sh
+npm start -- --rest guilds list --json
+npm start -- --rest channels list --guild <guild-id> --json
+npm start -- --rest messages send --channel <channel-id> --content "hello"
+npm start -- --rest channels delete --channel <channel-id> --yes
+```
+
+For repeated Gateway-backed commands or scripts, start the shared local broker once:
+
+```sh
+npm start -- daemon start
+npm start -- --broker guilds list --json
+npm start -- --broker script.ds
+npm start -- daemon stop
+```
+
 Discover supported direct commands or generate shell completion scripts:
 
 ```sh
