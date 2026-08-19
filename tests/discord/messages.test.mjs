@@ -49,6 +49,16 @@ function apiFor(message) {
 }
 
 describe('message capabilities', () => {
+  test('lists recent messages with a limit', async () => {
+    const channel = {
+      guild: { members: { me: { permissions: { has: () => true } } } },
+      messages: { fetch: jest.fn(async _options => new Map([['2', { id: '2', channelId: '1', content: 'hello' }]])) },
+    };
+    const api = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    await expect(api.messages.list('1', { limit: 10 })).resolves.toEqual([{ id: '2', channelId: '1', content: 'hello' }]);
+    expect(channel.messages.fetch).toHaveBeenCalledWith({ limit: 10 });
+  });
+
   test('gets and edits a message', async () => {
     const message = { id: '2', channelId: '1', content: 'old', edit: jest.fn(async content => ({ ...message, content })) };
     const api = apiFor(message);

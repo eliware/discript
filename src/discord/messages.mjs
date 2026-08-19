@@ -1,5 +1,12 @@
 export function createMessagesApi({ client, dryRun, normalizeMessage, resolveMessage, requireApproval, requireChannelPermission }) {
   return {
+      list: async (channelId, options = {}) => {
+        requireChannelPermission(channelId, 'ViewChannel');
+        const channel = client.channels.cache.get(String(channelId));
+        if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message listing is unavailable: ${channelId}`), { code: 'MESSAGES_UNSUPPORTED', exitCode: 1 });
+        const messages = await channel.messages.fetch({ limit: options.limit ? Number(options.limit) : 50 });
+        return typeof messages.map === 'function' ? messages.map(normalizeMessage) : [...messages.values()].map(normalizeMessage);
+      },
       get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
       edit: async (channelId, messageId, content, operationOptions = {}) => {
         requireChannelPermission(channelId, 'ManageMessages');

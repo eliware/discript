@@ -27,7 +27,7 @@ export function previewMutation(command, options) {
   if (command[0] === 'moderation') { requireUser(); if (command[1] === 'timeout') requireOption('duration', 'DURATION_REQUIRED'); }
   if (command[0] === 'channels' && command[1] === 'create') requireOption('name', 'NAME_REQUIRED');
   if (command[0] === 'channels' && command[1] === 'delete') requireChannel();
-  if (command[0] === 'threads') { requireChannel(); if (command[1] === 'create') requireOption('name', 'NAME_REQUIRED'); if (command[1] === 'archive') requireOption('thread', 'THREAD_REQUIRED'); }
+  if (command[0] === 'threads') { requireChannel(); if (command[1] === 'create' || command[1] === 'update') requireOption('name', 'NAME_REQUIRED'); if (['archive', 'update', 'delete'].includes(command[1])) requireOption('thread', 'THREAD_REQUIRED'); }
   if (command[0] === 'messages') { requireChannel(); if (['get', 'edit', 'delete', 'react', 'pin', 'unpin'].includes(command[1])) requireMessage(); if (['send', 'edit'].includes(command[1])) requireOption('content', 'CONTENT_REQUIRED'); if (command[1] === 'react') requireOption('emoji', 'EMOJI_REQUIRED'); if (command[1] === 'bulk-delete') requireOption('messages', 'MESSAGES_REQUIRED'); }
   if (command[0] === 'invites' && command[1] === 'create') requireChannel();
   if (command[0] === 'invites' && command[1] === 'delete') requireOption('invite', 'INVITE_REQUIRED');
@@ -40,7 +40,7 @@ export function previewMutation(command, options) {
   if (command[0] === 'stickers' && ['get', 'update', 'delete'].includes(command[1])) requireOption('sticker', 'STICKER_REQUIRED');
   if (command[0] === 'stickers' && command[1] === 'create') { requireOption('name', 'NAME_REQUIRED'); requireOption('file', 'FILE_REQUIRED'); requireOption('tags', 'TAGS_REQUIRED'); }
   if (command[0] === 'stickers' && command[1] === 'update' && !options.name && !options.description && !options.tags) throw Object.assign(new Error(`${action} requires --name, --description, or --tags.`), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
-  if (command[0] === 'webhooks') { requireChannel(); if (command[1] === 'create') requireOption('name', 'NAME_REQUIRED'); if (command[1] === 'delete') requireOption('webhook', 'WEBHOOK_REQUIRED'); }
+  if (command[0] === 'webhooks') { requireChannel(); if (['create', 'update'].includes(command[1])) requireOption('name', 'NAME_REQUIRED'); if (['update', 'delete'].includes(command[1])) requireOption('webhook', 'WEBHOOK_REQUIRED'); }
   if (command[0] === 'permissions') { requireChannel(); if (command[1] !== 'list') requireOption('target', 'TARGET_REQUIRED'); if (command[1] === 'set' && options.allow === undefined && options.deny === undefined) throw Object.assign(new Error(`${action} requires --allow and/or --deny.`), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 }); }
   if (command[0] === 'voice-users') { requireGuild(); requireUser(); if (command[1] === 'move') requireChannel(); }
   if (command[0] === 'voice' && command[1] === 'join') requireChannel();

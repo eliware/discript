@@ -28,6 +28,16 @@ export function createChannelsApi({ client, dryRun, mapCache, normalizeChannel, 
               if (!channel.createWebhook) throw Object.assign(new Error('Webhook creation is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
               return { ...normalizeWebhook(await channel.createWebhook({ name: String(name), reason: operationOptions.reason })), created: true };
             },
+            update: async (webhookId, settings = {}, operationOptions = {}) => {
+              if (!settings.name) throw Object.assign(new Error('Webhook update requires name.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+              requireChannelPermission(channel.id, 'ManageWebhooks');
+              requireApproval('Updating a webhook', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, webhookId: String(webhookId), name: String(settings.name), updated: true };
+              if (!client.fetchWebhook) throw Object.assign(new Error('Webhook update is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+              const webhook = await client.fetchWebhook(String(webhookId));
+              const updated = await webhook.edit({ name: String(settings.name), reason: operationOptions.reason });
+              return { id: updated.id ?? String(webhookId), name: updated.name ?? String(settings.name), channelId: channel.id, updated: true };
+            },
             delete: async (webhookId, operationOptions = {}) => {
               requireChannelPermission(channel.id, 'ManageWebhooks');
               requireApproval('Deleting a webhook', operationOptions);
@@ -78,6 +88,25 @@ export function createChannelsApi({ client, dryRun, mapCache, normalizeChannel, 
               if (!thread) throw Object.assign(new Error(`Thread not found: ${threadId}`), { code: 'THREAD_NOT_FOUND', exitCode: 1 });
               await thread.setArchived(true);
               return { id: thread.id, archived: true };
+            },
+            update: async (threadId, settings = {}, operationOptions = {}) => {
+              if (!settings.name) throw Object.assign(new Error('Thread update requires name.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+              requireChannelPermission(channel.id, 'ManageThreads');
+              requireApproval('Updating a thread', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, threadId: String(threadId), name: String(settings.name), updated: true };
+              const thread = channel.threads?.cache?.get(String(threadId));
+              if (!thread?.edit) throw Object.assign(new Error(`Thread update is unavailable: ${threadId}`), { code: 'THREADS_UNSUPPORTED', exitCode: 1 });
+              const updated = await thread.edit({ name: String(settings.name) });
+              return { id: updated.id ?? String(threadId), name: updated.name ?? String(settings.name), updated: true };
+            },
+            delete: async (threadId, operationOptions = {}) => {
+              requireChannelPermission(channel.id, 'ManageThreads');
+              requireApproval('Deleting a thread', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, threadId: String(threadId), deleted: true };
+              const thread = channel.threads?.cache?.get(String(threadId));
+              if (!thread?.delete) throw Object.assign(new Error(`Thread deletion is unavailable: ${threadId}`), { code: 'THREADS_UNSUPPORTED', exitCode: 1 });
+              await thread.delete();
+              return { id: String(threadId), deleted: true };
             },
           },
           delete: async (operationOptions = {}) => {

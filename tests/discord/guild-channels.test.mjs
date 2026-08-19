@@ -51,4 +51,19 @@ describe('channel organization and types', () => {
     const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true });
     await expect(api.guilds.get('1').channels.create('unknown', { type: 'forum' })).rejects.toMatchObject({ code: 'CHANNEL_TYPE_INVALID', exitCode: 2 });
   });
+
+  test('updates and deletes threads and updates webhooks', async () => {
+    const thread = { id: '30', name: 'old', edit: jest.fn(async () => ({ id: '30', name: 'new' })), delete: jest.fn() };
+    const webhook = { id: '40', name: 'old', edit: jest.fn(async () => ({ id: '40', name: 'new' })) };
+    const channel = { id: '10', type: 0, guild: { members: { me: { permissions: { has: () => true } } } }, threads: { cache: new Map([['30', thread]]) }, fetchWebhooks: jest.fn(async () => new Map([['40', webhook]])) };
+    const guild = { id: '1', channels: { cache: new Map([['10', channel]]) }, roles: { cache: new Map() }, members: { me: { permissions: { has: () => true } } } };
+    const client = { guilds: { cache: new Map([['1', guild]]) }, channels: { cache: new Map([['10', channel]]) }, fetchWebhook: jest.fn(async () => webhook) };
+    const api = createDiscordApi(client, { yes: true });
+    await expect(api.channels.get('10').threads.update('30', { name: 'new' })).resolves.toMatchObject({ updated: true, name: 'new' });
+    await expect(api.channels.get('10').threads.delete('30')).resolves.toEqual({ id: '30', deleted: true });
+    await expect(api.channels.get('10').webhooks.update('40', { name: 'new' })).resolves.toMatchObject({ updated: true, name: 'new' });
+    expect(thread.edit).toHaveBeenCalledWith({ name: 'new' });
+    expect(thread.delete).toHaveBeenCalled();
+    expect(webhook.edit).toHaveBeenCalledWith({ name: 'new', reason: undefined });
+  });
 });
