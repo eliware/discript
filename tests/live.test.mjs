@@ -43,4 +43,20 @@ describe('live Discord integration', () => {
     expect(result).toMatchObject({ dryRun: true, guildId: config.testGuild, name: 'discript-live-preview' });
     expect(output).toHaveLength(1);
   }, 30000);
+
+  (live ? test : test.skip)('validates role, message, and scheduled-event previews without mutation', async () => {
+    const config = loadConfig();
+    const runtime = await createDiscordRuntime({ token: config.token });
+    try {
+      const api = createDiscordApi(runtime.client, { dryRun: true });
+      const guild = api.guilds.get(requireTestGuild(config));
+      await expect(guild.roles.create('discript-validation-role')).resolves.toMatchObject({ dryRun: true, guildId: config.testGuild });
+      const textChannel = [...runtime.client.channels.cache.values()].find(channel => channel.guild?.id === config.testGuild && channel.type === 0);
+      expect(textChannel).toBeTruthy();
+      await expect(api.channels.get(textChannel.id).send('discript-validation-message')).resolves.toMatchObject({ dryRun: true, channelId: textChannel.id });
+      await expect(guild.scheduledEvents.create({ name: 'discript-validation-event', scheduledStartTime: '2030-01-01T00:00:00Z', entityType: 3 })).resolves.toMatchObject({ dryRun: true });
+    } finally {
+      await runtime.shutdown();
+    }
+  }, 30000);
 });
