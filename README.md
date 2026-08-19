@@ -68,6 +68,14 @@ npm start -- events update --guild <guild-id> --event <event-id> --name "Updated
 npm start -- events delete --guild <guild-id> --event <event-id> --yes --json
 ```
 
+Scripts can declare event handlers. The incoming Discord payload is available as `event` inside the handler:
+
+```text
+on("messageCreate") {
+  print(event.content)
+}
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh

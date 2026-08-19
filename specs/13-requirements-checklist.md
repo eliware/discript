@@ -16,7 +16,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript supports conditionals, comparisons, arithmetic, and bounded `while` loops.
 - [Not started] Discript supports callback syntax and general-purpose collection callbacks.
 - [Not started] Discript supports imports and reusable script modules.
-- [Not started] Discript supports event listener declarations.
+- [Half complete] Discript supports event listener declarations. The `on("event") { ... }` syntax and payload binding are implemented; long-running wait and signal orchestration remain.
 - [Not started] Discript supports timers and intentional long-running loops.
 - [Fully complete] Finite CLI executions shut down their Discord client.
 - [Half complete] Discript supports dry-run previews for state mutations.
