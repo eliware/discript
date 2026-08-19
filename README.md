@@ -30,6 +30,13 @@ List channels in a guild:
 npm start -- channels list --guild <guild-id> --json
 ```
 
+Preview or send a message. Writes require explicit approval:
+
+```sh
+npm start -- messages send --channel <channel-id> --content "Hello" --dry-run --json
+npm start -- messages send --channel <channel-id> --content "Hello" --yes --json
+```
+
 Evaluate source inline:
 
 ```sh

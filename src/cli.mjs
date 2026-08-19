@@ -46,7 +46,14 @@ async function executeInput(input, options, dependencies) {
 }
 
 async function executeDirectCommand(command, options) {
-  if (options.dry_run) return { dryRun: true, command };
+  if (options.dry_run) {
+    if (command[0] === 'messages' && command[1] === 'send') {
+      if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
+      return { dryRun: true, action: 'messages.send', channelId: options.channel, content: options.content };
+    }
+    return { dryRun: true, command };
+  }
   const { createDiscordRuntime } = await import('./runtime.mjs');
   const runtime = await createDiscordRuntime();
   try {
@@ -56,6 +63,11 @@ async function executeDirectCommand(command, options) {
       const guildId = options.guild;
       if (!guildId) throw Object.assign(new Error('channels list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(guildId).channels.list();
+    }
+    if (command[0] === 'messages' && command[1] === 'send') {
+      if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
+      return api.channels.get(options.channel).send(options.content);
     }
     throw Object.assign(new Error(`Unknown command: ${command.join(' ')}`), { code: 'UNKNOWN_COMMAND', exitCode: 2 });
   } finally {

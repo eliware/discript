@@ -6,6 +6,20 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
   const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
   const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
   return {
+    channels: {
+      get: id => {
+        const channel = client.channels.cache.get(String(id));
+        if (!channel) throw Object.assign(new Error(`Channel not found: ${id}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
+        return {
+          ...normalizeChannel(channel),
+          send: async content => {
+            requireApproval('Sending a message');
+            if (dryRun) return { dryRun: true, channelId: channel.id, content };
+            return normalizeMessage(await channel.send(String(content)));
+          },
+        };
+      },
+    },
     guilds: {
       list: () => client.guilds.cache.map(guild => ({ id: guild.id, name: guild.name })),
       get: id => {
