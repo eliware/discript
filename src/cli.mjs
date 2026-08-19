@@ -123,6 +123,15 @@ async function executeDirectCommand(command, options) {
       if (!options.guild) throw Object.assign(new Error('invites list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).invites.list();
     }
+    if (command[0] === 'invites' && command[1] === 'create') {
+      if (!options.guild) throw Object.assign(new Error('invites create requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.channel) throw Object.assign(new Error('invites create requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild).invites.create(options.channel, { maxAge: options.duration ? Number(options.duration) : 0, maxUses: options.messages ? Number(options.messages) : 0 });
+    }
+    if (command[0] === 'invites' && command[1] === 'delete') {
+      if (!options.invite) throw Object.assign(new Error('invites delete requires --invite <code>.'), { code: 'INVITE_REQUIRED', exitCode: 2 });
+      return api.guilds.get(options.guild ?? '').invites.delete(options.invite);
+    }
     if (command[0] === 'roles' && command[1] === 'create') {
       if (!options.guild) throw Object.assign(new Error('roles create requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       if (!options.name) throw Object.assign(new Error('roles create requires --name <name>.'), { code: 'NAME_REQUIRED', exitCode: 2 });
