@@ -95,6 +95,13 @@ after(1000) { print("started") }
 values = parallel(sleep(10), sleep(10))
 ```
 
+Arrow callbacks can transform and select collections:
+
+```text
+names = map(members, member => member.username)
+active = filter(members, member => member.roles != null)
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh

@@ -14,7 +14,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript supports asynchronous operations.
 - [Fully complete] Discript supports explicit async helpers including `sleep` and `parallel`.
 - [Fully complete] Discript supports conditionals, comparisons, arithmetic, bounded `while` loops, and bounded `for-in` loops.
-- [Not started] Discript supports callback syntax and general-purpose collection callbacks.
+- [Fully complete] Discript supports arrow callback syntax, callback blocks, and general-purpose async `map`, `filter`, and `reduce` helpers.
 - [Not started] Discript supports imports and reusable script modules.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.
