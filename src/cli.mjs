@@ -295,6 +295,16 @@ async function executeDirectCommand(command, options) {
       if (options.allow === undefined && options.deny === undefined) throw Object.assign(new Error('permissions set requires --allow and/or --deny.'), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
       return permissions.set(options.target, { ...(options.allow !== undefined ? { allow: options.allow.split(',').filter(Boolean) } : {}), ...(options.deny !== undefined ? { deny: options.deny.split(',').filter(Boolean) } : {}) }, { reason: options.reason });
     }
+    if (command[0] === 'voice-users' && ['status', 'mute', 'deafen', 'disconnect', 'move'].includes(command[1])) {
+      if (!options.guild) throw Object.assign(new Error(`voice-users ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      if (!options.user) throw Object.assign(new Error(`voice-users ${command[1]} requires --user <id>.`), { code: 'USER_REQUIRED', exitCode: 2 });
+      const voice = api.guilds.get(options.guild).members.get(options.user).voice;
+      if (command[1] === 'status') return voice.status();
+      if (command[1] === 'move') { if (!options.channel) throw Object.assign(new Error('voice-users move requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 }); return voice.move(options.channel, { reason: options.reason }); }
+      if (command[1] === 'mute') return voice.mute(true, { reason: options.reason });
+      if (command[1] === 'deafen') return voice.deafen(true, { reason: options.reason });
+      return voice.disconnect({ reason: options.reason });
+    }
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
       if (options.content === undefined) throw Object.assign(new Error('messages send requires --content <text>.'), { code: 'CONTENT_REQUIRED', exitCode: 2 });
@@ -382,6 +392,7 @@ function previewMutation(command, options) {
   if (command[0] === 'stickers' && command[1] === 'update' && !options.name && !options.description && !options.tags) throw Object.assign(new Error(`${action} requires --name, --description, or --tags.`), { code: 'STICKER_FIELDS_REQUIRED', exitCode: 2 });
   if (command[0] === 'webhooks') { requireChannel(); if (command[1] === 'create') requireOption('name', 'NAME_REQUIRED'); if (command[1] === 'delete') requireOption('webhook', 'WEBHOOK_REQUIRED'); }
   if (command[0] === 'permissions') { requireChannel(); if (command[1] !== 'list') requireOption('target', 'TARGET_REQUIRED'); if (command[1] === 'set' && options.allow === undefined && options.deny === undefined) throw Object.assign(new Error(`${action} requires --allow and/or --deny.`), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 }); }
+  if (command[0] === 'voice-users') { requireGuild(); requireUser(); if (command[1] === 'move') requireChannel(); }
   if (command[0] === 'voice' && command[1] === 'join') requireChannel();
   if (command[0] === 'voice' && command[1] === 'leave') requireGuild();
   return { dryRun: true, action, command, parameters: Object.fromEntries(Object.entries(options).filter(([key]) => !['json', 'pretty', 'dry_run', 'yes'].includes(key))) };

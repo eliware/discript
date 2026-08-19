@@ -106,6 +106,15 @@ npm start -- permissions set --channel <channel-id> --target <role-or-user-id> -
 npm start -- permissions delete --channel <channel-id> --target <role-or-user-id> --yes --json
 ```
 
+Member voice status and guarded controls are available through `voice-users`:
+
+```sh
+npm start -- voice-users status --guild <guild-id> --user <user-id> --json
+npm start -- voice-users mute --guild <guild-id> --user <user-id> --yes --json
+npm start -- voice-users move --guild <guild-id> --user <user-id> --channel <voice-channel-id> --yes --json
+npm start -- voice-users disconnect --guild <guild-id> --user <user-id> --yes --json
+```
+
 Invite creation and deletion are guarded mutations; use `--yes` (or `-y`) and preview with `--dry-run`:
 
 ```sh

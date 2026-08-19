@@ -25,4 +25,9 @@ describe('direct dry-run validation', () => {
     await expect(run(['permissions', 'set', '--dry-run', '--channel', '123', '--target', '456'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
     await expect(run(['permissions', 'delete', '--dry-run', '--channel', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'TARGET_REQUIRED', exitCode: 2 });
   });
+
+  test('validates voice-user command targets in dry-run mode', async () => {
+    await expect(run(['voice-users', 'mute', '--dry-run', '--guild', '123'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'USER_REQUIRED', exitCode: 2 });
+    await expect(run(['voice-users', 'move', '--dry-run', '--guild', '123', '--user', '456'], { stdout: () => {}, stdin: { isTTY: true } })).rejects.toMatchObject({ code: 'CHANNEL_REQUIRED', exitCode: 2 });
+  });
 });
