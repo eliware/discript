@@ -29,7 +29,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
 - [Fully complete] Discript covers threads, invites, emojis, stickers, scheduled events, and guarded voice join/leave/status operations.
 - [Fully complete] Discript exposes normalized bot identity through the API and `bot get` command.
-- [Half complete] Discript enforces Discord permissions and authorization safeguards across current mutation groups.
+- [Half complete] Discript enforces Discord permissions and authorization safeguards across current mutation groups, including message sends, thread lifecycle, invite deletion, roles, moderation, channels, events, and voice joins; broader Discord permission coverage remains.
 - [Fully complete] Discript enforces protected-role, permission, role-hierarchy, and moderation-target safeguards for the current mutation groups.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
 - [Fully complete] Discript has a `TEST_GUILD` configuration value.
