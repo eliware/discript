@@ -4,13 +4,16 @@ import { homedir, platform } from 'node:os';
 import { join } from 'node:path';
 import { unlink } from 'node:fs/promises';
 import { createDiscordRuntime } from './runtime.mjs';
+import { getGatewaySessionLimits, shouldWaitForGatewayStart } from './gateway-limits.mjs';
 
 export function brokerEndpoint(token, home = homedir(), os = platform()) {
   const id = createHash('sha256').update(String(token)).digest('hex').slice(0, 20);
   return os === 'win32' ? `\\\\.\\pipe\\discript-${id}` : join(home, `.discript-${id}.sock`);
 }
 
-export async function startGatewayBroker({ token, endpoint = brokerEndpoint(token), runtimeOptions = {} } = {}) {
+export async function startGatewayBroker({ token, endpoint = brokerEndpoint(token), runtimeOptions = {}, enforceSessionLimit = true, limits } = {}) {
+  const sessionLimits = limits ?? (!runtimeOptions.client && enforceSessionLimit ? await getGatewaySessionLimits({ token }) : null);
+  if (sessionLimits && shouldWaitForGatewayStart(sessionLimits)) throw Object.assign(new Error(`Discord Gateway session-start limit exhausted; retry after ${sessionLimits.resetAfter}ms.`), { code: 'GATEWAY_SESSION_LIMIT', exitCode: 6, resetAfter: sessionLimits.resetAfter });
   const runtime = await createDiscordRuntime({ token, ...runtimeOptions });
   const server = net.createServer(socket => {
     let buffer = '';
