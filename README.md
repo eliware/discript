@@ -28,6 +28,10 @@ The package is public and publishes to npm from `v*` Git tags through the standa
 
 ## Usage
 
+## Documentation
+
+The full documentation map is in [docs/README.md](docs/README.md), including getting started, the language, CLI and Discord references, agent workflows, developer guides, operations, and contribution guidance.
+
 List guilds with a direct CLI command:
 
 ```sh
