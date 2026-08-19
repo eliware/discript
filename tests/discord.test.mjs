@@ -89,4 +89,26 @@ describe('Discord capability layer', () => {
     const preview = createDiscordApi({ channels: { cache: new Map([['1', { ...channel, guild: { members: { me: { permissions: { has: () => true } } } } }]]) } }, { dryRun: true });
     await expect(preview.channels.get('1').webhooks.create('new')).resolves.toMatchObject({ dryRun: true, created: true });
   });
+
+  test('supports guarded channel permission overwrites', async () => {
+    const overwriteEdit = jest.fn(async (id, changes) => ({ id, type: 0, allow: { toArray: () => changes.allow ?? [] }, deny: { toArray: () => changes.deny ?? [] } }));
+    const overwriteDelete = jest.fn(async () => undefined);
+    const channel = {
+      id: '1', guild: { members: { me: { permissions: { has: () => true } } } },
+      permissionOverwrites: { cache: new Map([['2', { id: '2', type: 1, allow: { toArray: () => ['ViewChannel'] }, deny: { toArray: () => [] } }]]), edit: overwriteEdit, delete: overwriteDelete },
+    };
+    const api = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    expect(api.channels.get('1').permissions.list()).toEqual([{ id: '2', type: 1, allow: ['ViewChannel'], deny: [] }]);
+    await expect(api.channels.get('1').permissions.set('2', { allow: ['SendMessages'], deny: [] })).resolves.toMatchObject({ channelId: '1', id: '2', updated: true });
+    await expect(api.channels.get('1').permissions.delete('2')).resolves.toEqual({ channelId: '1', targetId: '2', deleted: true });
+    expect(overwriteEdit).toHaveBeenCalledWith('2', { allow: ['SendMessages'], deny: [] }, { reason: undefined });
+  });
+
+  test('requires ManageChannels and previews permission overwrites', async () => {
+    const channel = { id: '1', guild: { members: { me: { permissions: { has: () => false } } } }, permissionOverwrites: { cache: new Map(), edit: jest.fn() } };
+    const denied = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    await expect(denied.channels.get('1').permissions.set('2', { allow: ['ViewChannel'] })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+    const preview = createDiscordApi({ channels: { cache: new Map([['1', { ...channel, guild: { members: { me: { permissions: { has: () => true } } } } }]]) } }, { dryRun: true });
+    await expect(preview.channels.get('1').permissions.set('2', { allow: ['ViewChannel'] })).resolves.toMatchObject({ dryRun: true, targetId: '2', updated: true });
+  });
 });

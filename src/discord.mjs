@@ -12,6 +12,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
   const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
   const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
   const normalizeWebhook = webhook => ({ id: webhook.id, name: webhook.name ?? null, channelId: webhook.channelId ?? null, type: webhook.type ?? null });
+  const normalizeOverwrite = overwrite => ({ id: overwrite.id, type: overwrite.type ?? null, allow: overwrite.allow?.toArray?.() ?? [], deny: overwrite.deny?.toArray?.() ?? [] });
   const resolveMessage = async (channelId, messageId) => {
     const channel = client.channels.cache.get(String(channelId));
     if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
@@ -148,6 +149,29 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
               const webhook = await client.fetchWebhook(String(webhookId));
               await webhook.delete(operationOptions.reason);
               return { id: String(webhookId), deleted: true };
+            },
+          },
+          permissions: {
+            list: () => mapCache(channel.permissionOverwrites?.cache, normalizeOverwrite),
+            set: async (targetId, settings = {}, operationOptions = {}) => {
+              if (!targetId) throw Object.assign(new Error('Permission overwrite requires targetId.'), { code: 'TARGET_REQUIRED', exitCode: 2 });
+              if (!Array.isArray(settings.allow) && !Array.isArray(settings.deny)) throw Object.assign(new Error('Permission overwrite requires allow or deny arrays.'), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
+              requireChannelPermission(channel.id, 'ManageChannels');
+              requireApproval('Setting channel permissions', operationOptions);
+              const changes = { ...(Array.isArray(settings.allow) ? { allow: settings.allow } : {}), ...(Array.isArray(settings.deny) ? { deny: settings.deny } : {}) };
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, targetId: String(targetId), ...changes, updated: true };
+              if (!channel.permissionOverwrites?.edit) throw Object.assign(new Error('Channel permission editing is unavailable.'), { code: 'PERMISSIONS_UNSUPPORTED', exitCode: 1 });
+              const overwrite = await channel.permissionOverwrites.edit(String(targetId), changes, { reason: operationOptions.reason });
+              return { channelId: channel.id, ...normalizeOverwrite(overwrite), updated: true };
+            },
+            delete: async (targetId, operationOptions = {}) => {
+              if (!targetId) throw Object.assign(new Error('Permission overwrite requires targetId.'), { code: 'TARGET_REQUIRED', exitCode: 2 });
+              requireChannelPermission(channel.id, 'ManageChannels');
+              requireApproval('Deleting channel permissions', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, targetId: String(targetId), deleted: true };
+              if (!channel.permissionOverwrites?.delete) throw Object.assign(new Error('Channel permission deletion is unavailable.'), { code: 'PERMISSIONS_UNSUPPORTED', exitCode: 1 });
+              await channel.permissionOverwrites.delete(String(targetId), operationOptions.reason);
+              return { channelId: channel.id, targetId: String(targetId), deleted: true };
             },
           },
           threads: {
@@ -443,6 +467,29 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
                     const webhook = await client.fetchWebhook(String(webhookId));
                     await webhook.delete(operationOptions.reason);
                     return { id: String(webhookId), deleted: true };
+                  },
+                },
+                permissions: {
+                  list: () => mapCache(channel.permissionOverwrites?.cache, normalizeOverwrite),
+                  set: async (targetId, settings = {}, operationOptions = {}) => {
+                    if (!targetId) throw Object.assign(new Error('Permission overwrite requires targetId.'), { code: 'TARGET_REQUIRED', exitCode: 2 });
+                    if (!Array.isArray(settings.allow) && !Array.isArray(settings.deny)) throw Object.assign(new Error('Permission overwrite requires allow or deny arrays.'), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
+                    requireChannelPermission(channel.id, 'ManageChannels');
+                    requireApproval('Setting channel permissions', operationOptions);
+                    const changes = { ...(Array.isArray(settings.allow) ? { allow: settings.allow } : {}), ...(Array.isArray(settings.deny) ? { deny: settings.deny } : {}) };
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, targetId: String(targetId), ...changes, updated: true };
+                    if (!channel.permissionOverwrites?.edit) throw Object.assign(new Error('Channel permission editing is unavailable.'), { code: 'PERMISSIONS_UNSUPPORTED', exitCode: 1 });
+                    const overwrite = await channel.permissionOverwrites.edit(String(targetId), changes, { reason: operationOptions.reason });
+                    return { channelId: channel.id, ...normalizeOverwrite(overwrite), updated: true };
+                  },
+                  delete: async (targetId, operationOptions = {}) => {
+                    if (!targetId) throw Object.assign(new Error('Permission overwrite requires targetId.'), { code: 'TARGET_REQUIRED', exitCode: 2 });
+                    requireChannelPermission(channel.id, 'ManageChannels');
+                    requireApproval('Deleting channel permissions', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, targetId: String(targetId), deleted: true };
+                    if (!channel.permissionOverwrites?.delete) throw Object.assign(new Error('Channel permission deletion is unavailable.'), { code: 'PERMISSIONS_UNSUPPORTED', exitCode: 1 });
+                    await channel.permissionOverwrites.delete(String(targetId), operationOptions.reason);
+                    return { channelId: channel.id, targetId: String(targetId), deleted: true };
                   },
                 },
                 threads: {
