@@ -19,12 +19,13 @@ export async function run(argv = [], dependencies = {}) {
   const errors = registerHandlers({ log });
   let shutdownHook;
   try {
-    shutdownHook = registerSignals({ log, shutdownHook: async () => {} });
+    shutdownHook = registerSignals({ log, exit: false, shutdownHook: async () => {} });
     const result = await withTimeout(executeInput(source, options, dependencies), options.timeout);
     if (result !== undefined) writeResult(result, options, stdout);
     return result;
   } finally {
     await shutdownHook?.shutdown?.();
+    shutdownHook?.removeHandlers?.();
     errors.removeHandlers();
   }
 }
