@@ -1,15 +1,10 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
+import { createScope } from './evaluator/scope.mjs';
+import { normalizeError, runtimeError, ScriptExit } from './evaluator/errors.mjs';
+
+export { ScriptExit } from './evaluator/errors.mjs';
 
 export async function evaluate(program, globals = {}, { scope: sharedScope, baseDir = process.cwd() } = {}) {
-  const baseScope = sharedScope ?? new Map(Object.entries(globals));
-  const scopeContext = new AsyncLocalStorage();
-  const scope = new Proxy(baseScope, {
-    get(target, property) {
-      const current = scopeContext.getStore() ?? target;
-      const value = Reflect.get(current, property);
-      return typeof value === 'function' ? value.bind(current) : value;
-    },
-  });
+  const { baseScope, context: scopeContext, scope } = createScope(globals, sharedScope);
   return scopeContext.run(baseScope, () => evaluateBlock(program.body));
 
   async function evaluateBlock(statements) {
@@ -159,22 +154,6 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
   }
 }
 
-function runtimeError(message) { return Object.assign(new Error(message), { code: 'RUNTIME_ERROR', exitCode: 1 }); }
-
 class ReturnSignal {
   constructor(value) { this.value = value; }
-}
-
-function normalizeError(error) {
-  return { code: error?.code ?? 'DISCRIPT_ERROR', message: error?.message ?? String(error), exitCode: error?.exitCode ?? 1 };
-}
-
-export class ScriptExit extends Error {
-  constructor(exitCode = 0, message = null) {
-    super(message ?? `Script exited with status ${exitCode}.`);
-    this.name = 'ScriptExit';
-    this.code = 'SCRIPT_EXIT';
-    this.exitCode = Number(exitCode);
-    this.details = message ? { message } : undefined;
-  }
 }
