@@ -4,6 +4,8 @@ Discript loads the environment visible to the Node process. Keep secrets in `.en
 
 Discript also loads `~/.discript.env` as a user-level fallback. Project-local `.env` values take precedence, and explicitly exported shell variables are never overwritten. Keep both files private.
 
+On Linux, this file is `/home/<user>/.discript.env`; on Windows, it is `%USERPROFILE%\.discript.env`. Discript resolves the home directory through Node, so no shell-specific path syntax is required when launching the CLI.
+
 | Variable | Purpose |
 | --- | --- |
 | `DISCORD_TOKEN` | Discord bot token. Required for live execution. |

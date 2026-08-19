@@ -12,7 +12,7 @@ Discript is an early-stage scripting language and CLI for programmatic Discord i
 
 ```sh
 npm install
-cp .env.example .env
+node -e "require('node:fs').copyFileSync('.env.example', '.env')"
 # edit .env with a private Discord bot token
 ```
 
@@ -42,7 +42,7 @@ Discover supported direct commands or generate shell completion scripts:
 
 ```sh
 npm start -- commands list --json
-npm start -- completion bash > /tmp/discript-completion.bash
+npm start -- completion bash > discript-completion.bash
 npm start -- completion zsh
 npm start -- completion fish
 ```
