@@ -212,4 +212,20 @@ describe('channel organization and types', () => {
     await api.channels.get('10').permissions.delete('r');
     await api.channels.get('10').threads.update('30', { name: 'x' });
   });
+
+  test('covers null and absent optional channel collections', async () => {
+    const channel = { id: '10', type: 0, guild: { members: { me: { permissions: { has: () => true } } } }, edit: jest.fn(async changes => ({ id: '10', name: changes.name ?? 'x', type: 0 })), threads: undefined, permissionOverwrites: undefined };
+    const guild = { id: '1', channels: { cache: channelCollection([['10', channel]]), create: jest.fn(async settings => ({ id: '11', name: settings.name, type: settings.type })) }, roles: { cache: new Map() }, members: { me: { permissions: { has: () => true } } } };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) }, channels: { cache: new Map([['10', channel]]) } }, { yes: true });
+    const target = api.channels.get('10');
+    await api.guilds.get('1').channels.create('uncategorized', { parent: null, position: 0 });
+    await target.update({ name: 'preview', topic: undefined }, { dryRun: true });
+    await expect(target.update()).rejects.toMatchObject({ code: 'CHANNEL_FIELDS_REQUIRED' });
+    await expect(target.webhooks.update('40')).rejects.toMatchObject({ code: 'NAME_REQUIRED' });
+    await expect(target.permissions.set('r')).rejects.toMatchObject({ code: 'PERMISSIONS_REQUIRED' });
+    await expect(target.permissions.delete()).rejects.toMatchObject({ code: 'TARGET_REQUIRED' });
+    await expect(target.threads.update('30')).rejects.toMatchObject({ code: 'NAME_REQUIRED' });
+    expect(target.threads.list()).toEqual([]);
+    expect(target.permissions.list()).toEqual([]);
+  });
 });
