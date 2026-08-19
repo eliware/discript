@@ -295,14 +295,14 @@ async function executeDirectCommand(command, options) {
       if (options.allow === undefined && options.deny === undefined) throw Object.assign(new Error('permissions set requires --allow and/or --deny.'), { code: 'PERMISSIONS_REQUIRED', exitCode: 2 });
       return permissions.set(options.target, { ...(options.allow !== undefined ? { allow: options.allow.split(',').filter(Boolean) } : {}), ...(options.deny !== undefined ? { deny: options.deny.split(',').filter(Boolean) } : {}) }, { reason: options.reason });
     }
-    if (command[0] === 'voice-users' && ['status', 'mute', 'deafen', 'disconnect', 'move'].includes(command[1])) {
+    if (command[0] === 'voice-users' && ['status', 'mute', 'unmute', 'deafen', 'undeafen', 'disconnect', 'move'].includes(command[1])) {
       if (!options.guild) throw Object.assign(new Error(`voice-users ${command[1]} requires --guild <id>.`), { code: 'GUILD_REQUIRED', exitCode: 2 });
       if (!options.user) throw Object.assign(new Error(`voice-users ${command[1]} requires --user <id>.`), { code: 'USER_REQUIRED', exitCode: 2 });
       const voice = api.guilds.get(options.guild).members.get(options.user).voice;
       if (command[1] === 'status') return voice.status();
       if (command[1] === 'move') { if (!options.channel) throw Object.assign(new Error('voice-users move requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 }); return voice.move(options.channel, { reason: options.reason }); }
-      if (command[1] === 'mute') return voice.mute(true, { reason: options.reason });
-      if (command[1] === 'deafen') return voice.deafen(true, { reason: options.reason });
+      if (command[1] === 'mute' || command[1] === 'unmute') return voice.mute(command[1] === 'mute', { reason: options.reason });
+      if (command[1] === 'deafen' || command[1] === 'undeafen') return voice.deafen(command[1] === 'deafen', { reason: options.reason });
       return voice.disconnect({ reason: options.reason });
     }
     if (command[0] === 'messages' && command[1] === 'send') {

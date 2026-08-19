@@ -111,6 +111,9 @@ Member voice status and guarded controls are available through `voice-users`:
 ```sh
 npm start -- voice-users status --guild <guild-id> --user <user-id> --json
 npm start -- voice-users mute --guild <guild-id> --user <user-id> --yes --json
+npm start -- voice-users unmute --guild <guild-id> --user <user-id> --yes --json
+npm start -- voice-users deafen --guild <guild-id> --user <user-id> --yes --json
+npm start -- voice-users undeafen --guild <guild-id> --user <user-id> --yes --json
 npm start -- voice-users move --guild <guild-id> --user <user-id> --channel <voice-channel-id> --yes --json
 npm start -- voice-users disconnect --guild <guild-id> --user <user-id> --yes --json
 ```
