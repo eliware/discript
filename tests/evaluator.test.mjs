@@ -18,4 +18,9 @@ describe('evaluate', () => {
   test('evaluates unary expressions', async () => {
     await expect(evaluate(parse('value = -4; !false; value'))).resolves.toBe(-4);
   });
+
+  test('respects arithmetic precedence and short-circuits logic', async () => {
+    await expect(evaluate(parse('value = 2 + 3 * 4; value'))).resolves.toBe(14);
+    await expect(evaluate(parse('false && missing; true || missing'))).resolves.toBe(true);
+  });
 });

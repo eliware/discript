@@ -1,4 +1,4 @@
-const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(=>|==|!=|>=|<=|>|<|\+|-|\*|\/|!)|([()[\].,;=:{}`])/y;
+const TOKEN_RE = /\s+|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\d+(?:\.\d+)?)|([A-Za-z_$][\w$]*)|(=>|==|!=|>=|<=|&&|\|\||>|<|\+|-|\*|\/|!)|([()[\].,;=:{}`])/y;
 
 export function parse(source) {
   const tokens = tokenize(source);
@@ -79,7 +79,19 @@ export function parse(source) {
     return statements;
   }
 
-  function parseExpression() {
+  function parseExpression() { return parseBinary(0); }
+
+  function parseBinary(minPrecedence) {
+    let expression = parsePostfix();
+    while (peek()?.type === 'operator' && precedence(peek().value) >= minPrecedence) {
+      const operator = tokens[index++].value;
+      const right = parseBinary(precedence(operator) + 1);
+      expression = { type: 'BinaryExpression', operator, left: expression, right };
+    }
+    return expression;
+  }
+
+  function parsePostfix() {
     let expression = parsePrimary();
     while (match('.')) {
       const property = consume('identifier', 'Expected a property name after `.`.');
@@ -105,10 +117,6 @@ export function parse(source) {
       if (expression.type !== 'Identifier') throw syntaxError('Arrow callbacks require a single parameter name.');
       const body = peek()?.value === '{' ? { type: 'BlockBody', body: parseBlock() } : { type: 'ExpressionBody', body: parseExpression() };
       expression = { type: 'ArrowExpression', parameter: expression.name, body };
-    }
-    if (peek()?.type === 'operator') {
-      const operator = tokens[index++].value;
-      expression = { type: 'BinaryExpression', operator, left: expression, right: parseExpression() };
     }
     return expression;
   }
@@ -171,6 +179,10 @@ export function parse(source) {
   function consume(type, message) { if (!match(type)) throw syntaxError(message); return tokens[index - 1]; }
   function peek() { return tokens[index]; }
   function atEnd() { return index >= tokens.length; }
+}
+
+function precedence(operator) {
+  return { '||': 1, '&&': 2, '==': 3, '!=': 3, '>': 4, '<': 4, '>=': 4, '<=': 4, '+': 5, '-': 5, '*': 6, '/': 6 }[operator] ?? -1;
 }
 
 function tokenize(source) {

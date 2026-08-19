@@ -121,6 +121,8 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
     }
     if (expression.type === 'BinaryExpression') {
       const left = await evaluateExpression(expression.left);
+      if (expression.operator === '&&') return left && await evaluateExpression(expression.right);
+      if (expression.operator === '||') return left || await evaluateExpression(expression.right);
       const right = await evaluateExpression(expression.right);
       if (expression.operator === '==') return left === right;
       if (expression.operator === '!=') return left !== right;
