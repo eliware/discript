@@ -1,4 +1,5 @@
 import { createSafety } from './discord/safety.mjs';
+import { createNormalization } from './discord/normalization.mjs';
 
 export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null } = {}) {
   let loadedVoiceModule = voiceModule;
@@ -6,12 +7,8 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
     if (!loadedVoiceModule) loadedVoiceModule = await import('@discordjs/voice');
     return loadedVoiceModule;
   };
-  const mapCache = (cache, mapper) => typeof cache?.map === 'function' ? cache.map(mapper) : [...(cache?.values?.() ?? [])].map(mapper);
+  const { mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite } = createNormalization();
   const { requireApproval, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember } = createSafety({ client, dryRun, yes });
-  const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
-  const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
-  const normalizeWebhook = webhook => ({ id: webhook.id, name: webhook.name ?? null, channelId: webhook.channelId ?? null, type: webhook.type ?? null });
-  const normalizeOverwrite = overwrite => ({ id: overwrite.id, type: overwrite.type ?? null, allow: overwrite.allow?.toArray?.() ?? [], deny: overwrite.deny?.toArray?.() ?? [] });
   const resolveMessage = async (channelId, messageId) => {
     const channel = client.channels.cache.get(String(channelId));
     if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
