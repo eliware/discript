@@ -58,6 +58,7 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
     }
     if (statement.type === 'IfStatement') {
       const branch = await evaluateExpression(statement.test) ? statement.consequent : statement.alternate;
+      if (branch?.type === 'IfStatement') return evaluateStatement(branch);
       let branchResult;
       for (const nested of branch ?? []) branchResult = await evaluateStatement(nested);
       return branchResult;

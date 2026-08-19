@@ -63,7 +63,10 @@ export function parse(source) {
       const consequent = parseBlock();
       if (keyword === 'while') return { type: 'WhileStatement', test, body: consequent };
       let alternate = null;
-      if (peek()?.type === 'identifier' && peek().value === 'else') { index += 1; alternate = parseBlock(); }
+      if (peek()?.type === 'identifier' && peek().value === 'else') {
+        index += 1;
+        alternate = peek()?.type === 'identifier' && peek().value === 'if' ? parseStatement() : parseBlock();
+      }
       return { type: 'IfStatement', test, consequent, alternate };
     }
     const expression = parseExpression();
