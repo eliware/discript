@@ -66,12 +66,16 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                 displayName: member.displayName ?? null,
                 roles: mapCache(member.roles?.cache, role => ({ id: role.id, name: role.name })),
                 addRole: async (roleId, operationOptions = {}) => {
+                  const role = guild.roles.cache.get(String(roleId));
+                  if (role?.managed || role?.name === '@everyone') throw Object.assign(new Error('Managed and @everyone roles cannot be changed.'), { code: 'ROLE_PROTECTED', exitCode: 5 });
                   requireApproval('Adding a role', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, roleId: String(roleId), added: true };
                   await member.roles.add(String(roleId));
                   return { memberId: member.id, roleId: String(roleId), added: true };
                 },
                 removeRole: async (roleId, operationOptions = {}) => {
+                  const role = guild.roles.cache.get(String(roleId));
+                  if (role?.managed || role?.name === '@everyone') throw Object.assign(new Error('Managed and @everyone roles cannot be changed.'), { code: 'ROLE_PROTECTED', exitCode: 5 });
                   requireApproval('Removing a role', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, roleId: String(roleId), removed: true };
                   await member.roles.remove(String(roleId));

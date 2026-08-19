@@ -29,7 +29,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
 - [Not started] Discript covers threads, invites, emojis, stickers, scheduled events, and voice operations.
 - [Half complete] Discript enforces Discord permissions and authorization safeguards.
-- [Not started] Discript enforces complete role hierarchy and protected-target checks.
+- [Half complete] Discript enforces protected-role checks; complete role hierarchy and protected-target checks remain.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
 - [Fully complete] Discript has a `TEST_GUILD` configuration value.
 - [Fully complete] Discript has gated read-only live Discord tests.
