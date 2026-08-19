@@ -24,6 +24,12 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
     const highest = guild.members?.me?.roles?.highest;
     if (highest?.position !== undefined && role?.position !== undefined && role.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this role change.'), { code: 'ROLE_HIERARCHY', exitCode: 5 });
   };
+  const requireManageableMember = (guild, member) => {
+    if (member.user?.bot || member.id === guild.ownerId || member.id === guild.members?.me?.id) throw Object.assign(new Error('Bot, owner, and self targets cannot be moderated.'), { code: 'MEMBER_PROTECTED', exitCode: 5 });
+    const highest = guild.members?.me?.roles?.highest;
+    const targetHighest = member.roles?.highest;
+    if (highest?.position !== undefined && targetHighest?.position !== undefined && targetHighest.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this member moderation.'), { code: 'MEMBER_HIERARCHY', exitCode: 5 });
+  };
   const requireChannelPermission = (channelId, permission) => {
     const channel = client.channels.cache.get(String(channelId));
     const botMember = channel?.guild?.members?.me;
@@ -175,6 +181,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                   return { memberId: member.id, roleId: String(roleId), removed: true };
                 },
                 ban: async (reason, operationOptions = {}) => {
+                  requireManageableMember(guild, member);
                   requirePermission(guild, 'BanMembers');
                   requireApproval('Banning a member', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, banned: true, reason: reason ?? null };
@@ -182,6 +189,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                   return { memberId: member.id, banned: true };
                 },
                 kick: async (reason, operationOptions = {}) => {
+                  requireManageableMember(guild, member);
                   requirePermission(guild, 'KickMembers');
                   requireApproval('Kicking a member', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, memberId: member.id, kicked: true, reason: reason ?? null };
@@ -189,6 +197,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
                   return { memberId: member.id, kicked: true };
                 },
                 timeout: async (durationMs, reason, operationOptions = {}) => {
+                  requireManageableMember(guild, member);
                   requirePermission(guild, 'ModerateMembers');
                   requireApproval('Timing out a member', operationOptions);
                   if (!Number.isInteger(Number(durationMs)) || Number(durationMs) < 1) throw Object.assign(new Error('Timeout duration must be a positive number of milliseconds.'), { code: 'INVALID_DURATION', exitCode: 2 });
