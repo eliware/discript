@@ -1,55 +1,55 @@
 {
-  "name": "discript",
-  "version": "1.0.0",
-  "description": "Discord scripting language and automation CLI for developers and AI agents.",
-  "private": false,
-  "main": "bin/discript.mjs",
-  "scripts": {
-    "start": "node bin/discript.mjs",
-    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
-    "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
-    "test:live": "DISCRIPT_LIVE=1 npx --node-options=\"--experimental-vm-modules --no-warnings\" jest tests/live.test.mjs --runInBand",
-    "test:live:mutations": "DISCRIPT_LIVE=1 DISCRIPT_LIVE_MUTATIONS=1 npx --node-options=\"--experimental-vm-modules --no-warnings\" jest tests/live-mutations.test.mjs --runInBand",
-    "pack": "npm pack --dry-run",
-    "pack:check": "npm run package:check",
-    "package:check": "node scripts/verify-package.mjs",
-    "lint": "npx oxlint ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/eliware/discript.git"
-  },
-  "keywords": [],
-  "engines": {
-    "node": ">=26"
-  },
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/eliware/discript/issues"
-  },
-  "homepage": "https://github.com/eliware/discript#readme",
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "bin",
-    "src",
-    "examples",
-    "README.md",
-    "SPEC.md",
-    "specs"
-  ],
-  "bin": {
-    "discript": "bin/discript.mjs"
-  },
-  "dependencies": {
-    "@discordjs/voice": "^0.19.2",
-    "@eliware/common": "^1.1.8",
-    "discord.js": "^14.27.0",
-    "dotenv": "^17.4.2"
-  },
-  "devDependencies": {
-    "jest": "^30.4.2",
-    "oxlint": "^1.79.0"
-  }
+    "name": "discript",
+    "version": "1.0.1",
+    "description": "Discord scripting language and automation CLI for developers and AI agents.",
+    "private": false,
+    "main": "bin/discript.mjs",
+    "scripts": {
+        "start": "node bin/discript.mjs",
+        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
+        "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
+        "test:live": "DISCRIPT_LIVE=1 npx --node-options=\"--experimental-vm-modules --no-warnings\" jest tests/live.test.mjs --runInBand",
+        "test:live:mutations": "DISCRIPT_LIVE=1 DISCRIPT_LIVE_MUTATIONS=1 npx --node-options=\"--experimental-vm-modules --no-warnings\" jest tests/live-mutations.test.mjs --runInBand",
+        "pack": "npm pack --dry-run",
+        "pack:check": "npm run package:check",
+        "package:check": "node scripts/verify-package.mjs",
+        "lint": "npx oxlint ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/eliware/discript.git"
+    },
+    "keywords": [],
+    "engines": {
+        "node": ">=26"
+    },
+    "type": "module",
+    "bugs": {
+        "url": "https://github.com/eliware/discript/issues"
+    },
+    "homepage": "https://github.com/eliware/discript#readme",
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "bin",
+        "src",
+        "examples",
+        "README.md",
+        "SPEC.md",
+        "specs"
+    ],
+    "bin": {
+        "discript": "bin/discript.mjs"
+    },
+    "dependencies": {
+        "@discordjs/voice": "^0.19.2",
+        "@eliware/common": "^1.1.8",
+        "discord.js": "^14.27.0",
+        "dotenv": "^17.4.2"
+    },
+    "devDependencies": {
+        "jest": "^30.4.2",
+        "oxlint": "^1.79.0"
+    }
 }
