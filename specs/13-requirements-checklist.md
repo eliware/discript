@@ -35,11 +35,11 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript enforces protected-role, permission, role-hierarchy, and moderation-target safeguards for the current mutation groups.
 - [Fully complete] Discript uses `@eliware/common` for shared lifecycle and logging foundations.
 - [Fully complete] Discript has a `TEST_GUILD` configuration value.
-- [Fully complete] Discript has gated read-only live Discord tests, currently passing against `TEST_GUILD`.
-- [Fully complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD`, currently passing with cleanup.
+- [Half complete] Discript has gated read-only live Discord tests scoped to `TEST_GUILD`; the suite and script are present, but the current environment did not return a completed Discord login during verification.
+- [Half complete] Discript has gated reversible mutation tests scoped to `TEST_GUILD` with cleanup; the suite and cleanup path are present, but a completed live run is not evidenced in the current checkpoint.
 - [Fully complete] Discript provides agent-oriented structured errors and diagnostics, including stable exit codes and sanitized Discord API metadata in JSON errors.
 - [Fully complete] Discript provides command discovery, common aliases, typo suggestions, and Bash/Zsh/Fish shell completions.
-- [Fully complete] Discript has unit tests for the current parser, runtime, CLI, and capabilities.
+- [Fully complete] Discript has unit and integration tests for the current parser, runtime, CLI, command handlers, safety matrix, and capabilities.
 - [Fully complete] The parser and command-discovery modules each achieve 100% statements, branches, functions, and lines coverage.
 - [Fully complete] Discript has agent-focused examples and usage documentation covering discovery, guarded mutation workflows, exit handling, events, timers, callbacks, imports, and JSONL output.
 - [Fully complete] Discript is packaged as a public installable CLI through npm, Git SSH, or `npm pack`, with an automated isolated tarball-install smoke check and tag-triggered provenance publishing.
@@ -54,3 +54,12 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Run release validation for the post-1.0.3 local changes.
 - [Fully complete] Push the accumulated local release-ready commits after approval.
 - [Fully complete] Publish and verify the next npm patch release after npm visibility is resolved.
+
+## Current verification evidence
+
+- [Fully complete] `npm test -- --runInBand` passes with 266 tests passed and 9 skipped.
+- [Fully complete] `npm run docs:check` passes with 106 Markdown files, 66 CLI commands, and 65 parsed examples.
+- [Fully complete] `npm run package:check` passes with an isolated tarball install and packaged `docs/README.md` assertion.
+- [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
+- [Fully complete] Executable documentation tests parse every `.ds` example and execute representative fundamentals.
+- [Fully complete] CLI command-handler modules have direct operation-level coverage; the command-handler scope reports 100% statements, functions, and lines, with remaining branch gaps in validation/preview/catalog paths.
