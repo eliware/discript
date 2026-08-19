@@ -12,12 +12,12 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports variables and sequential result reuse.
 - [Fully complete] Discript supports structured values, arrays, objects, basic collection helpers, and bounded `for-in` iteration.
 - [Half complete] Discript supports asynchronous operations.
-- [Not started] Discript supports explicit concurrency primitives.
+- [Fully complete] Discript supports explicit async helpers including `sleep` and `parallel`.
 - [Fully complete] Discript supports conditionals, comparisons, arithmetic, bounded `while` loops, and bounded `for-in` loops.
 - [Not started] Discript supports callback syntax and general-purpose collection callbacks.
 - [Not started] Discript supports imports and reusable script modules.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
-- [Not started] Discript supports timers and intentional long-running loops.
+- [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.
 - [Fully complete] Finite CLI executions shut down their Discord client.
 - [Half complete] Discript supports dry-run previews for state mutations.
 - [Half complete] Destructive operations require explicit force approval.

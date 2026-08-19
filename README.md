@@ -87,6 +87,14 @@ for (member in members) {
 }
 ```
 
+Scripts can schedule asynchronous work and compose concurrent operations:
+
+```text
+every(60000) { print("heartbeat") }
+after(1000) { print("started") }
+values = parallel(sleep(10), sleep(10))
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
