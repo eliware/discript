@@ -45,6 +45,7 @@
         "discript": "bin/discript.mjs"
     },
     "dependencies": {
+        "@discordjs/rest": "^2.6.3",
         "@discordjs/voice": "^0.19.2",
         "@eliware/common": "^1.1.8",
         "discord.js": "^14.27.0",
