@@ -1,0 +1,20 @@
+export const VERSION = '1.0.0';
+
+export function helpText() {
+  return `Usage: discript [options] [script-file]\n\n` +
+    `Execute Discord commands or Discript source.\n\n` +
+    `Input:\n` +
+    `  discript <resource> <operation>  Run a direct command\n` +
+    `  discript -e <source>             Evaluate inline source\n` +
+    `  discript <script-file>           Run a script file\n` +
+    `  cat script.ds | discript          Read source from stdin\n\n` +
+    `Options:\n` +
+    `  -e, --eval <source>  Evaluate source\n` +
+    `  --json               Emit machine-readable JSON\n` +
+    `  --pretty             Emit human-readable output\n` +
+    `  --dry-run            Preview supported mutations\n` +
+    `  -y, --yes            Approve mutations\n` +
+    `  --timeout <ms>       Set an execution timeout\n` +
+    `  -h, --help           Show this help\n` +
+    `  -v, --version        Show the installed version`;
+}

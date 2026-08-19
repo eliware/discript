@@ -2,10 +2,11 @@
   "name": "discript",
   "version": "1.0.0",
   "description": "",
-  "main": "index.mjs",
+  "main": "bin/discript.mjs",
   "scripts": {
+    "start": "node bin/discript.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.mjs"
+    "lint": "npx oxlint ."
   },
   "repository": {
     "type": "git",
@@ -17,9 +18,15 @@
     "url": "https://github.com/eliware/discript/issues"
   },
   "homepage": "https://github.com/eliware/discript#readme",
+  "bin": {
+    "discript": "bin/discript.mjs"
+  },
   "dependencies": {
     "@eliware/common": "^1.1.8",
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "oxlint": "^1.79.0"
   }
 }
