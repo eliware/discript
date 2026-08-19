@@ -9,6 +9,7 @@ import { writeResult } from './output.mjs';
 import { parse } from './parser.mjs';
 import { evaluate, ScriptExit } from './evaluator.mjs';
 import { createDiscordApi } from './discord.mjs';
+import { commandCatalog, completionScript, normalizeCommand } from './commands.mjs';
 
 export async function run(argv = [], dependencies = {}) {
   const { stdout = console.log, stdin = process.stdin } = dependencies;
@@ -115,6 +116,9 @@ async function executeInput(input, options, dependencies, onRuntime = () => {}) 
 }
 
 async function executeDirectCommand(command, options) {
+  command = normalizeCommand(command);
+  if (command.join(' ') === 'commands list') return commandCatalog();
+  if (command[0] === 'completion') return completionScript(command[1] ?? 'bash');
   if (options.dry_run) {
     if (command[0] === 'messages' && command[1] === 'send') {
       if (!options.channel) throw Object.assign(new Error('messages send requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
