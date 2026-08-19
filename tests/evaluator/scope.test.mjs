@@ -8,10 +8,32 @@ import { dirname, join, resolve } from 'node:path';
 import { evaluate } from '../../src/evaluator.mjs';
 
 import { parse } from '../../src/parser.mjs';
+import { createScope } from '../../src/evaluator/scope.mjs';
 
 
 
 describe('script imports', () => {
+  test('creates a proxy over globals and binds functions to the active scope', () => {
+    const globals = { value: 3 };
+    const { baseScope, scope } = createScope(globals);
+    expect(baseScope.get('value')).toBe(3);
+    expect(scope.get('value')).toBe(3);
+    expect(scope.size).toBe(1);
+    scope.set('value', 4);
+    expect(scope.get('value')).toBe(4);
+  });
+
+  test('uses a supplied shared scope', () => {
+    const shared = new Map([['value', 9]]);
+    const { baseScope, scope } = createScope({ value: 1 }, shared);
+    expect(baseScope).toBe(shared);
+    expect(scope.get('value')).toBe(9);
+  });
+
+  test('reads from an async execution context when one is active', () => {
+    const { context, scope } = createScope({ value: 1 });
+    expect(context.run(new Map([['value', 42]]), () => scope.get('value'))).toBe(42);
+  });
   test('loads source into the caller scope', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'discript-import-'));
     try {

@@ -159,6 +159,26 @@ describe('channel organization and types', () => {
     await expect(api.guilds.get('1').channels.create('unknown', { type: 'forum' })).rejects.toMatchObject({ code: 'CHANNEL_TYPE_INVALID', exitCode: 2 });
   });
 
+  test('covers optional channel and operation settings', async () => {
+    const edit = jest.fn(async changes => ({ id: '10', name: changes.name ?? 'general', type: 0 }));
+    const create = jest.fn(async settings => ({ id: '11', name: settings.name, type: settings.type }));
+    const channel = {
+      id: '10', name: 'general', type: 0, edit, send: jest.fn(async () => ({ id: 'm', channelId: '10', content: 'x' })),
+      guild: { members: { me: { permissions: { has: () => true } } } },
+      permissionOverwrites: { cache: new Map(), edit: jest.fn(async () => ({ id: 'r', allow: { toArray: () => [] }, deny: { toArray: () => [] } })), delete: jest.fn() },
+      threads: { cache: new Map(), create: jest.fn(async () => ({ id: 't', name: 't' })) },
+    };
+    const guild = { id: '1', channels: { cache: channelCollection([['10', channel]]), create }, members: { me: { permissions: { has: () => true } } }, roles: { cache: new Map() } };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) }, channels: { cache: new Map([['10', channel]]) } }, { yes: true });
+    await expect(api.guilds.get('1').channels.create('plain', { type: undefined })).resolves.toMatchObject({ type: 0 });
+    await expect(api.guilds.get('1').channels.create('numeric', { type: 0 })).resolves.toMatchObject({ type: 0 });
+    await expect(api.guilds.get('1').channels.create('preview', { dryRun: true })).resolves.toMatchObject({ dryRun: true });
+    await expect(api.channels.get('10').update({ name: 'renamed', topic: 'topic', category: '20', position: '3' }, { dryRun: true })).resolves.toMatchObject({ dryRun: true, name: 'renamed', topic: 'topic', parent: '20', position: 3 });
+    await expect(api.channels.get('10').send('x', { dryRun: true })).resolves.toMatchObject({ dryRun: true });
+    expect(api.channels.get('10').permissions.list()).toEqual([]);
+    expect(api.channels.get('10').threads.list()).toEqual([]);
+  });
+
   test('updates and deletes threads and updates webhooks', async () => {
     const thread = { id: '30', name: 'old', edit: jest.fn(async () => ({ id: '30', name: 'new' })), delete: jest.fn() };
     const webhook = { id: '40', name: 'old', edit: jest.fn(async () => ({ id: '40', name: 'new' })) };
@@ -172,5 +192,24 @@ describe('channel organization and types', () => {
     expect(thread.edit).toHaveBeenCalledWith({ name: 'new' });
     expect(thread.delete).toHaveBeenCalled();
     expect(webhook.edit).toHaveBeenCalledWith({ name: 'new', reason: undefined });
+  });
+
+  test('covers omitted optional values and permission branches', async () => {
+    const webhook = { edit: jest.fn(async () => ({})), delete: jest.fn() };
+    const thread = { id: '30', name: 'old', edit: jest.fn(async () => ({})), delete: jest.fn() };
+    const channel = {
+      id: '10', type: 0, guild: { members: { me: { permissions: { has: () => true } } } },
+      edit: jest.fn(async () => ({ id: '10', name: 'x', type: 0 })),
+      permissionOverwrites: { cache: new Map(), edit: jest.fn(async () => ({ id: 'r', allow: { toArray: () => [] }, deny: { toArray: () => [] } })), delete: jest.fn() },
+      threads: { cache: new Map([['30', thread]]) }, fetchWebhooks: jest.fn(async () => new Map([['40', webhook]])),
+    };
+    const guild = { id: '1', channels: { cache: channelCollection([['10', channel]]), create: jest.fn(async () => ({ id: '11', name: 'x', type: 0 })) }, roles: { cache: new Map() }, members: { me: { permissions: { has: () => true } } } };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) }, channels: { cache: new Map([['10', channel]]) }, fetchWebhook: jest.fn(async () => webhook) }, { yes: true });
+    await api.guilds.get('1').channels.create('x');
+    await api.channels.get('10').update({ name: 'x' }, undefined);
+    await api.channels.get('10').webhooks.update('40', { name: 'x' });
+    await api.channels.get('10').permissions.set('r', { deny: ['SendMessages'] });
+    await api.channels.get('10').permissions.delete('r');
+    await api.channels.get('10').threads.update('30', { name: 'x' });
   });
 });
