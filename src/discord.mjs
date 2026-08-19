@@ -129,12 +129,14 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
           threads: {
             list: () => mapCache(channel.threads?.cache, thread => ({ id: thread.id, name: thread.name, archived: thread.archived ?? false })),
             create: async (name, operationOptions = {}) => {
+              requireChannelPermission(channel.id, 'CreatePublicThreads');
               requireApproval('Creating a thread', operationOptions);
               if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, name, created: true };
               const thread = await channel.threads.create({ name: String(name) });
               return { id: thread.id, name: thread.name, created: true };
             },
             archive: async (threadId, operationOptions = {}) => {
+              requireChannelPermission(channel.id, 'ManageThreads');
               requireApproval('Archiving a thread', operationOptions);
               if (dryRun || operationOptions.dryRun === true) return { dryRun: true, threadId: String(threadId), archived: true };
               const thread = channel.threads?.cache?.get(String(threadId));
@@ -151,6 +153,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
             return { id: channel.id, deleted: true };
           },
           send: async (content, operationOptions = {}) => {
+            requireChannelPermission(channel.id, 'SendMessages');
             requireApproval('Sending a message', operationOptions);
             if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, content };
             return normalizeMessage(await channel.send(String(content)));
@@ -310,6 +313,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
               return { code: invite.code, url: invite.url, channelId: invite.channelId ?? String(channelId), created: true };
             },
             delete: async (code, operationOptions = {}) => {
+              requirePermission(guild, 'ManageGuild');
               if (!client.invites?.delete) throw Object.assign(new Error('Invite deletion is unavailable.'), { code: 'INVITES_UNSUPPORTED', exitCode: 1 });
               requireApproval('Deleting an invite', operationOptions);
               if (dryRun || operationOptions.dryRun === true) return { dryRun: true, code: String(code), deleted: true };
@@ -333,12 +337,14 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
                 threads: {
                   list: () => mapCache(channel.threads?.cache, thread => ({ id: thread.id, name: thread.name, archived: thread.archived ?? false })),
                   create: async (name, operationOptions = {}) => {
+                    requireChannelPermission(channel.id, 'CreatePublicThreads');
                     requireApproval('Creating a thread', operationOptions);
                     if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, name, created: true };
                     const thread = await channel.threads.create({ name: String(name) });
                     return { id: thread.id, name: thread.name, created: true };
                   },
                   archive: async (threadId, operationOptions = {}) => {
+                    requireChannelPermission(channel.id, 'ManageThreads');
                     requireApproval('Archiving a thread', operationOptions);
                     if (dryRun || operationOptions.dryRun === true) return { dryRun: true, threadId: String(threadId), archived: true };
                     const thread = channel.threads?.cache?.get(String(threadId));
@@ -348,6 +354,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
                   },
                 },
                 send: async (content, operationOptions = {}) => {
+                  requireChannelPermission(channel.id, 'SendMessages');
                   requireApproval('Sending a message', operationOptions);
                   if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, content };
                   return normalizeMessage(await channel.send(String(content)));

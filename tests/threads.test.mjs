@@ -12,4 +12,10 @@ describe('thread capabilities', () => {
     await expect(api.channels.get('1').threads.archive('3')).resolves.toEqual({ id: '3', archived: true });
     expect(setArchived).toHaveBeenCalledWith(true);
   });
+
+  test('rejects thread mutation without the matching permission', async () => {
+    const channel = { id: '1', type: 0, guild: { members: { me: { permissions: { has: () => false } } } }, threads: { cache: new Map(), create: jest.fn() } };
+    const api = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    await expect(api.channels.get('1').threads.create('new')).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+  });
 });
