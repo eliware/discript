@@ -1,4 +1,8 @@
 export function writeResult(value, options = {}, stdout = console.log) {
+  if (options.output === 'jsonl') {
+    stdout(JSON.stringify(value === undefined ? null : value));
+    return;
+  }
   if (options.json || options.pretty) {
     stdout(JSON.stringify(value, null, 2));
     return;

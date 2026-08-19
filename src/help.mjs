@@ -11,6 +11,7 @@ export function helpText() {
     `Options:\n` +
     `  -e, --eval <source>  Evaluate source\n` +
     `  --json               Emit machine-readable JSON\n` +
+    `  --output jsonl       Emit one JSON value per line\n` +
     `  --pretty             Emit human-readable output\n` +
     `  --dry-run            Preview supported mutations\n` +
     `  -y, --yes            Approve mutations\n` +
