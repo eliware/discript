@@ -9,6 +9,7 @@ try {
   const { parseArgs } = await import('../src/args.mjs');
   let options = {};
   try { ({ options } = parseArgs(process.argv.slice(2))); } catch { /* Preserve the original CLI error. */ }
+  if (process.argv.includes('--json') || process.argv.some(argument => argument.startsWith('--json='))) options.json = true;
   console.error(formatError(error, options));
   process.exitCode = error.exitCode ?? 1;
 }

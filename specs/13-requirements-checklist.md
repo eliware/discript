@@ -21,10 +21,10 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Finite CLI executions shut down their Discord client.
 - [Fully complete] Discript supports API-level and direct CLI dry-run previews with command-field validation, plus opt-in connected target/permission validation via `--validate`; no mutation is made.
 - [Half complete] Destructive operations require explicit force approval.
-- [Half complete] CLI commands return stable process exit codes.
+- [Fully complete] CLI commands return stable process exit codes, including structured invalid-input failures on stderr.
 - [Fully complete] Scripts can capture operation exit codes and branch on them internally.
 - [Half complete] Scripts can explicitly terminate with a chosen exit code and message.
-- [Half complete] Discript emits machine-readable JSON results.
+- [Fully complete] Discript emits machine-readable JSON results and structured JSON errors on stderr.
 - [Fully complete] Discript emits opt-in structured JSONL records with `--output jsonl`, including incremental script output.
 - [Half complete] Discript covers guilds, channels, messages, members, roles, and basic moderation.
 - [Fully complete] Discript covers threads, invites, emojis, stickers, scheduled events, and guarded voice join/leave/status operations.
