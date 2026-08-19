@@ -177,6 +177,18 @@ async function executeDirectCommand(command, options) {
       if (!options.name && !options.description && !options.start) throw Object.assign(new Error('events update requires --name, --description, or --start.'), { code: 'EVENT_FIELDS_REQUIRED', exitCode: 2 });
       return event.update({ ...(options.name ? { name: options.name } : {}), ...(options.description ? { description: options.description } : {}), ...(options.start ? { scheduledStartTime: options.start } : {}) });
     }
+    if (command[0] === 'voice' && command[1] === 'status') {
+      if (!options.guild) throw Object.assign(new Error('voice status requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      return api.voice.status(options.guild);
+    }
+    if (command[0] === 'voice' && command[1] === 'join') {
+      if (!options.channel) throw Object.assign(new Error('voice join requires --channel <id>.'), { code: 'CHANNEL_REQUIRED', exitCode: 2 });
+      return api.voice.join(options.channel);
+    }
+    if (command[0] === 'voice' && command[1] === 'leave') {
+      if (!options.guild) throw Object.assign(new Error('voice leave requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
+      return api.voice.leave(options.guild);
+    }
     if (command[0] === 'invites' && command[1] === 'list') {
       if (!options.guild) throw Object.assign(new Error('invites list requires --guild <id>.'), { code: 'GUILD_REQUIRED', exitCode: 2 });
       return api.guilds.get(options.guild).invites.list();

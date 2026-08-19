@@ -1,3 +1,5 @@
+import { getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
+
 export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
   const mapCache = (cache, mapper) => typeof cache?.map === 'function' ? cache.map(mapper) : [...(cache?.values?.() ?? [])].map(mapper);
   const requireApproval = (action, operationOptions = {}) => {
@@ -28,6 +30,30 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
     if (botMember?.permissions?.has && !botMember.permissions.has(permission)) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
   };
   return {
+    voice: {
+      status: guildId => {
+        const connection = getVoiceConnection(String(guildId));
+        return connection ? { guildId: String(guildId), status: connection.state?.status ?? 'unknown', connected: true } : { guildId: String(guildId), connected: false };
+      },
+      join: async (channelId, operationOptions = {}) => {
+        const channel = client.channels.cache.get(String(channelId));
+        if (!channel?.isVoiceBased?.() && !['voice', 'stage'].includes(channel?.type)) throw Object.assign(new Error(`Voice channel not found: ${channelId}`), { code: 'VOICE_CHANNEL_REQUIRED', exitCode: 2 });
+        const guild = channel.guild;
+        requireChannelPermission(channelId, 'Connect');
+        requireApproval('Joining a voice channel', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: guild.id, channelId: String(channelId), joined: true };
+        if (!guild?.voiceAdapterCreator) throw Object.assign(new Error('Voice adapter is unavailable for this guild.'), { code: 'VOICE_UNSUPPORTED', exitCode: 1 });
+        const connection = joinVoiceChannel({ channelId: String(channelId), guildId: String(guild.id), adapterCreator: guild.voiceAdapterCreator, selfDeaf: false });
+        return { guildId: String(guild.id), channelId: String(channelId), status: connection.state?.status ?? 'connecting', joined: true };
+      },
+      leave: async (guildId, operationOptions = {}) => {
+        requireApproval('Leaving a voice channel', operationOptions);
+        if (dryRun || operationOptions.dryRun === true) return { dryRun: true, guildId: String(guildId), left: true };
+        const connection = getVoiceConnection(String(guildId));
+        if (connection) connection.destroy();
+        return { guildId: String(guildId), left: true };
+      },
+    },
     messages: {
       get: async (channelId, messageId) => normalizeMessage(await resolveMessage(channelId, messageId)),
       edit: async (channelId, messageId, content, operationOptions = {}) => {
