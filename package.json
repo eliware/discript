@@ -1,7 +1,7 @@
 {
   "name": "discript",
   "version": "1.0.0",
-  "description": "",
+  "description": "Discord scripting language and automation CLI for developers and AI agents.",
   "main": "bin/discript.mjs",
   "scripts": {
     "start": "node bin/discript.mjs",
@@ -14,11 +14,23 @@
     "url": "git+https://github.com/eliware/discript.git"
   },
   "keywords": [],
+  "engines": {
+    "node": ">=26"
+  },
   "type": "module",
   "bugs": {
     "url": "https://github.com/eliware/discript/issues"
   },
   "homepage": "https://github.com/eliware/discript#readme",
+  "files": [
+    "bin",
+    "src",
+    "examples",
+    "README.md",
+    "SPEC.md",
+    "specs",
+    "LICENSE"
+  ],
   "bin": {
     "discript": "bin/discript.mjs"
   },
