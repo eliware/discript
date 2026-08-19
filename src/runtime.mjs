@@ -23,7 +23,7 @@ export async function createDiscordRuntime({ token = loadConfig().token, client:
     };
     client.once('clientReady', onReady);
     client.once('error', onError);
-    client.login(token).catch(onError);
+    Promise.resolve().then(() => client.login(token)).catch(onError);
   });
   return {
     client,

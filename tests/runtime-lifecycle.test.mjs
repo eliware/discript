@@ -40,4 +40,12 @@ describe('Discord runtime lifecycle', () => {
     expect(client.listenerCount('clientReady')).toBe(0);
     expect(client.listenerCount('error')).toBe(0);
   });
+
+  test('normalizes synchronous login failures and removes temporary listeners', async () => {
+    const client = new EventEmitter();
+    client.login = () => { throw Object.assign(new Error('sync login failed'), { code: 'LOGIN_FAILED_SYNC' }); };
+    await expect(createDiscordRuntime({ token: 'test-token', client })).rejects.toMatchObject({ code: 'LOGIN_FAILED_SYNC' });
+    expect(client.listenerCount('clientReady')).toBe(0);
+    expect(client.listenerCount('error')).toBe(0);
+  });
 });
