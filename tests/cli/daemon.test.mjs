@@ -1,5 +1,7 @@
 import { describe, expect, jest, test } from '@jest/globals';
 
+process.env.DISCORD_TOKEN = 'test-token';
+
 const startGatewayBroker = jest.fn(async () => ({ endpoint: '/tmp/test.sock' }));
 const brokerRequest = jest.fn(async () => ({ ok: true, ready: true }));
 jest.unstable_mockModule('../../src/broker.mjs', () => ({ startGatewayBroker, brokerRequest }));
