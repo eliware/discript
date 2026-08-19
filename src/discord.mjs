@@ -1,3 +1,5 @@
+import { createSafety } from './discord/safety.mjs';
+
 export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null } = {}) {
   let loadedVoiceModule = voiceModule;
   const loadVoiceModule = async () => {
@@ -5,10 +7,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
     return loadedVoiceModule;
   };
   const mapCache = (cache, mapper) => typeof cache?.map === 'function' ? cache.map(mapper) : [...(cache?.values?.() ?? [])].map(mapper);
-  const requireApproval = (action, operationOptions = {}) => {
-    if (dryRun || operationOptions.dryRun === true) return;
-    if (!yes && operationOptions.force !== true) throw Object.assign(new Error(`${action} requires --yes or force: true.`), { code: 'CONFIRMATION_REQUIRED', exitCode: 2 });
-  };
+  const { requireApproval, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember } = createSafety({ client, dryRun, yes });
   const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
   const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
   const normalizeWebhook = webhook => ({ id: webhook.id, name: webhook.name ?? null, channelId: webhook.channelId ?? null, type: webhook.type ?? null });
@@ -18,27 +17,6 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
     if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
     try { return await channel.messages.fetch(String(messageId)); }
     catch { throw Object.assign(new Error(`Message not found: ${messageId}`), { code: 'MESSAGE_NOT_FOUND', exitCode: 1 }); }
-  };
-  const requirePermission = (guild, permission) => {
-    const botMember = guild?.members?.me;
-    if (Object.hasOwn(guild?.members ?? {}, 'me') && (!botMember?.permissions?.has || !botMember.permissions.has(permission))) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
-  };
-  const requireManageableRole = (guild, roleId) => {
-    const role = guild.roles.cache.get(String(roleId));
-    if (role?.managed || role?.name === '@everyone') throw Object.assign(new Error('Managed and @everyone roles cannot be changed.'), { code: 'ROLE_PROTECTED', exitCode: 5 });
-    const highest = guild.members?.me?.roles?.highest;
-    if (highest?.position !== undefined && role?.position !== undefined && role.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this role change.'), { code: 'ROLE_HIERARCHY', exitCode: 5 });
-  };
-  const requireManageableMember = (guild, member) => {
-    if (member.user?.bot || member.id === guild.ownerId || member.id === guild.members?.me?.id) throw Object.assign(new Error('Bot, owner, and self targets cannot be moderated.'), { code: 'MEMBER_PROTECTED', exitCode: 5 });
-    const highest = guild.members?.me?.roles?.highest;
-    const targetHighest = member.roles?.highest;
-    if (highest?.position !== undefined && targetHighest?.position !== undefined && targetHighest.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this member moderation.'), { code: 'MEMBER_HIERARCHY', exitCode: 5 });
-  };
-  const requireChannelPermission = (channelId, permission) => {
-    const channel = client.channels.cache.get(String(channelId));
-    const botMember = channel?.guild?.members?.me;
-    if (Object.hasOwn(channel?.guild?.members ?? {}, 'me') && (!botMember?.permissions?.has || !botMember.permissions.has(permission))) throw Object.assign(new Error(`Bot lacks ${permission} permission.`), { code: 'MISSING_PERMISSION', exitCode: 5 });
   };
   return {
     bot: {

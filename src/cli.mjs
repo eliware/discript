@@ -10,6 +10,7 @@ import { parse } from './parser.mjs';
 import { evaluate, ScriptExit } from './evaluator.mjs';
 import { createDiscordApi } from './discord.mjs';
 import { commandCatalog, completionScript, normalizeCommand, suggestCommands } from './commands.mjs';
+import { withTimeout, validateTimeout } from './cli/lifecycle.mjs';
 
 export async function run(argv = [], dependencies = {}) {
   const { stdout = console.log, stdin = process.stdin } = dependencies;
@@ -32,31 +33,6 @@ export async function run(argv = [], dependencies = {}) {
     shutdownHook?.removeHandlers?.();
     errors.removeHandlers();
   }
-}
-
-async function withTimeout(promise, timeout) {
-  if (timeout === undefined) return promise;
-  const timeoutMs = validateTimeout(timeout);
-  let timer;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise((_, reject) => {
-        timer = setTimeout(() => reject(Object.assign(new Error(`Execution exceeded ${timeoutMs}ms.`), { code: 'EXECUTION_TIMEOUT', exitCode: 6 })), timeoutMs);
-      }),
-    ]);
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function validateTimeout(timeout) {
-  if (timeout === undefined) return undefined;
-  const timeoutMs = Number(timeout);
-  if (!Number.isInteger(timeoutMs) || timeoutMs < 1) {
-    throw Object.assign(new Error('--timeout must be a positive integer in milliseconds.'), { code: 'INVALID_TIMEOUT', exitCode: 2 });
-  }
-  return timeoutMs;
 }
 
 async function executeInput(input, options, dependencies, onRuntime = () => {}) {
