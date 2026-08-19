@@ -206,6 +206,19 @@ export function createDiscordApi(client, { yes = false, dryRun = false } = {}) {
               };
             },
           },
+          emojis: {
+            list: () => mapCache(guild.emojis?.cache, emoji => ({ id: emoji.id, name: emoji.name, animated: emoji.animated ?? false })),
+          },
+          stickers: {
+            list: () => mapCache(guild.stickers?.cache, sticker => ({ id: sticker.id, name: sticker.name, description: sticker.description ?? null })),
+          },
+          invites: {
+            list: async () => {
+              if (!guild.invites?.fetch) throw Object.assign(new Error('Invite listing is unavailable.'), { code: 'INVITES_UNSUPPORTED', exitCode: 1 });
+              const invites = await guild.invites.fetch();
+              return mapCache(invites, invite => ({ code: invite.code, url: invite.url, uses: invite.uses ?? 0, channelId: invite.channelId ?? null }));
+            },
+          },
           channels: {
             list: () => guild.channels.cache.map(normalizeChannel),
             create: async (name, operationOptions = {}) => {

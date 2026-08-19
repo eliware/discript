@@ -44,6 +44,14 @@ npm start -- members list --guild <guild-id> --json
 npm start -- roles list --guild <guild-id> --json
 ```
 
+Read guild invites, emojis, and stickers:
+
+```sh
+npm start -- invites list --guild <guild-id> --json
+npm start -- emojis list --guild <guild-id> --json
+npm start -- stickers list --guild <guild-id> --json
+```
+
 Threads support inspection and guarded lifecycle operations:
 
 ```sh
