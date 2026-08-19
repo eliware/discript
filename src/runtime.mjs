@@ -1,11 +1,13 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { log } from '@eliware/common';
 import { loadConfig } from './config.mjs';
+import { acquireGatewayIdentifyLock } from './gateway-lock.mjs';
 
-export async function createDiscordRuntime({ token = loadConfig().token, client: suppliedClient, loginTimeout = 15000 } = {}) {
+export async function createDiscordRuntime({ token = loadConfig().token, client: suppliedClient, loginTimeout = 15000, gatewayLock = true, gatewayLockOptions = {} } = {}) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   const configured = loadConfig();
   const client = suppliedClient ?? new Client({ intents: resolveGatewayIntentBits(configured.intents) });
+  const lock = gatewayLock && !suppliedClient ? await acquireGatewayIdentifyLock({ token, wait: loginTimeout, ...gatewayLockOptions }) : null;
   let stopped = false;
   let resolveStopped;
   const stoppedPromise = new Promise(resolve => { resolveStopped = resolve; });
@@ -31,6 +33,8 @@ export async function createDiscordRuntime({ token = loadConfig().token, client:
     try { await client.destroy?.(); }
     catch (shutdownError) { log.warn('Discord startup cleanup failed', { error: shutdownError.message }); }
     throw error;
+  } finally {
+    await lock?.release();
   }
   return {
     client,
