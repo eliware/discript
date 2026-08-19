@@ -64,4 +64,29 @@ describe('Discord capability layer', () => {
     await expect(api.guilds.get('1').emojis.create({ name: 'new', attachment: '/tmp/a.png' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
     await expect(api.guilds.get('1').stickers.create({ name: 'new', file: '/tmp/a.png', tags: '😀' })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
   });
+
+  test('supports guarded channel webhook operations', async () => {
+    const createWebhook = jest.fn(async settings => ({ id: 'w2', name: settings.name, channelId: '1', delete: jest.fn() }));
+    const fetchedWebhook = { id: 'w1', name: 'old', channelId: '1', delete: jest.fn(async () => undefined) };
+    const channel = {
+      id: '1', name: 'general', type: 0,
+      guild: { id: 'g1', members: { me: { permissions: { has: () => true } } } },
+      fetchWebhooks: jest.fn(async () => new Map([['w1', fetchedWebhook]])), createWebhook,
+    };
+    const client = { channels: { cache: new Map([['1', channel]]) }, fetchWebhook: jest.fn(async () => fetchedWebhook) };
+    const api = createDiscordApi(client, { yes: true });
+    await expect(api.channels.get('1').webhooks.list()).resolves.toEqual([{ id: 'w1', name: 'old', channelId: '1', type: null }]);
+    await expect(api.channels.get('1').webhooks.create('new')).resolves.toMatchObject({ id: 'w2', created: true });
+    await expect(api.channels.get('1').webhooks.delete('w1')).resolves.toEqual({ id: 'w1', deleted: true });
+    expect(createWebhook).toHaveBeenCalledWith({ name: 'new', reason: undefined });
+    expect(fetchedWebhook.delete).toHaveBeenCalledWith(undefined);
+  });
+
+  test('requires ManageWebhooks and previews webhook mutations', async () => {
+    const channel = { id: '1', guild: { members: { me: { permissions: { has: () => false } } } }, createWebhook: jest.fn() };
+    const denied = createDiscordApi({ channels: { cache: new Map([['1', channel]]) } }, { yes: true });
+    await expect(denied.channels.get('1').webhooks.create('new')).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5 });
+    const preview = createDiscordApi({ channels: { cache: new Map([['1', { ...channel, guild: { members: { me: { permissions: { has: () => true } } } } }]]) } }, { dryRun: true });
+    await expect(preview.channels.get('1').webhooks.create('new')).resolves.toMatchObject({ dryRun: true, created: true });
+  });
 });

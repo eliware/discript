@@ -11,6 +11,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
   };
   const normalizeChannel = channel => ({ id: channel.id, name: channel.name, type: channel.type });
   const normalizeMessage = message => ({ id: message.id, channelId: message.channelId, content: message.content ?? null });
+  const normalizeWebhook = webhook => ({ id: webhook.id, name: webhook.name ?? null, channelId: webhook.channelId ?? null, type: webhook.type ?? null });
   const resolveMessage = async (channelId, messageId) => {
     const channel = client.channels.cache.get(String(channelId));
     if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
@@ -126,6 +127,29 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
         if (!channel) throw Object.assign(new Error(`Channel not found: ${id}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
         return {
           ...normalizeChannel(channel),
+          webhooks: {
+            list: async () => {
+              if (!channel.fetchWebhooks) throw Object.assign(new Error('Webhook listing is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+              return mapCache(await channel.fetchWebhooks(), normalizeWebhook);
+            },
+            create: async (name, operationOptions = {}) => {
+              if (!name) throw Object.assign(new Error('Webhook creation requires name.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+              requireChannelPermission(channel.id, 'ManageWebhooks');
+              requireApproval('Creating a webhook', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, name: String(name), created: true };
+              if (!channel.createWebhook) throw Object.assign(new Error('Webhook creation is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+              return { ...normalizeWebhook(await channel.createWebhook({ name: String(name), reason: operationOptions.reason })), created: true };
+            },
+            delete: async (webhookId, operationOptions = {}) => {
+              requireChannelPermission(channel.id, 'ManageWebhooks');
+              requireApproval('Deleting a webhook', operationOptions);
+              if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, webhookId: String(webhookId), deleted: true };
+              if (!client.fetchWebhook) throw Object.assign(new Error('Webhook deletion is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+              const webhook = await client.fetchWebhook(String(webhookId));
+              await webhook.delete(operationOptions.reason);
+              return { id: String(webhookId), deleted: true };
+            },
+          },
           threads: {
             list: () => mapCache(channel.threads?.cache, thread => ({ id: thread.id, name: thread.name, archived: thread.archived ?? false })),
             create: async (name, operationOptions = {}) => {
@@ -398,6 +422,29 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
               if (!channel) throw Object.assign(new Error(`Channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
               return {
                 ...normalizeChannel(channel),
+                webhooks: {
+                  list: async () => {
+                    if (!channel.fetchWebhooks) throw Object.assign(new Error('Webhook listing is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+                    return mapCache(await channel.fetchWebhooks(), normalizeWebhook);
+                  },
+                  create: async (name, operationOptions = {}) => {
+                    if (!name) throw Object.assign(new Error('Webhook creation requires name.'), { code: 'NAME_REQUIRED', exitCode: 2 });
+                    requireChannelPermission(channel.id, 'ManageWebhooks');
+                    requireApproval('Creating a webhook', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, name: String(name), created: true };
+                    if (!channel.createWebhook) throw Object.assign(new Error('Webhook creation is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+                    return { ...normalizeWebhook(await channel.createWebhook({ name: String(name), reason: operationOptions.reason })), created: true };
+                  },
+                  delete: async (webhookId, operationOptions = {}) => {
+                    requireChannelPermission(channel.id, 'ManageWebhooks');
+                    requireApproval('Deleting a webhook', operationOptions);
+                    if (dryRun || operationOptions.dryRun === true) return { dryRun: true, channelId: channel.id, webhookId: String(webhookId), deleted: true };
+                    if (!client.fetchWebhook) throw Object.assign(new Error('Webhook deletion is unavailable.'), { code: 'WEBHOOKS_UNSUPPORTED', exitCode: 1 });
+                    const webhook = await client.fetchWebhook(String(webhookId));
+                    await webhook.delete(operationOptions.reason);
+                    return { id: String(webhookId), deleted: true };
+                  },
+                },
                 threads: {
                   list: () => mapCache(channel.threads?.cache, thread => ({ id: thread.id, name: thread.name, archived: thread.archived ?? false })),
                   create: async (name, operationOptions = {}) => {
