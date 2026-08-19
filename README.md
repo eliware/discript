@@ -43,6 +43,12 @@ Evaluate source inline:
 npm start -- --eval 'guilds = discord.guilds.list(); guilds' --json
 ```
 
+Finite commands can be bounded for automation:
+
+```sh
+npm start -- --timeout 15000 --eval 'discord.guilds.list()' --json
+```
+
 Read source from standard input:
 
 ```sh

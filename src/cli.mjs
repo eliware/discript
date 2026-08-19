@@ -15,17 +15,43 @@ export async function run(argv = [], dependencies = {}) {
   if (options.version) return stdout(VERSION);
 
   const source = await readSource(positionals, options, stdin);
+  validateTimeout(options.timeout);
   const errors = registerHandlers({ log });
   let shutdownHook;
   try {
     shutdownHook = registerSignals({ log, shutdownHook: async () => {} });
-    const result = await executeInput(source, options, dependencies);
+    const result = await withTimeout(executeInput(source, options, dependencies), options.timeout);
     if (result !== undefined) writeResult(result, options, stdout);
     return result;
   } finally {
     await shutdownHook?.shutdown?.();
     errors.removeHandlers();
   }
+}
+
+async function withTimeout(promise, timeout) {
+  if (timeout === undefined) return promise;
+  const timeoutMs = validateTimeout(timeout);
+  let timer;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(Object.assign(new Error(`Execution exceeded ${timeoutMs}ms.`), { code: 'EXECUTION_TIMEOUT', exitCode: 6 })), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function validateTimeout(timeout) {
+  if (timeout === undefined) return undefined;
+  const timeoutMs = Number(timeout);
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1) {
+    throw Object.assign(new Error('--timeout must be a positive integer in milliseconds.'), { code: 'INVALID_TIMEOUT', exitCode: 2 });
+  }
+  return timeoutMs;
 }
 
 async function executeInput(input, options, dependencies) {
