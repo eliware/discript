@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.0.3
+
+Fix the package-install smoke check on Windows runners by using the platform-specific npm and CLI command names.
+
 ## 1.0.2
 
 First public npm release under the available `@eliware/discript` package scope after the unscoped `discript` name was rejected by npm.
