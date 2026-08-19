@@ -53,6 +53,11 @@ async function handleBrokerRequest(line, socket, runtime) {
       const value = await executeDirectCommand(request.command, request.options ?? {}, { runtime });
       reply(socket, { ok: true, value });
     }
+    else if (request.method === 'script') {
+      const { executeInput } = await import('./cli/script.mjs');
+      const value = await executeInput({ kind: 'source', source: request.source, origin: 'broker' }, request.options ?? {}, { runtime });
+      reply(socket, { ok: true, value });
+    }
     else reply(socket, { ok: false, error: 'Unknown broker method.' });
   } catch (error) { reply(socket, { ok: false, error: error.message, code: error.code, exitCode: error.exitCode }); }
 }

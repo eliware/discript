@@ -9,8 +9,8 @@ import { createEnvironment } from "../env.mjs";
 export async function executeInput(input, options, dependencies, onRuntime = () => {}) {
   if (input.kind === 'command') return executeDirectCommand(input.command, options, dependencies);
   if (options.dry_run) return { dryRun: true, source: input.source };
-  const { createDiscordRuntime } = await import('../runtime.mjs');
-  const runtime = await createDiscordRuntime();
+  const runtime = dependencies.runtime ?? await (async () => { const { createDiscordRuntime } = await import('../runtime.mjs'); return createDiscordRuntime(); })();
+  const ownsRuntime = !dependencies.runtime;
   onRuntime(runtime);
   const timers = new Set();
   try {
@@ -61,6 +61,6 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
     return result;
   } finally {
     for (const timer of timers) { clearTimeout(timer); clearInterval(timer); }
-    await runtime.shutdown();
+    if (ownsRuntime) await runtime.shutdown();
   }
 }
