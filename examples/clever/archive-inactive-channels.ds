@@ -1,0 +1,30 @@
+// Preview archival of channels whose names are explicitly supplied by the agent.
+guildId = env.TEST_GUILD
+apply = env.DISCRIPT_APPLY == "true"
+if (guildId == null || env.ARCHIVE_CHANNELS == null) {
+  exit(2, "set TEST_GUILD and ARCHIVE_CHANNELS")
+}
+names = env.ARCHIVE_CHANNELS.split(",")
+guild = discord.guilds.get(guildId)
+channels = guild.channels.list()
+archiveOptions = {dryRun: true, type: "category"}
+if (apply) {
+  archiveOptions = {force: true, type: "category"}
+}
+archive = guild.channels.create("Archive", archiveOptions)
+for (channel in channels) {
+  for (name in names) {
+    if (channel.name == name) {
+      moveOptions = {dryRun: true}
+      if (apply) {
+        moveOptions = {force: true}
+      }
+      discord.channels.get(channel.id).update({parent: archive.id}, moveOptions)
+    }
+  }
+}
+mode = "preview"
+if (apply) {
+  mode = "applied"
+}
+print({mode: mode, archive: archive, requested: names})

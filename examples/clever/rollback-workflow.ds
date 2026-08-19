@@ -1,0 +1,24 @@
+// Demonstrate a compensating cleanup path after a failed workflow step.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+guild = discord.guilds.get(guildId)
+options = {dryRun: true}
+if (env.DISCRIPT_APPLY == "true") {
+  options = {force: true}
+}
+category = guild.channels.create("temporary-workflow", {dryRun: true, type: "category"})
+if (env.DISCRIPT_APPLY == "true") {
+  category = guild.channels.create("temporary-workflow", {force: true, type: "category"})
+}
+channel = guild.channels.create("temporary-step", {dryRun: true, type: "text", parent: category.id})
+if (env.DISCRIPT_APPLY == "true") {
+  channel = guild.channels.create("temporary-step", {force: true, type: "text", parent: category.id})
+}
+if (env.SIMULATE_FAILURE == "true") {
+  discord.channels.get(channel.id).delete(options)
+  discord.channels.get(category.id).delete(options)
+  exit(10, "step failed; compensating cleanup executed")
+}
+print({ok: true, category: category, channel: channel})

@@ -1,0 +1,11 @@
+// Report permission overwrites for every channel without changing state.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+guild = discord.guilds.get(guildId)
+for (channel in guild.channels.list()) {
+  if (channel.type == 0) {
+    print({channelId: channel.id, channelName: channel.name, permissions: discord.channels.get(channel.id).permissions.list()})
+  }
+}

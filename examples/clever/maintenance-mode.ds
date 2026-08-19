@@ -1,0 +1,22 @@
+// Toggle a read-only maintenance mode for a declared channel.
+guildId = env.TEST_GUILD
+channelId = env.MAINTENANCE_CHANNEL
+apply = env.DISCRIPT_APPLY == "true"
+if (guildId == null || channelId == null) {
+  exit(2, "set TEST_GUILD and MAINTENANCE_CHANNEL")
+}
+options = {dryRun: true}
+if (apply) {
+  options = {force: true}
+}
+discord.channels.get(channelId).permissions.set(guildId, {deny: ["SendMessages"]}, options)
+message = "This channel is temporarily read-only."
+if (env.MAINTENANCE_MESSAGE != null) {
+  message = env.MAINTENANCE_MESSAGE
+}
+discord.channels.get(channelId).send(message, options)
+mode = "preview"
+if (apply) {
+  mode = "enabled"
+}
+print({mode: mode, channelId: channelId})

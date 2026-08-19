@@ -1,0 +1,7 @@
+// Export a compact, JSON-friendly guild backup for an agent or pipeline.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+guild = discord.guilds.get(guildId)
+print({guild: {id: guild.id, name: guild.name}, roles: guild.roles.list(), channels: guild.channels.list(), members: guild.members.list()})

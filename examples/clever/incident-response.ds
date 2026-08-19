@@ -1,0 +1,26 @@
+// Create an incident workspace, restrict posting, and publish responder guidance.
+guildId = env.TEST_GUILD
+apply = env.DISCRIPT_APPLY == "true"
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+options = {dryRun: true}
+if (apply) {
+  options = {force: true}
+}
+guild = discord.guilds.get(guildId)
+category = guild.channels.create("Incident", {dryRun: true, type: "category"})
+if (apply) {
+  category = guild.channels.create("Incident", {force: true, type: "category"})
+}
+channel = guild.channels.create("incident-room", {dryRun: true, type: "text", parent: category.id})
+if (apply) {
+  channel = guild.channels.create("incident-room", {force: true, type: "text", parent: category.id})
+}
+discord.channels.get(channel.id).permissions.set(guildId, {allow: ["ViewChannel", "ReadMessageHistory"], deny: ["SendMessages"]}, options)
+discord.channels.get(channel.id).send("Incident channel opened. Use this room for verified updates only.", options)
+mode = "preview"
+if (apply) {
+  mode = "applied"
+}
+print({mode: mode, category: category, channel: channel})

@@ -1,0 +1,31 @@
+// Preview a declared role policy and create only missing roles.
+guildId = env.TEST_GUILD
+apply = env.DISCRIPT_APPLY == "true"
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+guild = discord.guilds.get(guildId)
+existing = guild.roles.list()
+desired = ["Member", "Moderator", "Support"]
+missing = []
+for (name in desired) {
+  found = false
+  for (role in existing) {
+    if (role.name == name) {
+      found = true
+    }
+  }
+  if (!found) {
+    missing = missing + [name]
+    options = {dryRun: true}
+    if (apply) {
+      options = {force: true}
+    }
+    guild.roles.create(name, options)
+  }
+}
+mode = "preview"
+if (apply) {
+  mode = "applied"
+}
+print({mode: mode, missing: missing})

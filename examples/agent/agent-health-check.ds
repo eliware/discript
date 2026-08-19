@@ -1,0 +1,13 @@
+// Machine-readable readiness check with an exit status for CI or an agent.
+guildId = env.TEST_GUILD
+channelId = env.HEALTH_CHANNEL
+if (guildId == null || channelId == null) {
+  exit(2, "set TEST_GUILD and HEALTH_CHANNEL")
+}
+guild = discord.guilds.get(guildId)
+channel = discord.channels.get(channelId)
+if (guild.id != guildId || channel.id != channelId) {
+  exit(3, "Discord target is unavailable")
+}
+print({ok: true, guildId: guild.id, channelId: channel.id, channelName: channel.name})
+exit(0, "healthy")

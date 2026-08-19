@@ -1,0 +1,10 @@
+// Intended for: cat plan.ds | discript --json
+// Read-only planning keeps an AI harness deterministic before approval.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+guild = discord.guilds.get(guildId)
+channels = guild.channels.list()
+roles = guild.roles.list()
+print({plan: "inventory", guild: {id: guild.id, name: guild.name}, channelCount: channels.length, roleCount: roles.length, channels: channels, roles: roles})

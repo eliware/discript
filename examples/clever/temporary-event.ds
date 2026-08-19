@@ -1,0 +1,37 @@
+// Provision a temporary event area with a text and voice channel.
+guildId = env.TEST_GUILD
+apply = env.DISCRIPT_APPLY == "true"
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+options = {dryRun: true}
+if (apply) {
+  options = {force: true}
+}
+guild = discord.guilds.get(guildId)
+eventName = "Event"
+if (env.EVENT_NAME != null) {
+  eventName = env.EVENT_NAME
+}
+category = guild.channels.create(eventName, {dryRun: true, type: "category"})
+if (apply) {
+  category = guild.channels.create(eventName, {force: true, type: "category"})
+}
+chat = guild.channels.create("event-chat", {dryRun: true, type: "text", parent: category.id})
+if (apply) {
+  chat = guild.channels.create("event-chat", {force: true, type: "text", parent: category.id})
+}
+voice = guild.channels.create("Event Voice", {dryRun: true, type: "voice", parent: category.id})
+if (apply) {
+  voice = guild.channels.create("Event Voice", {force: true, type: "voice", parent: category.id})
+}
+message = "Welcome to the event!"
+if (env.EVENT_MESSAGE != null) {
+  message = env.EVENT_MESSAGE
+}
+discord.channels.get(chat.id).send(message, options)
+mode = "preview"
+if (apply) {
+  mode = "applied"
+}
+print({mode: mode, category: category, chat: chat, voice: voice})
