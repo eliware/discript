@@ -24,6 +24,17 @@ List guilds with a direct CLI command:
 npm start -- guilds list --json
 ```
 
+Discover supported direct commands or generate shell completion scripts:
+
+```sh
+npm start -- commands list --json
+npm start -- completion bash > /tmp/discript-completion.bash
+npm start -- completion zsh
+npm start -- completion fish
+```
+
+Common singular and abbreviated resource names are accepted, such as `msg send`, `chan list`, and `guild list`.
+
 List channels in a guild:
 
 ```sh
