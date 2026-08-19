@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { parse } from '../src/parser.mjs';
+import { parse, precedence } from '../src/parser.mjs';
 
 describe('parse', () => {
   test('parses assignments and chained calls', () => {
@@ -88,5 +88,13 @@ describe('parse', () => {
   test('parses empty and alternate core forms', () => {
     expect(parse('fn noop() { return }; if (false) {} ; while (false) {} ; [] ; {} ; map([1], item => { return item })')).toMatchObject({ type: 'Program' });
     expect(parse('value = true; value = false; value = null')).toMatchObject({ type: 'Program' });
+    expect(parse(';;; if (true) { ; } ; call(1, 2); value = \'single\'')).toMatchObject({ type: 'Program' });
+    expect(parse('call(1)')).toMatchObject({ type: 'Program' });
+    expect(precedence('unknown')).toBe(-1);
+  });
+
+  test('covers block and expression termination errors', () => {
+    expect(() => parse('if (true) { value = 1')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+    expect(parse('if (true) {}')).toMatchObject({ type: 'Program' });
   });
 });

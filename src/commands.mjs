@@ -20,7 +20,12 @@ export function normalizeCommand(command = []) {
 }
 
 export function commandCatalog() {
-  return COMMANDS.map(name => ({ name, aliases: [ALIASES.get(name.split(' ')[0]) ? name.replace(name.split(' ')[0], Object.keys(Object.fromEntries(ALIASES)).find(alias => ALIASES.get(alias) === name.split(' ')[0]) ?? '') : ''].filter(Boolean) }));
+  const aliasesByCanonical = new Map();
+  for (const [alias, canonical] of ALIASES) {
+    if (!aliasesByCanonical.has(canonical)) aliasesByCanonical.set(canonical, []);
+    aliasesByCanonical.get(canonical).push(alias);
+  }
+  return COMMANDS.map(name => ({ name, aliases: aliasesByCanonical.get(name.split(' ')[0]) ?? [] }));
 }
 
 export function suggestCommands(input, limit = 3) {

@@ -77,7 +77,11 @@ export function parse(source) {
   function parseBlock() {
     consume('{', 'Expected `{` to begin a block.');
     const statements = [];
-    while (!atEnd() && !match('}')) { if (match(';')) continue; statements.push(parseStatement()); match(';'); }
+    while (!atEnd() && !match('}')) {
+      if (match(';')) continue;
+      statements.push(parseStatement());
+      match(';');
+    }
     if (tokens[index - 1]?.value !== '}') throw syntaxError('Expected `}` to close the block.');
     return statements;
   }
@@ -100,21 +104,11 @@ export function parse(source) {
       const property = consume('identifier', 'Expected a property name after `.`.');
       expression = { type: 'MemberExpression', object: expression, property: property.value };
       if (match('(')) {
-        const args = [];
-        if (!match(')')) {
-          do args.push(parseExpression()); while (match(','));
-          consume(')', 'Expected `)` after arguments.');
-        }
-        expression = { type: 'CallExpression', callee: expression, arguments: args };
+        expression = { type: 'CallExpression', callee: expression, arguments: parseArguments() };
       }
     }
     if (match('(')) {
-      const args = [];
-      if (!match(')')) {
-        do args.push(parseExpression()); while (match(','));
-        consume(')', 'Expected `)` after arguments.');
-      }
-      expression = { type: 'CallExpression', callee: expression, arguments: args };
+      expression = { type: 'CallExpression', callee: expression, arguments: parseArguments() };
     }
     if (match('=>')) {
       if (expression.type !== 'Identifier') throw syntaxError('Arrow callbacks require a single parameter name.');
@@ -122,6 +116,15 @@ export function parse(source) {
       expression = { type: 'ArrowExpression', parameter: expression.name, body };
     }
     return expression;
+  }
+
+  function parseArguments() {
+    const args = [];
+    if (!match(')')) {
+      do args.push(parseExpression()); while (match(','));
+      consume(')', 'Expected `)` after arguments.');
+    }
+    return args;
   }
 
   function parsePrimary() {
@@ -188,8 +191,9 @@ export function parse(source) {
   function atEnd() { return index >= tokens.length; }
 }
 
-function precedence(operator) {
-  return { '||': 1, '&&': 2, '==': 3, '!=': 3, '>': 4, '<': 4, '>=': 4, '<=': 4, '+': 5, '-': 5, '*': 6, '/': 6 }[operator] ?? -1;
+export function precedence(operator) {
+  const levels = { '||': 1, '&&': 2, '==': 3, '!=': 3, '>': 4, '<': 4, '>=': 4, '<=': 4, '+': 5, '-': 5, '*': 6, '/': 6 };
+  return levels[operator] ?? -1;
 }
 
 function tokenize(source) {

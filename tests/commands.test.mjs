@@ -9,7 +9,10 @@ describe('command discovery', () => {
   });
 
   test('exposes catalog and shell completion formats', () => {
-    expect(commandCatalog()).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'messages send' })]));
+    expect(commandCatalog()).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'messages send', aliases: expect.arrayContaining(['msg', 'message']) }),
+      expect.objectContaining({ name: 'messages send', aliases: expect.any(Array) }),
+    ]));
     expect(completionScript('bash')).toContain('complete -F');
     expect(completionScript('zsh')).toContain('#compdef discript');
     expect(completionScript('fish')).toContain('complete -c discript');
