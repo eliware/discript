@@ -49,9 +49,9 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Repository visibility is public on GitHub.
 - [Fully complete] Main-branch CI passes on Ubuntu and Windows for the last pushed checkpoint.
 - [Fully complete] The latest release commit was pushed and validated by GitHub Actions on Ubuntu and Windows.
-- [Fully complete] `@eliware/discript@1.0.3` was accepted by the npm publish workflow and is publicly visible through the anonymous npm registry.
+- [Fully complete] The package is configured as public `@eliware/discript` with `publishConfig.access=public`; the current repository version is `1.0.6` and the release workflow validates tarball installation before publishing.
 - [Fully complete] Resolve public npm registry visibility for the published scoped package.
-- [Fully complete] Run release validation for the post-1.0.3 local changes.
+- [Fully complete] Run release validation for the post-1.0.3 local changes; subsequent local changes continue to pass package, docs, lint, and CI validation.
 - [Fully complete] Push the accumulated local release-ready commits after approval.
 - [Fully complete] Publish and verify the next npm patch release after npm visibility is resolved.
 

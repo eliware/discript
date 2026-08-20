@@ -12,10 +12,10 @@ The CLI shall support these broad invocation forms:
 discript <resource> <operation> [options]
 discript --eval <source>
 discript <script-file>
-discript --stdin
+cat script.ds | discript
 ```
 
-The CLI should also accept source from a pipe when no script file is provided.
+The CLI accepts source from a pipe when no script file is provided; there is no separate `--stdin` mode.
 
 The CLI shall provide:
 
@@ -24,6 +24,10 @@ The CLI shall provide:
 - `--json` for machine-readable results
 - `--dry-run` for supported mutations
 - `--yes` for explicitly approving mutations or destructive operations
+- `--rest` for supported REST operations without opening a Gateway client
+- `--broker` for commands or scripts routed through a persistent local Gateway broker
+- `--output jsonl` for newline-delimited results
+- `--timeout <ms>` for bounded execution
 
 Finite invocations shall connect, execute, emit a result, clean up, and exit. Long-running invocations may remain active when the source registers listeners, timers, or loops.
 
@@ -61,3 +65,5 @@ Machine-readable results shall be written to stdout. Diagnostics shall be writte
 Failures shall provide a stable error code, a useful message, and a nonzero exit status. Credentials and other sensitive configuration shall never appear in results, diagnostics, or errors.
 
 Scripts receive a read/write `env` standard-library object backed by the Node process environment. Environment variables may be read with `env.NAME` or `env.get("NAME")`, written with `env.set("NAME", value)` or `env.NAME = value`, and removed with `env.clear("NAME")`. Variable names must be valid environment identifiers.
+
+Configuration is loaded from the process environment, the project `.env`, and the user-level `.discript.env` fallback. Existing exported variables are preserved; project-local values take precedence over the user-level file. Gateway intent names are configured through `DISCRIPT_INTENTS` and default to `Guilds,GuildMessages,GuildMembers`.
