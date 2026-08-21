@@ -102,11 +102,11 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 - [x] Test configuration precedence, profile selection, CLI overrides, and redacted config output. Configuration/profile parsing, MCP and client profile mapping, direct/client routing overrides, argument precedence, and secret-redacted inspection are covered by focused tests.
 - [x] Test MCP tool discovery and compact schema validation. Includes remote preflight discovery and missing-tool failure behavior.
-- [ ] Test resources, prompts, server instructions, and discovery metadata.
+- [x] Test resources, prompts, server instructions, and discovery metadata. The HTTP/stdio/remote integration tests cover instructions, tool/resource/prompt listing, generated help resources, examples, command catalog, and discovery preflight.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, stdio, HTTPS listener and certificate rejection, malformed HTTP, static bearer, OAuth2 introspection, bearer-passthrough, and configured CORS integration are covered; remaining authorization and transport failure cases are pending.
 - [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Includes tool-level read/write/admin scope enforcement.
 - [x] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Broker reuse/duplicate-startup, concurrent broker and MCP shutdown, client/server timeouts, cancellation signaling, output limits, and concurrency bounds are covered.
-- [ ] Test dry-run, force approval, structured results, and sanitized error mapping. Structured success/failure results and sanitized error mapping are covered; dry-run/force approval coverage remains pending.
+- [x] Test dry-run, force approval, structured results, and sanitized error mapping. MCP unit and end-to-end tests cover dry-run, force propagation, structured success/failure results, exit codes, scope failures, output limits, and credential-safe error mapping.
 - [x] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup. CI runs the MCP suite on Linux and Windows; transport/process tests cover stdio child cleanup, HTTP/HTTPS listeners, Unix broker paths, Windows named-pipe path generation, and the package verifier is Node-native rather than Unix-`tar` dependent.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
 - [x] Add MCP examples to the package and documentation checker.
@@ -121,4 +121,4 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add CI coverage for local stdio, HTTP, HTTPS, authentication, and remote MCP integration. CI runs the dedicated MCP suite on both Linux and Windows in addition to the full test suite.
 - [x] Add an MCP operations/release checklist, including secret and certificate handling. Added `docs/mcp/operations-release-checklist.md` covering deployment, runtime operations, security, and release gates.
 - [ ] Publish only after all required security, integration, packaging, and CI gates pass.
-- [ ] Commit server integration, configuration, security, resources, client mode, tests, documentation, and release work as separate solid checkpoints.
+- [x] Commit server integration, configuration, security, resources, client mode, tests, documentation, and release work as separate solid checkpoints. The work is split across focused local commits; publication remains intentionally separate.
