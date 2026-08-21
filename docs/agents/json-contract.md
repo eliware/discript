@@ -1,6 +1,5 @@
 # JSON contract
 
-Use JSON output for machine consumers. Keep human messages out of the data channel when using `--json`; use `--output jsonl` when a script emits multiple independent values. Consumers should inspect both process exit status and the returned `code`/`exitCode` fields.
+Use `--json` when an agent needs deterministic machine-readable output. Return structured success or error data with stable operation context, resource IDs where relevant, and the engine's exit/status code; keep human prose out of JSON fields intended for parsing.
 
-Do not parse pretty output. Treat Discord IDs as strings, preserve them without numeric conversion, and record the original operation alongside returned resource IDs when building an audit trail.
-
+Redact tokens, authorization headers, webhook URLs, and private configuration. Preserve dry-run previews and approval failures as explicit statuses so an agent can branch safely. See [CLI JSON output](../cli/json-output.md), [exit-code branching](exit-code-branching.md), and [stdin protocol](stdin-protocol.md).
