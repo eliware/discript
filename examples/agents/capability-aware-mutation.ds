@@ -1,0 +1,12 @@
+/*
+  Capability-aware automation: inspect the host policy before planning work.
+  Set DISCRIPT_CAPABILITIES=discord:read,discord:write to allow ordinary writes.
+*/
+print({capabilities: capabilities.list(), canWrite: capabilities.has("discord:write"), canAdmin: capabilities.has("discord:admin")})
+
+if (!capabilities.has("discord:write")) {
+  print({skipped: true, reason: "write capability is not available"})
+} else {
+  /* The Discord safety layer still requires dry-run/force approval separately. */
+  print(discord.guilds.list())
+}

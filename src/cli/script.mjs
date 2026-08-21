@@ -44,7 +44,8 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       args: input.args ?? [],
       ...createLanguageBuiltins(),
       json: createJsonHelpers(),
-      discord: createDiscordApi(runtime.client, { ...options, rest }),
+      discord: createDiscordApi(runtime.client, { ...options, rest, capabilities: dependencies.capabilities ? new Set(dependencies.capabilities) : null }),
+      capabilities: createCapabilities(dependencies.capabilities),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
       filter: async (items, selector, expected) => {
         if (typeof selector === 'function') {
@@ -112,6 +113,19 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
     for (const [eventName, handler] of eventHandlers) runtime.client.off(eventName, handler);
     if (ownsRuntime) await runtime.shutdown();
   }
+}
+
+function createCapabilities(values) {
+  const allowed = values ? new Set(values) : null;
+  return {
+    list: () => allowed ? [...allowed] : ['discord:read', 'discord:write', 'discord:admin'],
+    has: capability => !allowed || allowed.has(String(capability)),
+    require: capability => {
+      const name = String(capability);
+      if (allowed && !allowed.has(name)) throw Object.assign(new Error(`Capability required: ${name}.`), { code: 'CAPABILITY_REQUIRED', exitCode: 5, details: { capability: name } });
+      return true;
+    },
+  };
 }
 
 function waitForStop(runtime, signal) {

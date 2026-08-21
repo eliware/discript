@@ -16,6 +16,7 @@ export function loadConfig(env = process.env) {
   const token = String(env.DISCORD_TOKEN ?? '').trim();
   const testGuild = String(env.TEST_GUILD ?? '').trim();
   const intents = parseIntents(env.DISCRIPT_INTENTS);
+  const capabilities = listValue(env.DISCRIPT_CAPABILITIES);
   const connectionMode = enumValue(env.DISCRIPT_CONNECTION_MODE, CONNECTION_MODES, 'direct', 'DISCRIPT_CONNECTION_MODE');
   const daemonMode = enumValue(env.DISCRIPT_DAEMON_MODE, DAEMON_MODES, 'socket', 'DISCRIPT_DAEMON_MODE');
   const mcpTransport = enumValue(env.DISCRIPT_MCP_TRANSPORT, MCP_TRANSPORTS, 'http', 'DISCRIPT_MCP_TRANSPORT');
@@ -25,6 +26,7 @@ export function loadConfig(env = process.env) {
     token: token || null,
     testGuild: testGuild || null,
     intents,
+    capabilities,
     connectionMode,
     daemonMode,
     mcp: {

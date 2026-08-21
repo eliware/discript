@@ -7,14 +7,14 @@ import { createChannelsApi } from './discord/channels.mjs';
 import { createGuildsApi } from './discord/guilds.mjs';
 import { createRestDiscordApi } from './rest-api.mjs';
 
-export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null, rest = null } = {}) {
+export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null, rest = null, capabilities = null } = {}) {
   let loadedVoiceModule = voiceModule;
   const loadVoiceModule = async () => {
     if (!loadedVoiceModule) loadedVoiceModule = await import('@discordjs/voice');
     return loadedVoiceModule;
   };
   const { mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite } = createNormalization();
-  const { requireApproval, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember } = createSafety({ client, dryRun, yes });
+  const { requireApproval, requireCapability, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember } = createSafety({ client, dryRun, yes, capabilities });
   const resolveMessage = async (channelId, messageId) => {
     const channel = client.channels.cache.get(String(channelId));
     if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });

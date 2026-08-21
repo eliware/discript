@@ -28,3 +28,19 @@ print(decoded)
 `json.stringify(value)` returns a JSON string and `json.parse(text)` returns a
 script value. Invalid JSON raises a normal runtime error. The full JavaScript
 `JSON` global is intentionally not exposed.
+
+## Capabilities
+
+Hosts may restrict Discord mutations with `DISCRIPT_CAPABILITIES`, a comma-separated
+list such as `discord:read,discord:write`. Scripts can inspect the active policy:
+
+```ds
+print({allowed: capabilities.list(), canWrite: capabilities.has("discord:write")})
+capabilities.require("discord:read")
+```
+
+Read-only previews do not require write access. Approved ordinary mutations require
+`discord:write`; approved destructive operations additionally require
+`discord:admin`. If no capability policy is configured, the direct CLI preserves its
+normal behavior. Restricted hosts should set the policy before evaluating untrusted
+or agent-generated scripts.

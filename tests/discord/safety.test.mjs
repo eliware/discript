@@ -33,6 +33,14 @@ describe('mutation safety matrix', () => {
     expect(() => requireApproval('Deleting a channel')).not.toThrow();
   });
 
+  test('capabilities restrict ordinary and destructive mutations independently', () => {
+    const writeOnly = safety({ capabilities: new Set(['discord:write']) }).requireApproval;
+    expect(() => writeOnly('Creating a channel', { force: true })).not.toThrow();
+    expect(() => writeOnly('Deleting a channel', { force: true })).toThrow(expect.objectContaining({ code: 'CAPABILITY_REQUIRED', details: { capability: 'discord:admin' } }));
+    const readOnly = safety({ capabilities: new Set(['discord:read']) }).requireApproval;
+    expect(() => readOnly('Creating a channel')).toThrow(expect.objectContaining({ code: 'CAPABILITY_REQUIRED', details: { capability: 'discord:write' } }));
+  });
+
   test('permission checks fail closed when bot permission state is unavailable', () => {
     const requirePermission = safety().requirePermission;
     expect(() => requirePermission({ members: { me: undefined } }, 'ManageChannels')).toThrow(expect.objectContaining({ code: 'MISSING_PERMISSION', exitCode: 5 }));

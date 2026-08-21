@@ -59,6 +59,7 @@ The initial language shall support:
 - Aliased modules execute in isolated per-run scopes and are cached; legacy side-effect imports remain supported
 - Function calls use lexical scopes; nested functions retain state in captured outer bindings while parameters and new locals remain per-call
 - The standard library provides bounded text normalization and delimiter helpers (`split`, `join`, `includes`, `lower`, `upper`, and `trim`)
+- Hosts may restrict script mutation capabilities with `DISCRIPT_CAPABILITIES`; previews require read access, ordinary approved mutations require `discord:write`, and destructive approvals require `discord:admin`
 
 Example:
 

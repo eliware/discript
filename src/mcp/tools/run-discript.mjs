@@ -43,7 +43,9 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       log.debug?.({ event: 'mcp.execution.started', requestId, mode, dryRun, force, rest });
       try {
         release = await limits.limiter?.acquire?.();
-        const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal, ...(mcpServer.context?.token !== undefined ? { token: mcpServer.context.token } : {}) }), effectiveTimeout, { onTimeout: () => controller.abort() });
+        const scopes = extra.mcpAuth?.scopes || extra._meta?.mcpAuth?.scopes;
+        const capabilities = Array.isArray(scopes) ? scopes : undefined;
+        const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal, capabilities, ...(mcpServer.context?.token !== undefined ? { token: mcpServer.context.token } : {}) }), effectiveTimeout, { onTimeout: () => controller.abort() });
         const result = executionSuccess(value, { requestId,
           warnings: Array.isArray(value?.warnings) ? value.warnings : [],
           diagnostics: Array.isArray(value?.diagnostics) ? value.diagnostics : [],

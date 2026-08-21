@@ -1,6 +1,10 @@
-export function createSafety({ client, dryRun, yes }) {
+export function createSafety({ client, dryRun, yes, capabilities = null }) {
+  const requireCapability = capability => {
+    if (capabilities && !capabilities.has(capability)) throw Object.assign(new Error(`Capability required: ${capability}.`), { code: 'CAPABILITY_REQUIRED', exitCode: 5, details: { capability } });
+  };
   const requireApproval = (action, operationOptions = {}) => {
     if (dryRun || operationOptions.dryRun === true) return;
+    requireCapability(/delete|delet|ban|kick|remove|leave|bulk/i.test(action) && (operationOptions.force === true || yes === true) ? 'discord:admin' : 'discord:write');
     if (!yes && operationOptions.force !== true) throw Object.assign(new Error(`${action} requires --yes or force: true.`), { code: 'CONFIRMATION_REQUIRED', exitCode: 2 });
   };
   const requirePermission = (guild, permission) => {
@@ -22,5 +26,5 @@ export function createSafety({ client, dryRun, yes }) {
     const highest = guild.members?.me?.roles?.highest; const targetHighest = member.roles?.highest;
     if (highest?.position !== undefined && targetHighest?.position !== undefined && targetHighest.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this member moderation.'), { code: 'MEMBER_HIERARCHY', exitCode: 5 });
   };
-  return { requireApproval, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember };
+  return { requireApproval, requireCapability, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember };
 }

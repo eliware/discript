@@ -56,7 +56,7 @@ export async function run(argv = [], dependencies = {}) {
   let activeRuntime;
   try {
     shutdownHook = registerSignals({ log, exit: false, shutdownHook: async signal => activeRuntime?.shutdown(signal) });
-    const result = await withTimeout(executeInput(source, options, dependencies, runtime => { activeRuntime = runtime; }), options.timeout);
+    const result = await withTimeout(executeInput(source, options, { ...dependencies, capabilities: config.capabilities }, runtime => { activeRuntime = runtime; }), options.timeout);
     if (result !== undefined) writeResult(result, options, stdout);
     return result;
   } finally {
