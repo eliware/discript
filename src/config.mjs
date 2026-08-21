@@ -64,6 +64,20 @@ export function redactedConfig(config = loadConfig()) {
   };
 }
 
+export function validateConfig(config = loadConfig()) {
+  const mcp = config.mcp ?? {};
+  if (config.daemonMode === 'mcp' && mcp.transport === 'stdio') {
+    throw configurationError('DISCRIPT_DAEMON_MODE=mcp requires an HTTP or HTTPS MCP transport.');
+  }
+  if (mcp.httpRedirect && (!mcp.httpPort || !mcp.httpsPort)) {
+    throw configurationError('DISCRIPT_MCP_HTTP_REDIRECT requires DISCRIPT_MCP_HTTP_PORT and DISCRIPT_MCP_HTTPS_PORT.');
+  }
+  if (mcp.httpsPort && (!mcp.tlsKeyFile || !mcp.tlsCertFile)) {
+    throw configurationError('An HTTPS MCP listener requires DISCRIPT_MCP_TLS_KEY_FILE and DISCRIPT_MCP_TLS_CERT_FILE.');
+  }
+  return config;
+}
+
 function enumValue(value, allowed, fallback, name) {
   const result = String(value ?? '').trim() || fallback;
   if (!allowed.includes(result)) throw Object.assign(new Error(`${name} must be one of: ${allowed.join(', ')}.`), { code: 'INVALID_CONFIGURATION', exitCode: 2 });
@@ -93,6 +107,10 @@ function listValue(value) {
 
 function redact(value) {
   return value ? '[redacted]' : null;
+}
+
+function configurationError(message) {
+  return Object.assign(new Error(message), { code: 'INVALID_CONFIGURATION', exitCode: 2 });
 }
 
 export function requireTestGuild(config = loadConfig()) {

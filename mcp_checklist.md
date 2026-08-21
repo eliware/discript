@@ -23,11 +23,11 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
 - [x] Add MCP server profile loading for transport, port, endpoint, static/bearer auth, TLS files, redirect, and CORS settings.
 - [ ] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
-- [ ] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
+- [x] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
 - [ ] Make normal CLI commands use the configured daemon/client profile when selected.
 - [x] Preserve explicit `--direct` and `--broker` flags as higher-precedence one-shot overrides.
 - [x] Add `discript config` and `discript config --json` with complete secret redaction.
-- [ ] Validate incompatible profiles before starting Discord, MCP, or network listeners.
+- [x] Validate incompatible profiles before starting Discord, MCP, or network listeners.
 - [ ] Document precedence: process environment, project `.env`, user `~/.discript.env`, profile defaults, then CLI overrides.
 
 ## Phase 3 — Transport and execution behavior

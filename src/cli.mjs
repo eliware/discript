@@ -20,7 +20,7 @@ import { writeResult } from './output.mjs';
 import { withTimeout, validateTimeout } from "./cli/lifecycle.mjs";
 import { executeInput } from './cli/script.mjs';
 import { brokerRequest, startGatewayBroker } from './broker.mjs';
-import { loadConfig, redactedConfig } from './config.mjs';
+import { loadConfig, redactedConfig, validateConfig } from './config.mjs';
 import { withGatewayRetry } from './gateway-retry.mjs';
 
 export async function run(argv = [], dependencies = {}) {
@@ -86,7 +86,7 @@ async function runBrokerScript(source, options, stdout) {
 }
 
 async function runDaemon(action, options, stdout) {
-  const config = loadConfig();
+  const config = validateConfig(loadConfig());
   const token = config.token;
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   if (action === 'start') {

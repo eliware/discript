@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { loadConfig, redactedConfig, requireTestGuild } from '../src/config.mjs';
+import { loadConfig, redactedConfig, requireTestGuild, validateConfig } from '../src/config.mjs';
 
 describe('configuration', () => {
   test('loads token and test guild without exposing defaults', () => {
@@ -33,5 +33,18 @@ describe('configuration', () => {
     const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret' });
     expect(redactedConfig(config)).toMatchObject({ token: '[redacted]', mcp: { authToken: '[redacted]' }, client: { token: '[redacted]' } });
     expect(JSON.stringify(redactedConfig(config))).not.toContain('secret');
+  });
+
+  test('rejects incompatible MCP profiles before startup', () => {
+    expect(() => validateConfig(loadConfig({ DISCRIPT_DAEMON_MODE: 'mcp', DISCRIPT_MCP_TRANSPORT: 'stdio' }))).toThrow('requires an HTTP or HTTPS');
+    expect(() => validateConfig(loadConfig({ DISCRIPT_MCP_HTTP_REDIRECT: 'true', DISCRIPT_MCP_HTTP_PORT: '8080' }))).toThrow('requires DISCRIPT_MCP_HTTP_PORT and DISCRIPT_MCP_HTTPS_PORT');
+    expect(() => validateConfig(loadConfig({ DISCRIPT_MCP_HTTPS_PORT: '8443' }))).toThrow('requires DISCRIPT_MCP_TLS_KEY_FILE');
+  });
+
+  test('accepts a complete dual-listener HTTPS profile', () => {
+    expect(validateConfig(loadConfig({
+      DISCRIPT_MCP_HTTP_REDIRECT: 'true', DISCRIPT_MCP_HTTP_PORT: '8080', DISCRIPT_MCP_HTTPS_PORT: '8443',
+      DISCRIPT_MCP_TLS_KEY_FILE: '/run/key.pem', DISCRIPT_MCP_TLS_CERT_FILE: '/run/cert.pem',
+    })).mcp).toMatchObject({ httpPort: 8080, httpsPort: 8443, httpRedirect: true });
   });
 });
