@@ -29,6 +29,9 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
     ...(mcp.tlsKeyFile ? { keyFile: mcp.tlsKeyFile } : {}),
     ...(mcp.tlsCertFile ? { certFile: mcp.tlsCertFile } : {}),
     ...(mcp.tlsCaFile ? { caFile: mcp.tlsCaFile } : {}),
+    ...(mcp.tlsKey ? { key: mcp.tlsKey } : {}),
+    ...(mcp.tlsCert ? { cert: mcp.tlsCert } : {}),
+    ...(mcp.tlsCa ? { ca: mcp.tlsCa } : {}),
   };
   return {
     ...options,

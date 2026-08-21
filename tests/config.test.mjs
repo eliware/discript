@@ -49,6 +49,12 @@ describe('configuration', () => {
     })).mcp).toMatchObject({ httpPort: 8080, httpsPort: 8443, httpRedirect: true });
   });
 
+  test('accepts inline TLS material and redacts it for inspection', () => {
+    const config = loadConfig({ DISCRIPT_MCP_HTTPS_PORT: '8443', DISCRIPT_MCP_TLS_KEY: 'inline-key', DISCRIPT_MCP_TLS_CERT: 'inline-cert', DISCRIPT_MCP_TLS_CA: 'inline-ca' });
+    expect(validateConfig(config).mcp).toMatchObject({ tlsKey: 'inline-key', tlsCert: 'inline-cert', tlsCa: 'inline-ca' });
+    expect(redactedConfig(config).mcp).toMatchObject({ tlsKey: '[redacted]', tlsCert: '[redacted]', tlsCa: '[redacted]' });
+  });
+
   test('loads remote client profile and validates client mode', () => {
     const config = loadConfig({
       DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_URL: 'https://agent.example/mcp',

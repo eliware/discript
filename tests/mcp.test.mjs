@@ -111,6 +111,10 @@ describe('MCP server profile mapping', () => {
     expect(options).toMatchObject({ httpPort: null, httpsPort: 9443, tls: { keyFile: '/run/key.pem', certFile: '/run/cert.pem', caFile: '/run/ca.pem' }, auth: { mode: 'bearer-passthrough' } });
   });
 
+  test('maps inline TLS profile settings', () => {
+    expect(createMcpServerOptions({ mcp: { transport: 'https', port: 9443, tlsKey: 'key', tlsCert: 'cert', tlsCa: 'ca' } }).tls).toEqual({ key: 'key', cert: 'cert', ca: 'ca' });
+  });
+
   test('maps separate HTTP and HTTPS listeners for redirects', () => {
     const options = createMcpServerOptions({ mcp: {
       transport: 'http', port: 8765, httpPort: 8080, httpsPort: 8443,

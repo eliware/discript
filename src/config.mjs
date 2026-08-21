@@ -45,6 +45,9 @@ export function loadConfig(env = process.env) {
       tlsKeyFile: stringValue(env.DISCRIPT_MCP_TLS_KEY_FILE, null),
       tlsCertFile: stringValue(env.DISCRIPT_MCP_TLS_CERT_FILE, null),
       tlsCaFile: stringValue(env.DISCRIPT_MCP_TLS_CA_FILE, null),
+      tlsKey: stringValue(env.DISCRIPT_MCP_TLS_KEY, null),
+      tlsCert: stringValue(env.DISCRIPT_MCP_TLS_CERT, null),
+      tlsCa: stringValue(env.DISCRIPT_MCP_TLS_CA, null),
       httpRedirect: booleanValue(env.DISCRIPT_MCP_HTTP_REDIRECT, false),
       allowedOrigins: listValue(env.DISCRIPT_MCP_ALLOWED_ORIGINS),
       executionTimeout: numberValue(env.DISCRIPT_MCP_EXECUTION_TIMEOUT, 300000, 'DISCRIPT_MCP_EXECUTION_TIMEOUT'),
@@ -73,7 +76,7 @@ export function redactedConfig(config = loadConfig()) {
   return {
     ...config,
     token: redact(config.token),
-    mcp: { ...config.mcp, authToken: redact(config.mcp.authToken), oauthClientSecret: redact(config.mcp.oauthClientSecret) },
+    mcp: { ...config.mcp, authToken: redact(config.mcp.authToken), oauthClientSecret: redact(config.mcp.oauthClientSecret), tlsKey: redact(config.mcp.tlsKey), tlsCert: redact(config.mcp.tlsCert), tlsCa: redact(config.mcp.tlsCa) },
     client: { ...config.client, token: redact(config.client.token), headers: redactedHeaders(config.client.headers) },
   };
 }
@@ -89,7 +92,7 @@ export function validateConfig(config = loadConfig()) {
   if (mcp.httpRedirect && (!mcp.httpPort || !mcp.httpsPort)) {
     throw configurationError('DISCRIPT_MCP_HTTP_REDIRECT requires DISCRIPT_MCP_HTTP_PORT and DISCRIPT_MCP_HTTPS_PORT.');
   }
-  if (mcp.httpsPort && (!mcp.tlsKeyFile || !mcp.tlsCertFile)) {
+  if (mcp.httpsPort && ((!mcp.tlsKeyFile && !mcp.tlsKey) || (!mcp.tlsCertFile && !mcp.tlsCert))) {
     throw configurationError('An HTTPS MCP listener requires DISCRIPT_MCP_TLS_KEY_FILE and DISCRIPT_MCP_TLS_CERT_FILE.');
   }
   const client = config.client ?? {};

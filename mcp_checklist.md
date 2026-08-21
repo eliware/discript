@@ -53,7 +53,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Decide whether Discript needs server-side OAuth only or also OAuth client helpers. Keep OAuth client flows provider-neutral and delegate discovery, consent, PKCE, refresh, and session storage to the caller's OAuth/OIDC library.
 - [x] If OAuth client support is needed, add provider discovery, client registration, PKCE, authorization-code exchange, and durable state handling. Not required in Discript: programmatic callers supply the resulting token or async token provider to `@eliware/mcp-client`.
 - [x] Add HTTP/HTTPS configuration for daemon MCP mode.
-- [ ] Support inline TLS key/certificate/CA configuration.
+- [x] Support inline TLS key/certificate/CA configuration. Supports `DISCRIPT_MCP_TLS_KEY`, `DISCRIPT_MCP_TLS_CERT`, and `DISCRIPT_MCP_TLS_CA`, with file paths taking precedence and inline material redacted from config inspection.
 - [x] Support TLS key/certificate/CA files and `TLS_KEY_FILE`, `TLS_CERT_FILE`, and `TLS_CA_FILE` environment variables.
 - [x] Support HTTP-to-HTTPS redirects with separately configurable HTTP and HTTPS listeners.
 - [x] Add configurable CORS `allowedOrigins`.
