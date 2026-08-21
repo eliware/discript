@@ -14,4 +14,9 @@ describe('parser/tokenizer', () => {
     const { tokenize } = await import('../../src/parser/tokenizer.mjs');
     expect(() => tokenize('ok\n  @')).toThrow(expect.objectContaining({ details: { line: 2, column: 3, offset: 5 } }));
   });
+
+  test('decodes escaped single-quoted strings', async () => {
+    const { tokenize } = await import('../../src/parser/tokenizer.mjs');
+    expect(tokenize("'it\\'s\\nready'")[0].value).toBe("it's\nready");
+  });
 });
