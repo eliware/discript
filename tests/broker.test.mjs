@@ -23,7 +23,8 @@ describe('Gateway broker', () => {
     await expect(brokerRequest({ token: 'test', endpoint, method: 'script', source: '7', options: {} })).resolves.toMatchObject({ ok: true, value: 7 });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'shutdown' })).resolves.toEqual({ ok: true });
     expect(onClose).toHaveBeenCalledTimes(1);
-    await broker.close();
+    await Promise.all([broker.close(), broker.close(), broker.close()]);
+    expect(client.destroy).toHaveBeenCalledTimes(1);
   });
 
   test('refuses an exhausted session-start budget', async () => {

@@ -38,14 +38,16 @@ export async function startGatewayBroker({ token, endpoint = brokerEndpoint(toke
     if (error.code === 'EADDRINUSE' || error.code === 'EPIPE') throw brokerAlreadyRunningError(endpoint);
     throw error;
   }
-  let closed = false;
+  let closePromise;
   closeBroker = async () => {
-    if (closed) return;
-    closed = true;
-    await onCloseHandler?.();
-    await runtime.shutdown();
-    await new Promise(resolve => server.close(resolve));
-    await unlink(endpoint).catch(() => undefined);
+    if (closePromise) return closePromise;
+    closePromise = (async () => {
+      await onCloseHandler?.();
+      await runtime.shutdown();
+      await new Promise(resolve => server.close(resolve));
+      await unlink(endpoint).catch(() => undefined);
+    })();
+    return closePromise;
   };
   return {
     endpoint,
