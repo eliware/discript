@@ -2,6 +2,8 @@
 
 Configuration comes from the process environment and `.env` loading. `DISCORD_TOKEN` is required for connection; `TEST_GUILD` scopes examples/tests; `DISCRIPT_LIVE` and `DISCRIPT_LIVE_MUTATIONS` opt into live test suites. Script-defined variables are process-local.
 
+Precedence is: explicitly exported process environment, project `.env`, user `~/.discript.env`, profile defaults, then one-shot CLI overrides. Existing environment values are never overwritten while loading dotenv files.
+
 ## MCP server profile
 
 Set `DISCRIPT_CONNECTION_MODE=daemon` and `DISCRIPT_DAEMON_MODE=mcp` to start the configured MCP listener with `discript daemon start`. Use `DISCRIPT_MCP_TRANSPORT=http` or `https`, `DISCRIPT_MCP_PORT` for the primary listener, and `DISCRIPT_MCP_HTTP_PORT`/`DISCRIPT_MCP_HTTPS_PORT` for separate listeners and redirects. HTTPS requires `DISCRIPT_MCP_TLS_KEY_FILE` and `DISCRIPT_MCP_TLS_CERT_FILE`.

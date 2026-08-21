@@ -33,6 +33,16 @@ export async function run(argv = [], dependencies = {}) {
   if (positionals[0] === 'mcp-client') return runMcpClient(positionals[1], options, stdout, positionals.slice(2), stdin);
   if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
   const config = loadConfig();
+  if (config.connectionMode === 'mcp-client' && !options.direct) {
+    const input = await readSource(positionals, options, stdin);
+    const { runRemoteDiscript } = await import('./mcp/client.mjs');
+    const result = await runRemoteDiscript(config, {
+      ...(input.kind === 'source' ? { source: input.source } : { command: input.command }),
+      dryRun: options.dry_run === true, force: options.yes === true, timeout: options.timeout, rest: options.rest === true,
+    });
+    writeResult(result, options, stdout);
+    return result;
+  }
   if (options.broker || (config.connectionMode === 'daemon' && !options.direct)) {
     const brokerInput = await readSource(positionals, options, stdin);
     if (brokerInput.kind === 'source') return runBrokerScript(brokerInput.source, options, stdout);
