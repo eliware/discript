@@ -60,6 +60,13 @@ describe('CLI script runtime integration', () => {
     delete process.env.DISCRIPT_TEST_VALUE;
   });
 
+  test('supports constrained JSON serialization helpers', async () => {
+    const output = [];
+    const result = await run(['-e', 'json.parse(json.stringify({name: "discript", ok: true}))', '--json'], { stdout: value => output.push(value), stdin: { isTTY: true } });
+    expect(result).toEqual({ name: 'discript', ok: true });
+    expect(output.at(-1)).toBe('{\n  "name": "discript",\n  "ok": true\n}');
+  });
+
   test('runs concurrency and delay helpers', async () => {
     const output = [];
     const result = await run(['-e', 'sleep(1); print({parallel: parallel(1, 2)})', '--json'], { stdout: value => output.push(value), stdin: { isTTY: true } });
