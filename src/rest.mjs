@@ -6,6 +6,6 @@ export function createDiscordRest({ token = loadConfig().token, version = '10', 
   const rest = suppliedRest ?? new REST({ version }).setToken(token);
   return {
     rest,
-    request(route, options = {}) { return rest.request(route, options); },
+    request(route, options = {}) { return rest.request({ ...options, fullRoute: route }); },
   };
 }
