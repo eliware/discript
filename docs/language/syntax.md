@@ -1,4 +1,11 @@
-# Syntax
+# Syntax quick start
 
-Discript uses statements separated by newlines or semicolons, blocks delimited by braces, string and numeric literals, identifiers, calls, member access, and object/array literals. See the fundamentals examples for executable syntax.
+```ds
+// Read, branch, and print a result.
+guilds = discord.guilds.list()
+for (guild in guilds) {
+  print(guild.name)
+}
+```
 
+Comments may use `//` or `/* ... */`. Strings, arrays, objects, functions, conditionals, loops, event handlers, and environment access are covered by the [reference](reference.md). Start with the [first script](../getting-started/first-script.md) and browse the [runnable examples](../../examples/README.md).
