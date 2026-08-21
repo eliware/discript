@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.0.9
+
+- Fixed evaluator member-method binding so native string helpers such as `startsWith` work correctly in scripts.
+- Made tests hermetic by preventing user-home configuration from affecting test connection, daemon, authentication, or port settings.
+- Added agent examples for structured announcement planning and prefix-based channel cleanup.
+- Expanded the agent exit-code branching guide with script, CLI, MCP, and harness contracts.
+
 ## 1.0.8
 
 - Made MCP end-to-end and CLI mode tests hermetic across CI environments by avoiding implicit local Discord credentials and Gateway startup.
