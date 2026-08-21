@@ -80,3 +80,45 @@ describe('moderation capabilities', () => {
     await expect(api.guilds.get('1').members.get('3').timeout(1000)).rejects.toMatchObject({ code: 'MEMBER_PROTECTED', exitCode: 5 });
   });
 });
+
+describe('member edge cases', () => {
+  test('rejects an unknown member', () => {
+    const guild = { id: '1', members: { cache: new Map() }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    expect(() => createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }).guilds.get('1').members.get('x')).toThrow(expect.objectContaining({ code: 'MEMBER_NOT_FOUND' }));
+  });
+  test('kicks a member with approval', async () => {
+    const kick = jest.fn(); const member = { id: '2', user: { username: 'u' }, roles: { cache: new Map() }, kick };
+    const guild = { id: '1', members: { cache: new Map([['2', member]]), me: { id: 'bot', roles: { highest: { position: 10 } }, permissions: { has: () => true } } }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    await expect(createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true }).guilds.get('1').members.get('2').kick('bye')).resolves.toMatchObject({ kicked: true });
+    expect(kick).toHaveBeenCalledWith('bye');
+  });
+  test('bans a member with approval', async () => {
+    const ban = jest.fn(); const member = { id: '2', user: { username: 'u' }, roles: { cache: new Map() }, ban };
+    const guild = { id: '1', members: { cache: new Map([['2', member]]), me: { id: 'bot', roles: { highest: { position: 10 } }, permissions: { has: () => true } } }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    await expect(createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true }).guilds.get('1').members.get('2').ban('bad')).resolves.toMatchObject({ banned: true });
+    expect(ban).toHaveBeenCalled();
+  });
+  test('previews kick and ban', async () => {
+    const member = { id: '2', user: { username: 'u' }, roles: { cache: new Map() }, kick: jest.fn(), ban: jest.fn() };
+    const guild = { id: '1', members: { cache: new Map([['2', member]]), me: { id: 'bot', roles: { highest: { position: 10 } }, permissions: { has: () => true } } }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    const api = createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { dryRun: true });
+    await expect(api.guilds.get('1').members.get('2').kick()).resolves.toMatchObject({ dryRun: true });
+    await expect(api.guilds.get('1').members.get('2').ban()).resolves.toMatchObject({ dryRun: true });
+    expect(member.kick).not.toHaveBeenCalled();
+  });
+  test('rejects moderation without approval', async () => {
+    const member = { id: '2', user: { username: 'u' }, roles: { cache: new Map() }, kick: jest.fn() };
+    const guild = { id: '1', members: { cache: new Map([['2', member]]), me: { id: 'bot', roles: { highest: { position: 10 } }, permissions: { has: () => true } } }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    await expect(createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }).guilds.get('1').members.get('2').kick()).rejects.toMatchObject({ code: 'CONFIRMATION_REQUIRED' });
+  });
+  test('rejects invalid timeout duration', async () => {
+    const member = { id: '2', user: { username: 'u' }, roles: { cache: new Map() }, timeout: jest.fn() };
+    const guild = { id: '1', members: { cache: new Map([['2', member]]), me: { id: 'bot', roles: { highest: { position: 10 } }, permissions: { has: () => true } } }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    await expect(createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }, { yes: true }).guilds.get('1').members.get('2').timeout(0)).rejects.toMatchObject({ code: 'INVALID_DURATION' });
+  });
+  test('reports a member with no voice channel', () => {
+    const member = { id: '2', user: { username: 'u' }, voice: { channelId: null, serverMute: true, serverDeaf: true }, roles: { cache: new Map() } };
+    const guild = { id: '1', members: { cache: new Map([['2', member]]) }, roles: { cache: new Map() }, channels: { cache: new Map() } };
+    expect(createDiscordApi({ guilds: { cache: new Map([['1', guild]]) } }).guilds.get('1').members.get('2').voice.status()).toEqual({ memberId: '2', channelId: null, muted: true, deafened: true });
+  });
+});

@@ -39,4 +39,54 @@ describe('REST Discord API adapter', () => {
     expect(request).toHaveBeenNthCalledWith(3, '/guilds/1/roles/2', { method: 'DELETE' });
     expect(request).toHaveBeenNthCalledWith(4, '/channels/1/permissions/2', { method: 'PUT', body: { allow: 'ViewChannel', deny: '', type: 0 } });
   });
+
+  test('maps direct channel lookup', async () => {
+    const request = jest.fn(async route => ({ route }));
+    await expect(createRestDiscordApi({ request }).channels.get('4')).resolves.toEqual({ route: '/channels/4' });
+  });
+  test('returns undefined for unknown reads', async () => {
+    await expect(executeRestRead(['unknown', 'list'], {}, { request: jest.fn() })).resolves.toBeUndefined();
+  });
+  test('maps all guild collection reads', async () => {
+    const request = jest.fn(async route => route);
+    for (const command of [['emojis', 'list'], ['stickers', 'list'], ['events', 'list'], ['invites', 'list']]) await expect(executeRestRead(command, { guild: 'g' }, { request })).resolves.toContain('/guilds/g/');
+  });
+  test('maps message and webhook limits', async () => {
+    const request = jest.fn(async route => route);
+    await executeRestRead(['messages', 'list'], { channel: 'c', limit: 5 }, { request });
+    await executeRestRead(['webhooks', 'list'], { channel: 'c', limit: 5 }, { request });
+    expect(request).toHaveBeenNthCalledWith(1, '/channels/c/messages', { query: { limit: '5' } });
+  });
+  test('previews channel updates and uncategorizing', async () => {
+    const request = jest.fn();
+    await expect(executeRestOperation(['channels', 'update'], { channel: 'c', parent: '', position: '4', dry_run: true }, { request })).resolves.toEqual({ dryRun: true, method: 'PATCH', route: '/channels/c', body: { parent_id: null, position: 4 } });
+  });
+  test('maps numeric channel types', async () => {
+    const request = jest.fn(async () => ({}));
+    await executeRestOperation(['channels', 'create'], { guild: 'g', name: 'stage', type: '13' }, { request });
+    expect(request).toHaveBeenCalledWith('/guilds/g/channels', { method: 'POST', body: { name: 'stage', type: 13 } });
+  });
+  test('maps message sending', async () => {
+    const request = jest.fn(async () => ({ id: 'm' }));
+    await expect(executeRestOperation(['messages', 'send'], { channel: 'c', content: 'hi' }, { request })).resolves.toEqual({ id: 'm' });
+  });
+  test('maps moderation operations', async () => {
+    const request = jest.fn(async () => ({}));
+    await executeRestOperation(['moderation', 'kick'], { guild: 'g', user: 'u', yes: true }, { request });
+    await executeRestOperation(['moderation', 'ban'], { guild: 'g', user: 'u', yes: true }, { request });
+    expect(request).toHaveBeenNthCalledWith(1, '/guilds/g/members/u', { method: 'DELETE' });
+  });
+  test('maps event, invite, and webhook deletion', async () => {
+    const request = jest.fn(async () => ({}));
+    await executeRestOperation(['events', 'delete'], { guild: 'g', event: 'e', yes: true }, { request });
+    await executeRestOperation(['invites', 'delete'], { invite: 'i', yes: true }, { request });
+    await executeRestOperation(['webhooks', 'delete'], { webhook: 'w', yes: true }, { request });
+    expect(request).toHaveBeenCalledTimes(3);
+  });
+  test('requires approval for destructive REST operations', async () => {
+    for (const command of [['messages', 'delete'], ['roles', 'delete'], ['moderation', 'kick'], ['invites', 'delete']]) await expect(executeRestOperation(command, { channel: 'c', message: 'm', guild: 'g', role: 'r', user: 'u', invite: 'i' }, { request: jest.fn() })).rejects.toMatchObject({ code: 'APPROVAL_REQUIRED' });
+  });
+  test('returns undefined for unknown mutations', async () => {
+    await expect(executeRestOperation(['unknown', 'update'], {}, { request: jest.fn() })).resolves.toBeUndefined();
+  });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import { formatError, structuredError } from '../src/errors.mjs';
+import { createRequestId, executionFailure, executionSuccess, isExecutionResult } from '../src/execution/result.mjs';
 
 describe('CLI errors', () => {
   test('formats machine-readable errors', () => {
@@ -31,5 +32,23 @@ describe('CLI errors', () => {
     expect(JSON.stringify(result)).not.toContain('discord-secret');
     expect(JSON.stringify(result)).not.toContain('bearer-secret');
     expect(JSON.stringify(result)).not.toContain('oauth-secret');
+  });
+
+  test('creates unique request ids', () => {
+    expect(createRequestId()).toEqual(expect.any(String));
+    expect(createRequestId()).not.toBe(createRequestId());
+  });
+  test('creates a complete execution success envelope', () => {
+    expect(executionSuccess(3, { requestId: 'r' })).toEqual({ ok: true, requestId: 'r', exitCode: 0, value: 3, warnings: [], diagnostics: [] });
+  });
+  test('creates a sanitized execution failure envelope', () => {
+    expect(executionFailure(Object.assign(new Error('bad'), { code: 'BAD', exitCode: 7 }), { requestId: 'r' })).toMatchObject({ ok: false, requestId: 'r', code: 'BAD', exitCode: 7, error: 'bad' });
+  });
+  test('recognizes execution envelopes', () => {
+    expect(isExecutionResult(executionSuccess(null))).toBe(true);
+    expect(isExecutionResult({ ok: true })).toBe(false);
+  });
+  test('preserves warning and diagnostic arrays', () => {
+    expect(executionSuccess('x', { warnings: ['w'], diagnostics: ['d'] })).toMatchObject({ warnings: ['w'], diagnostics: ['d'] });
   });
 });

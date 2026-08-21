@@ -39,4 +39,47 @@ describe('cli/script', () => {
     )).resolves.toEqual([{ id: 'guild-1', name: 'Test Guild' }]);
     expect(request).toHaveBeenCalledWith({ method: 'GET', fullRoute: '/users/@me/guilds' });
   });
+
+  test('returns dry-run source without starting a runtime', async () => {
+    await expect(executeInput({ kind: 'source', source: 'discord.guilds.list()' }, { dry_run: true }, { stdout: () => {} })).resolves.toEqual({ dryRun: true, source: 'discord.guilds.list()' });
+  });
+
+  test('supports find and property filter helpers', async () => {
+    const active = runtime();
+    await expect(executeInput({ kind: 'source', source: 'find([{id: "a"}], "id", "a")' }, {}, { runtime: active })).resolves.toEqual({ id: 'a' });
+    await expect(executeInput({ kind: 'source', source: 'filter([{ok: true}, {ok: false}], "ok", true)' }, {}, { runtime: active })).resolves.toEqual([{ ok: true }]);
+  });
+
+  test('supports async collection helpers', async () => {
+    const active = runtime();
+    await expect(executeInput({ kind: 'source', source: 'map([1, 2], x => x * 2)' }, {}, { runtime: active })).resolves.toEqual([2, 4]);
+    await expect(executeInput({ kind: 'source', source: 'reduce([1, 2, 3], (total, x) => total + x, 0)' }, {}, { runtime: active })).rejects.toMatchObject({ code: 'PARSE_ERROR' });
+  });
+
+  test('supports parallel operations', async () => {
+    await expect(executeInput({ kind: 'source', source: 'parallel(1, 2)' }, {}, { runtime: runtime() })).resolves.toEqual([1, 2]);
+  });
+
+  test('rejects invalid timer delays', async () => {
+    await expect(executeInput({ kind: 'source', source: 'after(0) {}' }, {}, { runtime: runtime() })).rejects.toMatchObject({ code: 'INVALID_TIMER', exitCode: 2 });
+  });
+
+  test('rejects an already-cancelled execution', async () => {
+    const controller = new AbortController(); controller.abort();
+    await expect(executeInput({ kind: 'source', source: '1' }, {}, { runtime: runtime(), signal: controller.signal })).rejects.toMatchObject({ code: 'EXECUTION_CANCELLED', exitCode: 130 });
+  });
+
+  test('supports one-shot timers when keep-alive is disabled', async () => {
+    await expect(executeInput({ kind: 'source', source: 'after(1) {}' }, { keep_alive: false }, { runtime: runtime() })).resolves.toMatchObject({ timer: 'timeout', registered: true });
+  });
+
+  test('supports callback filters', async () => {
+    await expect(executeInput({ kind: 'source', source: 'filter([1, 2], x => x > 1)' }, {}, { runtime: runtime() })).resolves.toEqual([2]);
+  });
+
+  test('cleans up timers after execution', async () => {
+    jest.useFakeTimers();
+    try { await executeInput({ kind: 'source', source: 'every(10) {}' }, { keep_alive: false }, { runtime: runtime() }); jest.advanceTimersByTime(100); }
+    finally { jest.useRealTimers(); }
+  });
 });

@@ -50,4 +50,34 @@ describe('mutation safety matrix', () => {
     expect(() => api.requireManageableRole(guild, 'everyone')).toThrow(expect.objectContaining({ code: 'ROLE_PROTECTED', exitCode: 5 }));
     expect(() => api.requireManageableMember(guild, { id: 'owner', user: {}, roles: { highest: { position: 1 } } })).toThrow(expect.objectContaining({ code: 'MEMBER_PROTECTED', exitCode: 5 }));
   });
+
+  test('channel permission checks fail closed', () => {
+    const requireChannelPermission = safety().requireChannelPermission;
+    expect(() => requireChannelPermission('missing', 'SendMessages')).not.toThrow();
+  });
+
+  test('channel permission checks reject an explicit denial', () => {
+    const client = { channels: { cache: new Map([['c', { guild: { members: { me: { permissions: { has: () => false } } } } }]]) } };
+    expect(() => createSafety({ client }).requireChannelPermission('c', 'SendMessages')).toThrow(expect.objectContaining({ code: 'MISSING_PERMISSION' }));
+  });
+
+  test('managed roles are protected', () => {
+    const guild = { members: { me: { roles: { highest: { position: 10 } } } }, roles: { cache: new Map([['r', { managed: true, position: 1 }]]) } };
+    expect(() => safety().requireManageableRole(guild, 'r')).toThrow(expect.objectContaining({ code: 'ROLE_PROTECTED' }));
+  });
+
+  test('higher roles are rejected', () => {
+    const guild = { members: { me: { roles: { highest: { position: 2 } } } }, roles: { cache: new Map([['r', { position: 2 }]]) } };
+    expect(() => safety().requireManageableRole(guild, 'r')).toThrow(expect.objectContaining({ code: 'ROLE_HIERARCHY' }));
+  });
+
+  test('bot members cannot be moderated', () => {
+    const guild = { members: { me: { id: 'bot', roles: { highest: { position: 10 } } } }, roles: { cache: new Map() } };
+    expect(() => safety().requireManageableMember(guild, { id: 'u', user: { bot: true }, roles: { highest: { position: 1 } } })).toThrow(expect.objectContaining({ code: 'MEMBER_PROTECTED' }));
+  });
+
+  test('equal or higher member roles are rejected', () => {
+    const guild = { members: { me: { id: 'bot', roles: { highest: { position: 2 } } } }, roles: { cache: new Map() } };
+    expect(() => safety().requireManageableMember(guild, { id: 'u', user: {}, roles: { highest: { position: 2 } } })).toThrow(expect.objectContaining({ code: 'MEMBER_HIERARCHY' }));
+  });
 });
