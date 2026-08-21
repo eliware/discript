@@ -10,6 +10,11 @@ describe('configuration', () => {
     expect(loadConfig({ DISCRIPT_INTENTS: 'Guilds, MessageContent' }).intents).toEqual(['Guilds', 'MessageContent']);
   });
 
+  test('loads an optional capability policy without exposing secrets', () => {
+    expect(loadConfig({ DISCRIPT_CAPABILITIES: 'discord:read, discord:write' }).capabilities).toEqual(['discord:read', 'discord:write']);
+    expect(redactedConfig(loadConfig({ DISCRIPT_CAPABILITIES: 'discord:read' })).capabilities).toEqual(['discord:read']);
+  });
+
   test('validates test guild IDs', () => {
     expect(requireTestGuild({ testGuild: '123' })).toBe('123');
     expect(() => requireTestGuild({ testGuild: 'guild' })).toThrow('must be a Discord guild ID');
