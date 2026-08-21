@@ -58,7 +58,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Support HTTP-to-HTTPS redirects with separately configurable HTTP and HTTPS listeners.
 - [x] Add configurable CORS `allowedOrigins`.
 - [x] Add authentication, authorization, TLS, CORS, and remote-host trust documentation.
-- [ ] Define scope mapping for read-only, mutating, destructive, and administrative Discript operations.
+- [x] Define scope mapping for read-only, mutating, destructive, and administrative Discript operations. Authenticated MCP executions require `discord:read`, `discord:write`, or `discord:admin` based on operation and approval mode; unauthenticated/local and static-token requests retain compatibility unless scopes are supplied.
 
 ## Phase 5 — Help, resources, prompts, and discovery
 
@@ -104,7 +104,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test MCP tool discovery and compact schema validation.
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, stdio, HTTPS listener and certificate rejection, malformed HTTP, static bearer, OAuth2 introspection, bearer-passthrough, and configured CORS integration are covered; remaining authorization and transport failure cases are pending.
-- [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata.
+- [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Includes tool-level read/write/admin scope enforcement.
 - [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Broker reuse/duplicate-startup, MCP shutdown idempotence, client/server timeouts, cancellation signaling, output limits, and concurrency bounds are covered; full cross-component shutdown cases remain pending.
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping. Structured success/failure results and sanitized error mapping are covered; dry-run/force approval coverage remains pending.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.

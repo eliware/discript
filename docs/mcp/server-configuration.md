@@ -25,3 +25,5 @@ For OAuth2, set `DISCRIPT_MCP_AUTH_MODE=oauth2` and provide issuer, resource, in
 HTTPS transport is exercised with real TLS key and certificate files in the integration suite. Certificate verification remains a client-side trust decision; production clients should validate the certificate chain rather than disable verification.
 
 The listener also exposes a read-only `GET /healthz` endpoint. It reports the service name and whether the shared Discord runtime is ready; it does not require MCP tool authentication and should be protected by the network boundary when exposed beyond localhost.
+
+When an authenticated request includes OAuth scopes, `run_discript` maps execution intent to conventional scopes: `discord:read` for inventory and previews, `discord:write` for approved non-destructive mutations, and `discord:admin` for force-approved destructive operations. Configure the OAuth resource server's required baseline scopes accordingly; static bearer authentication remains compatible with deployments that do not provide scope claims.

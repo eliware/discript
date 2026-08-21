@@ -68,6 +68,14 @@ describe('MCP run_discript tool', () => {
     );
   });
 
+  test('maps authenticated requests to read, write, and admin scopes', async () => {
+    const tool = registeredTool();
+    await tool.handler({ command: ['guilds', 'list'] }, { mcpAuth: { scopes: ['discord:read'] } });
+    await expect(tool.handler({ command: ['messages', 'send'] }, { mcpAuth: { scopes: ['discord:read'] } })).rejects.toMatchObject({ code: 'MCP_SCOPE_REQUIRED', details: { scope: 'discord:write' } });
+    await expect(tool.handler({ command: ['roles', 'delete'], force: true }, { mcpAuth: { scopes: ['discord:write'] } })).rejects.toMatchObject({ code: 'MCP_SCOPE_REQUIRED', details: { scope: 'discord:admin' } });
+    await tool.handler({ command: ['roles', 'delete'], force: true }, { mcpAuth: { scopes: ['discord:admin'] } });
+  });
+
   test('aborts an MCP execution when its timeout expires', async () => {
     let signal;
     executeInput.mockImplementationOnce(async (_input, _options, dependencies) => {

@@ -18,7 +18,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
     'run_discript',
     'Execute one Discript source program or direct Discord command. Prefer dryRun=true before mutations; destructive operations require force=true.',
     inputSchema,
-    async ({ source, command, dryRun = false, force = false, timeout, rest = false }) => {
+    async ({ source, command, dryRun = false, force = false, timeout, rest = false }, extra = {}) => {
       if ((source === undefined) === (command === undefined)) {
         throw Object.assign(new Error('Exactly one of source or command is required.'), { code: 'MCP_INPUT_REQUIRED', exitCode: 2 });
       }
@@ -29,6 +29,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       const mode = source === undefined ? 'command' : 'source';
       const effectiveTimeout = timeout ?? limits.timeout;
       validateTimeout(effectiveTimeout);
+      enforceScope({ source, command, dryRun, force }, extra);
       // Direct commands use the CLI spelling; source evaluation also consumes
       // the camelCase API option when constructing the Discord facade.
       const options = { dry_run: dryRun, dryRun, yes: force, rest };
@@ -74,4 +75,27 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       }
     },
   );
+}
+
+function enforceScope({ source, command, dryRun, force }, extra) {
+  const scopes = extra.mcpAuth?.scopes || extra._meta?.mcpAuth?.scopes;
+  if (!Array.isArray(scopes)) return;
+  const required = source !== undefined ? (force ? 'discord:admin' : dryRun ? 'discord:read' : 'discord:write') : commandScope(command, { dryRun, force });
+  if (!hasScope(extra, required)) {
+    throw Object.assign(new Error(`Missing scope: ${required}`), { code: 'MCP_SCOPE_REQUIRED', exitCode: 5, details: { scope: required } });
+  }
+}
+
+function hasScope(extra, scope) {
+  const scopes = extra.mcpAuth?.scopes || extra._meta?.mcpAuth?.scopes || [];
+  return scopes.includes(scope);
+}
+
+function commandScope(command = [], { dryRun, force }) {
+  const action = String(command[1] || '').toLowerCase();
+  const destructive = ['delete', 'remove', 'kick', 'ban', 'unban', 'bulk-delete', 'leave'].includes(action);
+  const mutating = ['create', 'update', 'set', 'add', 'send', 'edit', 'react', 'pin', 'unpin', 'join', 'move', 'archive', 'timeout'].includes(action);
+  if (force && destructive) return 'discord:admin';
+  if (dryRun || (!mutating && !destructive)) return 'discord:read';
+  return 'discord:write';
 }
