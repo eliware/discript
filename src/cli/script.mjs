@@ -26,10 +26,14 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
     const registerTimer = (delay, callback, repeating) => {
       const milliseconds = Number(delay);
       if (!Number.isInteger(milliseconds) || milliseconds < 1) throw Object.assign(new Error('Timer delay must be a positive integer in milliseconds.'), { code: 'INVALID_TIMER', exitCode: 2 });
-      const timer = repeating ? setInterval(() => { void callback(); }, milliseconds) : setTimeout(() => { void callback(); }, milliseconds);
+      const timer = repeating ? setInterval(() => { if (!signal?.aborted) void callback(); }, milliseconds) : setTimeout(() => { if (!signal?.aborted) void callback(); }, milliseconds);
       timers.add(timer);
       let active = true;
-      return { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true, cancel: () => { if (!active) return false; active = false; clearTimeout(timer); clearInterval(timer); timers.delete(timer); return true; } };
+      let registration;
+      const cancel = () => { if (!active) return false; active = false; clearTimeout(timer); clearInterval(timer); timers.delete(timer); handlerCount -= 1; signal?.removeEventListener('abort', cancel); return true; };
+      registration = { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true, cancel };
+      signal?.addEventListener('abort', cancel, { once: true });
+      return registration;
     };
     const baseDir = input.origin && !['eval', 'stdin'].includes(input.origin) ? dirname(resolve(input.origin)) : process.cwd();
     const rest = options.rest === true
@@ -62,7 +66,9 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
         eventHandlers.add(registration);
         handlerCount += 1;
         let active = true;
-        return { event: eventName, registered: true, cancel: () => { if (!active) return false; active = false; runtime.client.off(eventName, handler); eventHandlers.delete(registration); return true; } };
+        const cancel = () => { if (!active) return false; active = false; runtime.client.off(eventName, handler); eventHandlers.delete(registration); handlerCount -= 1; signal?.removeEventListener('abort', cancel); return true; };
+        signal?.addEventListener('abort', cancel, { once: true });
+        return { event: eventName, registered: true, cancel };
       },
       every: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, true); },
       after: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, false); },

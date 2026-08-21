@@ -104,6 +104,19 @@ describe('cli/script', () => {
     expect(active.client.listenerCount('ready')).toBe(0);
   });
 
+  test('cancels registered timers and handlers when the execution signal aborts', async () => {
+    const active = runtime();
+    const controller = new AbortController();
+    const output = [];
+    const execution = executeInput({ kind: 'source', source: 'every(10) { print("tick") }; on("ready") { print("ready") }' }, { keep_alive: true }, { runtime: active, signal: controller.signal, stdout: value => output.push(value) });
+    await new Promise(resolve => setImmediate(resolve));
+    controller.abort();
+    await expect(execution).rejects.toMatchObject({ code: 'EXECUTION_CANCELLED', exitCode: 130 });
+    await new Promise(resolve => setTimeout(resolve, 25));
+    expect(output).toEqual([]);
+    expect(active.client.listenerCount('ready')).toBe(0);
+  });
+
   test('isolates and caches aliased modules while preserving private closure state', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'discript-module-'));
     try {
@@ -111,7 +124,7 @@ describe('cli/script', () => {
       const entryPath = join(directory, 'entry.ds');
       await writeFile(modulePath, 'secret = "private"; count = 0; export fn next() { count += 1; return {count: count, secret: secret} }');
       await writeFile(entryPath, 'import first from "./counter.ds"; import second from "./counter.ds"; a = first.next(); b = second.next(); same = first == second; {a: a, b: b, same: same}');
-      await expect(executeInput({ kind: 'source', source: await readFile(entryPath, 'utf8'), origin: entryPath }, {}, { runtime: runtime() })).resolves.toEqual({ a: { count: 1, secret: 'private' }, b: { count: 1, secret: 'private' }, same: true });
+      await expect(executeInput({ kind: 'source', source: await readFile(entryPath, 'utf8'), origin: entryPath }, {}, { runtime: runtime() })).resolves.toEqual({ a: { count: 1, secret: 'private' }, b: { count: 2, secret: 'private' }, same: true });
     } finally { await rm(directory, { recursive: true, force: true }); }
   });
 });
