@@ -1,0 +1,4 @@
+// In hybrid mode local CLI calls use the socket while remote agents use MCP.
+guilds = discord.guilds.list()
+{transportNeutral: true, guilds: guilds}
+

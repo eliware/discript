@@ -1,0 +1,5 @@
+// Invite lifecycle: inspect existing invites before creating or removing one.
+guild = discord.guilds.get(env.TEST_GUILD)
+invites = guild.invites.list()
+{guildId: guild.id, inviteCount: invites.length, invites: invites}
+

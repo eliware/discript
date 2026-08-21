@@ -1,0 +1,7 @@
+// Independent reads can be launched together with parallel to reduce waiting.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+roles = guild.roles.list()
+members = guild.members.list()
+reports = parallel(channels, roles, members)
+{channels: channels, roles: roles, members: members, parallelResults: reports}

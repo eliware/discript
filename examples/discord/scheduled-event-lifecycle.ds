@@ -1,0 +1,5 @@
+// Scheduled events are structured resources: list them before planning changes.
+guild = discord.guilds.get(env.TEST_GUILD)
+events = guild.scheduledEvents.list()
+{guildId: guild.id, events: events}
+

@@ -1,0 +1,10 @@
+// Find an existing channel before creating one, making reruns safe to reason about.
+guild = discord.guilds.get(env.TEST_GUILD)
+name = env.DISCRIPT_CHANNEL_NAME
+existing = find(guild.channels.list(), "name", name)
+if (existing != null) {
+  {created: false, channel: existing}
+} else {
+  guild.channels.create(name, {dryRun: true, type: "text"})
+}
+

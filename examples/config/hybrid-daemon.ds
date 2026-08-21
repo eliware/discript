@@ -1,0 +1,3 @@
+// The daemon profile is configured in the environment, not repeated on each call.
+{connectionMode: env.DISCRIPT_CONNECTION_MODE, daemonMode: env.DISCRIPT_DAEMON_MODE, mcpTransport: env.DISCRIPT_MCP_TRANSPORT}
+

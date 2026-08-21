@@ -1,0 +1,6 @@
+// Cache a guild lookup in a variable instead of resolving the same guild repeatedly.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+roles = guild.roles.list()
+{guildId: guild.id, channelCount: channels.length, roleCount: roles.length}
+

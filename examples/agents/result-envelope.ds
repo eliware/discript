@@ -1,0 +1,13 @@
+// Shape a stable result envelope for an AI agent or shell consumer.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+result = try {
+  guild = discord.guilds.get(guildId)
+  {ok: true, value: {id: guild.id, name: guild.name}}
+} catch (error) {
+  {ok: false, error: {code: error.code, message: error.message}}
+}
+result
+

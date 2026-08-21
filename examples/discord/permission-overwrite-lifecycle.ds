@@ -1,0 +1,6 @@
+// Permission overwrites can be previewed, applied, and removed independently.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+target = env.DISCRIPT_ROLE_ID
+preview = channel.permissions.set(target, {allow: ["ViewChannel"], deny: ["SendMessages"]}, {dryRun: true})
+{channelId: channel.id, target: target, preview: preview}
+

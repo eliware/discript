@@ -1,0 +1,5 @@
+// Member voice controls use the same guarded dry-run pattern as other mutations.
+guild = discord.guilds.get(env.TEST_GUILD)
+member = guild.members.get(env.DISCRIPT_USER_ID)
+{mute: member.voice.mute(true, {dryRun: true}), deafen: member.voice.deafen(true, {dryRun: true})}
+

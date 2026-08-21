@@ -1,0 +1,14 @@
+// Preview first. Apply only when the caller explicitly sets the approval flag.
+guildId = env.TEST_GUILD
+channelName = env.DISCRIPT_CHANNEL_NAME
+if (guildId == null || channelName == null) {
+  exit(2, "set TEST_GUILD and DISCRIPT_CHANNEL_NAME")
+}
+approved = env.DISCRIPT_APPLY == "true"
+if (approved) {
+  options = {force: true}
+} else {
+  options = {dryRun: true}
+}
+guild = discord.guilds.get(guildId)
+guild.channels.create(channelName, options)

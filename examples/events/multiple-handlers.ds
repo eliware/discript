@@ -1,0 +1,8 @@
+// Multiple handlers can watch different events while one process remains alive.
+on("messageCreate") {
+  print({event: "messageCreate", id: event.id})
+}
+on("guildMemberAdd") {
+  print({event: "guildMemberAdd", id: event.id})
+}
+

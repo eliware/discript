@@ -1,0 +1,5 @@
+/* Block comments can span lines and are useful for longer teaching notes.
+   They can also appear between expressions without changing the program. */
+value = /* inline explanation */ 21 * 2
+value
+

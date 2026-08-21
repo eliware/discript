@@ -1,0 +1,10 @@
+// Keep created resources in variables so a later failure can trigger cleanup.
+guild = discord.guilds.get(env.TEST_GUILD)
+created = guild.channels.create("discript-staging", {dryRun: true, type: "text"})
+result = try {
+  {created: created, next: "continue deployment"}
+} catch (error) {
+  {created: created, rollback: true, error: error.code}
+}
+result
+

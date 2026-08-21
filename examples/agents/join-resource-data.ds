@@ -1,0 +1,6 @@
+// Join two resource collections by projecting each into a compact report.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+roles = guild.roles.list()
+{guild: {id: guild.id, name: guild.name}, channels: channels, roles: roles}
+

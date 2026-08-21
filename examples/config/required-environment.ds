@@ -1,0 +1,7 @@
+// Fail clearly when a deployment-specific variable has not been configured.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+{configured: true, guildId: guildId}
+

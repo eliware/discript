@@ -1,0 +1,4 @@
+// Message CRUD: list, inspect, edit, react, pin, and delete are separate operations.
+channelId = env.DISCRIPT_CHANNEL_ID
+messages = discord.channels.get(channelId).messages.list({limit: 5})
+{count: messages.length, messages: messages}

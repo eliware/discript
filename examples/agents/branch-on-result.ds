@@ -1,0 +1,12 @@
+// Branch on a recoverable operation instead of aborting the whole workflow.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "set TEST_GUILD")
+}
+result = try { discord.guilds.get(guildId) } catch (error) { error }
+if (result.code != null) {
+  print({ok: false, code: result.code})
+} else {
+  print({ok: true, guildId: result.id})
+}
+

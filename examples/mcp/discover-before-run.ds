@@ -1,0 +1,4 @@
+// MCP clients should discover tools/resources first, then submit this read-only source.
+guilds = discord.guilds.list()
+{operation: "inventory", safe: true, guildCount: guilds.length}
+

@@ -1,0 +1,6 @@
+// Functions may return values that come from asynchronous Discord operations.
+fn identity(value) {
+  return value
+}
+identity({ready: true})
+

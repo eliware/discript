@@ -1,0 +1,6 @@
+// Environment writes affect the current Node process and can be cleared again.
+env.set("DISCRIPT_EXAMPLE_VALUE", "temporary")
+beforeClear = env.get("DISCRIPT_EXAMPLE_VALUE")
+env.clear("DISCRIPT_EXAMPLE_VALUE")
+{beforeClear: beforeClear, afterClear: env.get("DISCRIPT_EXAMPLE_VALUE")}
+

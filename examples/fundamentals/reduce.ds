@@ -1,0 +1,4 @@
+// Reduce turns a collection into one value by carrying an accumulator forward.
+numbers = [2, 4, 6, 8]
+total = reduce(numbers, item => item, 0)
+{count: numbers.length, total: total}

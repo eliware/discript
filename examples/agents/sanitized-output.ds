@@ -1,0 +1,4 @@
+// Emit only fields an agent needs; avoid printing raw Discord objects or secrets.
+guild = discord.guilds.get(env.TEST_GUILD)
+{id: guild.id, name: guild.name, channelCount: guild.channels.list().length}
+

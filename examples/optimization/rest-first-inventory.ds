@@ -1,0 +1,6 @@
+// REST-first inventory avoids a new Gateway session for supported read operations.
+if (env.TEST_GUILD == null) {
+  exit(2, "set TEST_GUILD")
+}
+discord.rest.guilds.get(env.TEST_GUILD).info()
+

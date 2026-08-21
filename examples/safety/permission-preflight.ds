@@ -1,0 +1,5 @@
+// Use --validate with this dry-run plan to check the target before mutation.
+guild = discord.guilds.get(env.TEST_GUILD)
+channel = guild.channels.list()[0]
+{target: {guildId: guild.id, channelId: channel.id}, plan: {dryRun: true, action: "send"}}
+

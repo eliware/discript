@@ -1,0 +1,6 @@
+// JSON helpers are intentionally explicit so scripts can exchange portable data.
+payload = {name: "discript", enabled: true, values: [1, 2, 3]}
+encoded = json.stringify(payload)
+decoded = json.parse(encoded)
+{encoded: encoded, decoded: decoded}
+

@@ -1,0 +1,4 @@
+// This source is suitable for a remote run_discript MCP call; keep output compact.
+guilds = discord.guilds.list()
+print({count: guilds.length, guilds: guilds})
+

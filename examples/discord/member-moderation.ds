@@ -1,0 +1,6 @@
+// Moderation is explicit and guarded; use dryRun first and force only when approved.
+guild = discord.guilds.get(env.TEST_GUILD)
+member = guild.members.get(env.DISCRIPT_USER_ID)
+plan = member.timeout(60000, "temporary policy check", {dryRun: true})
+{member: member.id, plan: plan}
+

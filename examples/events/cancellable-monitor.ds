@@ -1,0 +1,8 @@
+// Long-running handlers should have an operational stop path supplied by the caller.
+on("messageCreate") {
+  print({event: "messageCreate", content: event.content})
+}
+every(60000) {
+  print({status: "monitoring"})
+}
+
