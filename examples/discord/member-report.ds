@@ -4,3 +4,7 @@ members = discord.guilds.get(guildId).members.list()
 for (member in members) {
   print({id: member.id, name: member.username, bot: member.bot})
 }
+// Mini tutorial: member report.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/member-report.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

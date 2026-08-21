@@ -11,3 +11,7 @@ if (guild.id != guildId || channel.id != channelId) {
 }
 print({ok: true, guildId: guild.id, channelId: channel.id, channelName: channel.name})
 exit(0, "healthy")
+// Mini tutorial: agent health check.
+// This example demonstrates agent-friendly input, structured output, and safe automation.
+// Run it with: discript examples/agent/agent-health-check.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

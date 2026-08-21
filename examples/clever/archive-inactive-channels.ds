@@ -28,3 +28,7 @@ if (apply) {
   mode = "applied"
 }
 print({mode: mode, archive: archive, requested: names})
+// Mini tutorial: archive inactive channels.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/archive-inactive-channels.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

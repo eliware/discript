@@ -5,3 +5,7 @@ empty = null
 profile = {name: name, version: version, enabled: enabled}
 values = [name, version, enabled, empty, profile]
 values
+// Mini tutorial: values.
+// This example demonstrates core Discript syntax and runtime behavior.
+// Run it with: discript examples/fundamentals/values.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

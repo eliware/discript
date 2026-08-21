@@ -3,3 +3,7 @@ targetId = "<role-or-user-id>"
 
 preview = discord.channels.get(channelId).permissions.set(targetId, {allow: ["ViewChannel", "SendMessages"], deny: ["ManageMessages"], dryRun: true})
 preview
+// Mini tutorial: permissions preview.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/permissions-preview.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

@@ -2,3 +2,7 @@ guildId = "<guild-id>"
 invites = discord.guilds.get(guildId).invites.list()
 events = discord.guilds.get(guildId).scheduledEvents.list()
 {invites: invites, scheduledEvents: events}
+// Mini tutorial: invites events.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/invites-events.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

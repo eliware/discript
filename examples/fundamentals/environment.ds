@@ -7,3 +7,7 @@ if (mode == null) {
 print({mode: env.DISCRIPT_MODE})
 env.set("DISCRIPT_LAST_RUN", "environment-example")
 env.clear("DISCRIPT_TEMP")
+// Mini tutorial: environment.
+// This example demonstrates core Discript syntax and runtime behavior.
+// Run it with: discript examples/fundamentals/environment.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

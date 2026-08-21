@@ -1,3 +1,7 @@
 // Independent operations can run concurrently.
 results = parallel(sleep(20), sleep(10), sleep(5))
 print(results)
+// Mini tutorial: parallel.
+// This example demonstrates core Discript syntax and runtime behavior.
+// Run it with: discript examples/fundamentals/parallel.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

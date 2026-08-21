@@ -5,3 +5,7 @@ on("guildMemberUpdate") {
 every(60000) {
   print({status: "audit-monitoring"})
 }
+// Mini tutorial: moderation audit.
+// This example demonstrates Gateway event handlers and timers.
+// Run it with: discript examples/events/moderation-audit.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

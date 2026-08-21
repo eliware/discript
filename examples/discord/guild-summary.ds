@@ -5,3 +5,7 @@ roles = guild.roles.list()
 channels = guild.channels.list()
 
 {guild: {id: guild.id, name: guild.name}, memberCount: members.length, roleCount: roles.length, channelCount: channels.length}
+// Mini tutorial: guild summary.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/guild-summary.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

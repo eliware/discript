@@ -6,3 +6,7 @@ every(30000) {
   bot = discord.bot.get()
   print({status: "healthy", bot: bot.username})
 }
+// Mini tutorial: heartbeat.
+// This example demonstrates Gateway event handlers and timers.
+// Run it with: discript examples/events/heartbeat.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

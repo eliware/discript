@@ -17,3 +17,7 @@ deletedVoice = discord.channels.get(voice.id).delete({force: true})
 deletedCategory = discord.channels.get(category.id).delete({force: true})
 
 {category: category, voice: voice, moved: moved, deletedVoice: deletedVoice, deletedCategory: deletedCategory}
+// Mini tutorial: mutation category voice lifecycle.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/mutation-category-voice-lifecycle.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

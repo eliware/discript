@@ -18,3 +18,7 @@ deletedMessage = discord.messages.delete(created.id, message.id, {force: true})
 deletedChannel = discord.channels.get(created.id).delete({force: true})
 
 {created: created, edited: edited, deletedMessage: deletedMessage, deletedChannel: deletedChannel}
+// Mini tutorial: mutation channel lifecycle.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/mutation-channel-lifecycle.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

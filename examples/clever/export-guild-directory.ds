@@ -13,3 +13,7 @@ directory = {
   invites: guild.invites.list()
 }
 print(directory)
+// Mini tutorial: export guild directory.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/export-guild-directory.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

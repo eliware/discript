@@ -9,3 +9,7 @@ for (guild in guilds) {
   }
   print(result)
 }
+// Mini tutorial: resilient guild inventory.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/resilient-guild-inventory.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

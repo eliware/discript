@@ -6,3 +6,7 @@ first = greet("Discord", "!")
 second = greet("agent", ".")
 print(first)
 second
+// Mini tutorial: functions.
+// This example demonstrates core Discript syntax and runtime behavior.
+// Run it with: discript examples/fundamentals/functions.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

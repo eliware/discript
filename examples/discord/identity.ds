@@ -1,3 +1,7 @@
 // Read-only bot identity lookup.
 bot = discord.bot.get()
 print({id: bot.id, username: bot.username})
+// Mini tutorial: identity.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/identity.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

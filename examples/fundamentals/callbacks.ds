@@ -4,3 +4,7 @@ large = filter(doubled, number => number > 4)
 total = large.length
 
 {doubled: doubled, large: large, total: total}
+// Mini tutorial: callbacks.
+// This example demonstrates core Discript syntax and runtime behavior.
+// Run it with: discript examples/fundamentals/callbacks.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

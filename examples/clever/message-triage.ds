@@ -11,3 +11,7 @@ on("messageCreate") {
     })
   }
 }
+// Mini tutorial: message triage.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/message-triage.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

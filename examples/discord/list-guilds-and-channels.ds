@@ -4,3 +4,7 @@ for (guild in guilds) {
   channels = discord.guilds.get(guild.id).channels.list()
   print({guildId: guild.id, channels: channels})
 }
+// Mini tutorial: list guilds and channels.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/list-guilds-and-channels.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

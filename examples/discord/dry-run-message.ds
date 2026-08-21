@@ -1,3 +1,7 @@
 channelId = "<channel-id>"
 preview = discord.channels.get(channelId).send("This message is only a preview", {dryRun: true})
 preview
+// Mini tutorial: dry run message.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/dry-run-message.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

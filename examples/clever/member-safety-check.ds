@@ -16,3 +16,7 @@ if (member.bot == true) {
   decision = {target: decision.target, allowed: true, reason: "eligible-for-human-review"}
 }
 print(decision)
+// Mini tutorial: member safety check.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/member-safety-check.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

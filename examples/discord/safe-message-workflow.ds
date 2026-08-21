@@ -14,3 +14,7 @@ if (approval.ok == false) {
   exit(approval.error.exitCode, "message was not sent")
 }
 approval
+// Mini tutorial: safe message workflow.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/safe-message-workflow.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

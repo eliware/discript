@@ -5,3 +5,7 @@ if (guildId == null) {
 }
 guild = discord.guilds.get(guildId)
 print({guild: {id: guild.id, name: guild.name}, roles: guild.roles.list(), channels: guild.channels.list(), members: guild.members.list()})
+// Mini tutorial: backup guild.
+// This example demonstrates agent-friendly input, structured output, and safe automation.
+// Run it with: discript examples/agent/backup-guild.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

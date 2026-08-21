@@ -8,3 +8,7 @@ guild = discord.guilds.get(guildId)
 channels = guild.channels.list()
 roles = guild.roles.list()
 print({plan: "inventory", guild: {id: guild.id, name: guild.name}, channelCount: channels.length, roleCount: roles.length, channels: channels, roles: roles})
+// Mini tutorial: stdin plan.
+// This example demonstrates agent-friendly input, structured output, and safe automation.
+// Run it with: discript examples/agent/stdin-plan.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

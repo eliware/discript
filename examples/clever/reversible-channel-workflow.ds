@@ -18,3 +18,7 @@ if (env.DISCORD_CLEANUP == "true") {
   deleted = discord.channels.get(created.id).delete({force: true})
   print({phase: "cleaned-up", result: deleted})
 }
+// Mini tutorial: reversible channel workflow.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/reversible-channel-workflow.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

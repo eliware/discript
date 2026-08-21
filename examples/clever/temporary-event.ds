@@ -35,3 +35,7 @@ if (apply) {
   mode = "applied"
 }
 print({mode: mode, category: category, chat: chat, voice: voice})
+// Mini tutorial: temporary event.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/temporary-event.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

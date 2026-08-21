@@ -18,3 +18,7 @@ updatedWebhook = channel.webhooks.update(webhook.id, {name: "discript-webhook-up
 deletedWebhook = channel.webhooks.delete(webhook.id, {force: true})
 
 {thread: {created: thread, updated: updatedThread, deleted: deletedThread}, webhook: {created: webhook, updated: updatedWebhook, deleted: deletedWebhook}}
+// Mini tutorial: mutation webhook thread lifecycle.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/mutation-webhook-thread-lifecycle.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

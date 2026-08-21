@@ -15,3 +15,7 @@ print({
   channels: channels,
   roles: roles
 })
+// Mini tutorial: incident snapshot.
+// This example demonstrates composition, decision-making, and resilient workflows.
+// Run it with: discript examples/clever/incident-snapshot.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

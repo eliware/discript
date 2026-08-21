@@ -6,3 +6,7 @@ on("messageCreate") {
 every(60000) {
   print({kind: "heartbeat", status: "waiting"})
 }
+// Mini tutorial: jsonl monitor.
+// This example demonstrates agent-friendly input, structured output, and safe automation.
+// Run it with: discript examples/agent/jsonl-monitor.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

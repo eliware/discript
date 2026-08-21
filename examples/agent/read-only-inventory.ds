@@ -7,3 +7,7 @@ for (guild in guilds) {
     roles: discord.guilds.get(guild.id).roles.list()
   })
 }
+// Mini tutorial: read only inventory.
+// This example demonstrates agent-friendly input, structured output, and safe automation.
+// Run it with: discript examples/agent/read-only-inventory.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

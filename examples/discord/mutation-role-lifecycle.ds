@@ -15,3 +15,7 @@ updated = guild.roles.get(created.id).update({name: "discript-role-updated-" + r
 deleted = guild.roles.get(created.id).delete({force: true})
 
 {created: created, updated: updated, deleted: deleted}
+// Mini tutorial: mutation role lifecycle.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/mutation-role-lifecycle.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

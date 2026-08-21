@@ -4,3 +4,7 @@ guilds = discord.guilds.list()
 for (guild in guilds) {
   print(formatGuild(guild))
 }
+// Mini tutorial: imported functions.
+// This example demonstrates reusable functions and imported scripts.
+// Run it with: discript examples/composition/imported-functions.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

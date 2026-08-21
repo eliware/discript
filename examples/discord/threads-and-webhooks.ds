@@ -2,3 +2,7 @@ channelId = "<channel-id>"
 threads = discord.channels.get(channelId).threads.list()
 webhooks = discord.channels.get(channelId).webhooks.list()
 {threads: threads, webhooks: webhooks}
+// Mini tutorial: threads and webhooks.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/threads-and-webhooks.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

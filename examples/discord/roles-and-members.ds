@@ -7,3 +7,7 @@ for (role in roles) {
 memberId = "<user-id>"
 member = discord.guilds.get(guildId).members.get(memberId)
 member
+// Mini tutorial: roles and members.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/roles-and-members.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

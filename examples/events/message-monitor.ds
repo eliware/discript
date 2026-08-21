@@ -3,3 +3,7 @@ on("messageCreate") {
     print({channelId: event.channelId, authorId: event.author.id, content: event.content})
   }
 }
+// Mini tutorial: message monitor.
+// This example demonstrates Gateway event handlers and timers.
+// Run it with: discript examples/events/message-monitor.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

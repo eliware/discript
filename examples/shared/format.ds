@@ -1,3 +1,7 @@
 fn formatGuild(guild) {
   return {id: guild.id, label: guild.name}
 }
+// Mini tutorial: format.
+// This example demonstrates shared script utilities.
+// Run it with: discript examples/shared/format.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.

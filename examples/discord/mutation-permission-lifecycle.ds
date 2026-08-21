@@ -16,3 +16,7 @@ removed = discord.channels.get(channel.id).permissions.delete(targetId, {force: 
 deleted = discord.channels.get(channel.id).delete({force: true})
 
 {channel: channel, overwrite: overwrite, removed: removed, deleted: deleted}
+// Mini tutorial: mutation permission lifecycle.
+// This example demonstrates Discord API operations with safety controls.
+// Run it with: discript examples/discord/mutation-permission-lifecycle.ds (or pipe it to discript for stdin mode).
+// Read the final value and comments together to follow the data flow.
