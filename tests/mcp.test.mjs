@@ -63,7 +63,7 @@ describe('MCP run_discript tool', () => {
     await tool.handler({ command: ['roles', 'delete'], force: true, dryRun: false });
     expect(executeInput).toHaveBeenLastCalledWith(
       { kind: 'command', command: ['roles', 'delete'] },
-      { dry_run: false, dryRun: false, yes: true, rest: false },
+      { dry_run: false, dryRun: false, yes: true, rest: true },
       { runtime: undefined, signal: expect.any(AbortSignal) },
     );
   });
