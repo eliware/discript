@@ -21,3 +21,5 @@ DISCRIPT_CLIENT_ARGS=["mcp","--stdio"]
 ```
 
 Inspect capabilities with `discript mcp-client inspect`, list individual capability classes with `list-tools`, `list-resources`, or `list-prompts`, and invoke them with `call`, `read-resource`, or `get-prompt`. Use `run` with stdin to stream source without creating a temporary file.
+
+The programmatic `runRemoteDiscript()` API returns normalized Discript JSON: `{ ok, requestId, exitCode, value, warnings, diagnostics }` for successful execution. Remote failures preserve the Discript error code and exit code. The CLI applies its normal human-readable, JSON, or JSONL formatting locally; it does not expose raw MCP envelopes as the execution contract.

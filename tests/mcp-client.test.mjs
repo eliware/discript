@@ -34,8 +34,8 @@ describe('MCP client mode', () => {
   });
 
   test('normalizes standard MCP text tool results', async () => {
-    const client = { callTool: jest.fn(async () => ({ content: [{ type: 'text', text: JSON.stringify({ ok: true, exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] }) }] })), close: jest.fn(async () => {}) };
-    await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['guilds', 'list'], clientFactory: async () => client })).resolves.toMatchObject({ ok: true, exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] });
+    const client = { callTool: jest.fn(async () => ({ content: [{ type: 'text', text: JSON.stringify({ ok: true, requestId: 'request-1', exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] }) }] })), close: jest.fn(async () => {}) };
+    await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['guilds', 'list'], clientFactory: async () => client })).resolves.toEqual({ ok: true, requestId: 'request-1', exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] });
   });
 
   test('preserves remote failures and exit codes', async () => {

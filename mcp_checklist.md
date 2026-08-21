@@ -85,7 +85,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Support piping Discript source into the remote client without temporary files.
 - [ ] Support client-side static tokens, async token providers, custom headers, and OAuth/PKCE integration where selected. Static tokens and custom headers are complete; async providers and OAuth/PKCE remain pending.
 - [x] Add remote execution examples for local agents, CI harnesses, and multi-host Discord automation.
-- [ ] Define whether remote execution returns raw MCP JSON, normalized Discript JSON, JSONL, or human-readable output.
+- [x] Define whether remote execution returns raw MCP JSON, normalized Discript JSON, JSONL, or human-readable output. The programmatic client returns normalized Discript JSON; CLI formatting remains local.
 - [x] Preserve remote MCP errors, Discript exit codes, and authentication failures in the local CLI contract.
 
 ## Phase 7 — Security, operations, and observability
