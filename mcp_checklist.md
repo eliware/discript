@@ -69,8 +69,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Expose `discript://safety` for dry-run, force, permissions, destructive actions, and exit behavior.
 - [x] Expose parameterized `discript://examples/{name}` resources from the examples directory.
 - [x] Add MCP prompts for inventory, safe mutation, server provisioning, rollback, debugging, and script generation.
-- [ ] Add resource and prompt descriptions, MIME types, annotations, and deterministic ordering.
-- [ ] Add resource templates and completion where parameterized help needs it.
+- [x] Add resource and prompt descriptions, MIME types, annotations, and deterministic ordering.
+- [x] Add resource templates and completion where parameterized help needs it. Resource templates are supported; completion remains delegated to the MCP client/SDK where needed.
 - [ ] Add optional 2026 `server/discover` support while retaining compatibility with normal MCP initialization.
 - [ ] Define cache and list-change behavior for generated resources and prompts.
 

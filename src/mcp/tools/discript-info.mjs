@@ -23,9 +23,9 @@ const staticResources = {
 
 export default function registerDiscriptInfo({ mcpServer }) {
   for (const [uri, resource] of Object.entries(staticResources)) {
-    mcpServer.registerResource(resource.name, uri, { title: resource.title, description: resource.description, mimeType: resource.mimeType }, async requestedUri => ({ contents: [{ uri: requestedUri.toString(), mimeType: resource.mimeType, text: resource.text }] }));
+    mcpServer.registerResource(resource.name, uri, { title: resource.title, description: resource.description, mimeType: resource.mimeType, annotations: { audience: ['assistant'], priority: 0.8 } }, async requestedUri => ({ contents: [{ uri: requestedUri.toString(), mimeType: resource.mimeType, text: resource.text }] }));
   }
-  mcpServer.registerResource('discript-example', { uriTemplate: 'discript://examples/{name}', name: 'discript-example', description: 'A Discript example script by filename.' }, { title: 'Discript example', description: 'Read a packaged Discript example.', mimeType: 'text/plain' }, async (uri, variables) => {
+  mcpServer.registerResource('discript-example', { uriTemplate: 'discript://examples/{name}', name: 'discript-example', description: 'A Discript example script by filename.' }, { title: 'Discript example', description: 'Read a packaged Discript example.', mimeType: 'text/plain', annotations: { audience: ['assistant'], priority: 0.7 } }, async (uri, variables) => {
     const name = String(variables.name).replaceAll('..', '');
     const file = join(projectRoot, 'examples', name.endsWith('.ds') ? name : `${name}.ds`);
     return { contents: [{ uri: uri.toString(), mimeType: 'text/plain', text: await readFile(file, 'utf8') }] };

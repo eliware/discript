@@ -8,6 +8,7 @@ describe('MCP Discript information resources and prompts', () => {
     expect(server.registerResource).toHaveBeenCalledTimes(5);
     expect(server.registerResource.mock.calls.map(call => call[1])).toEqual(['discript://help', 'discript://commands', 'discript://language', 'discript://safety', { uriTemplate: 'discript://examples/{name}', name: 'discript-example', description: 'A Discript example script by filename.' }]);
     expect(server.registerPrompt).toHaveBeenCalledTimes(6);
+    expect(server.registerResource.mock.calls[0][2]).toMatchObject({ mimeType: 'text/markdown', annotations: { audience: ['assistant'] } });
   });
 
   test('resource and prompt callbacks return MCP-shaped content', async () => {
