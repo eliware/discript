@@ -115,7 +115,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 ## Phase 9 — Documentation, packaging, and release
 
-- [ ] Add CLI help, command discovery, shell completion, specs, and release notes for server and client modes.
+- [x] Add CLI help, command discovery, shell completion, specs, and release notes for server and client modes. Existing global help, command catalog, shell completion, specs, and `docs/mcp/cli-reference.md` cover server/client operation and contracts; publication notes remain part of the final release gate.
 - [x] Add authentication and TLS configuration examples for local, private HTTP, HTTPS, and OAuth2 deployments. Added `docs/mcp/deployment-examples.md` with stdio, loopback HTTP, static bearer HTTPS, and OAuth2 introspection profiles.
 - [x] Add packaging checks ensuring MCP dependencies and examples are included correctly. The package smoke check now verifies MCP client/server sources, deployment documentation, examples, and the public spec are present before installing the tarball.
 - [x] Add CI coverage for local stdio, HTTP, HTTPS, authentication, and remote MCP integration. CI runs the dedicated MCP suite on both Linux and Windows in addition to the full test suite.
