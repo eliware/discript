@@ -123,4 +123,11 @@ describe('parse', () => {
     expect(() => parse('if (true) { value = 1')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
     expect(parse('if (true) {}')).toMatchObject({ type: 'Program' });
   });
+
+  test('includes source locations in syntax errors', () => {
+    expect(() => parse('value = 1\nif (true) {\n  broken =\n}')).toThrow(expect.objectContaining({
+      code: 'PARSE_ERROR',
+      details: expect.objectContaining({ line: 4, column: 1 }),
+    }));
+  });
 });
