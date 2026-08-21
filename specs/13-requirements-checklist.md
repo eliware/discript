@@ -71,8 +71,10 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 
 ## Current verification evidence
 
-- [Fully complete] `npm test` passes with 492 tests passed and 9 skipped at the latest local checkpoint.
-- [Fully complete] `npm run docs:check` passes with 114 Markdown files, 66 CLI commands, and 155 parsed examples at the latest local checkpoint.
+- [Fully complete] `npm test` passes with 494 tests passed and 9 skipped at the latest local checkpoint.
+- [Fully complete] Script capability policies, including `DISCRIPT_CAPABILITIES`, read/write/admin enforcement, and script introspection, are implemented and documented.
+- [Fully complete] Language compatibility metadata, feature detection, and version requirements are implemented and documented.
+- [Fully complete] `npm run docs:check` passes with 114 Markdown files, 66 CLI commands, and 157 parsed examples at the latest local checkpoint.
 - [Fully complete] `npm run package:check` passes with an isolated tarball install and packaged `docs/README.md` assertion.
 - [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
 - [Fully complete] Executable documentation tests parse every `.ds` example and execute representative fundamentals.
