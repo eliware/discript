@@ -22,9 +22,11 @@ export function parseArgs(argv = []) {
     else if (token === '--stdio') options.stdio = true;
     else if (token.startsWith('--')) {
       const [rawKey, inlineValue] = token.slice(2).split('=', 2);
-      const key = rawKey.replaceAll('-', '_');
+      const parsedKey = rawKey.replaceAll('-', '_');
+      const key = OPTION_ALIASES[parsedKey] ?? parsedKey;
+      if (!KNOWN_OPTIONS.has(parsedKey) && !KNOWN_OPTIONS.has(key)) throw cliError(`Unknown option: --${rawKey}`, 'UNKNOWN_OPTION', 2);
       if (inlineValue !== undefined) options[key] = inlineValue;
-      else if (['eval', 'timeout', 'duration', 'start', 'reason', 'emoji', 'sticker', 'webhook', 'target', 'allow', 'deny', 'messages', 'invite', 'event', 'guild', 'channel', 'message', 'thread', 'user', 'role', 'content', 'name', 'description', 'topic', 'location', 'event_type', 'output', 'file', 'tags', 'type', 'category', 'parent', 'position', 'limit', 'mcp_port', 'tool', 'arguments', 'uri'].includes(key)) options[key] = requireValue(argv, ++index, `--${rawKey}`);
+      else if (VALUE_OPTIONS.has(key)) options[key] = requireValue(argv, ++index, `--${rawKey}`);
       else options[key] = true;
     } else {
       throw cliError(`Unknown option: ${token}`, 'INVALID_OPTION', 2);
@@ -33,6 +35,10 @@ export function parseArgs(argv = []) {
 
   return { positionals, options };
 }
+
+const VALUE_OPTIONS = new Set(['eval', 'timeout', 'duration', 'start', 'reason', 'emoji', 'sticker', 'webhook', 'target', 'allow', 'deny', 'messages', 'invite', 'event', 'guild', 'channel', 'message', 'thread', 'user', 'role', 'content', 'name', 'description', 'topic', 'location', 'event_type', 'output', 'file', 'tags', 'type', 'category', 'parent', 'position', 'limit', 'mcp_port', 'tool', 'arguments', 'uri']);
+const OPTION_ALIASES = Object.freeze({ guild_id: 'guild', channel_id: 'channel', message_id: 'message', thread_id: 'thread', user_id: 'user', role_id: 'role', webhook_id: 'webhook', event_id: 'event', sticker_id: 'sticker', emoji_id: 'emoji' });
+const KNOWN_OPTIONS = new Set([...VALUE_OPTIONS, ...Object.keys(OPTION_ALIASES), 'help', 'version', 'json', 'jsonl', 'output', 'pretty', 'dry_run', 'validate', 'yes', 'rest', 'broker', 'direct', 'stdio', 'keep_alive']);
 
 function requireValue(argv, index, option) {
   const value = argv[index];

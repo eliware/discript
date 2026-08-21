@@ -5,6 +5,7 @@ import { posix } from 'node:path';
 import { unlink } from 'node:fs/promises';
 import { createDiscordRuntime } from './runtime.mjs';
 import { getGatewaySessionLimits, shouldWaitForGatewayStart } from './gateway-limits.mjs';
+import { createRequestId, executionFailure, executionSuccess } from './execution/result.mjs';
 
 export function brokerEndpoint(token, home = homedir(), os = platform()) {
   const id = createHash('sha256').update(String(token)).digest('hex').slice(0, 20);
@@ -79,34 +80,37 @@ async function brokerEndpointIsActive(endpoint, timeout = 250) {
 }
 
 async function handleBrokerRequest(line, socket, runtime, close) {
+  let requestId = createRequestId();
   try {
     const request = JSON.parse(line);
+    requestId = request.requestId ?? requestId;
     if (request.method === 'status') reply(socket, { ok: true, ready: runtime.client.isReady?.() ?? true });
     else if (request.method === 'shutdown') { reply(socket, { ok: true }); await close?.(); }
     else if (request.method === 'command') {
       const { executeDirectCommand } = await import('./cli/commands/index.mjs');
       const value = await executeDirectCommand(request.command, request.options ?? {}, { runtime });
-      reply(socket, { ok: true, value });
+      reply(socket, executionSuccess(value, { requestId }));
     }
     else if (request.method === 'script') {
       const { executeInput } = await import('./cli/script.mjs');
       const value = await executeInput({ kind: 'source', source: request.source, origin: 'broker' }, request.options ?? {}, { runtime });
-      reply(socket, { ok: true, value });
+      reply(socket, executionSuccess(value, { requestId }));
     }
-    else reply(socket, { ok: false, error: 'Unknown broker method.' });
-  } catch (error) { reply(socket, { ok: false, error: error.message, code: error.code, exitCode: error.exitCode }); }
+    else reply(socket, executionFailure(Object.assign(new Error('Unknown broker method.'), { code: 'UNKNOWN_BROKER_METHOD', exitCode: 2 }), { requestId }));
+  } catch (error) { reply(socket, executionFailure(error, { requestId })); }
 }
 
 function reply(socket, value) { socket.write(`${JSON.stringify(value)}\n`); }
 
 export async function brokerRequest({ token, endpoint = brokerEndpoint(token), method, timeout = 5000, ...payload } = {}) {
   return await new Promise((resolve, reject) => {
+    const requestId = payload.requestId ?? createRequestId();
     const socket = net.createConnection(endpoint);
     let buffer = '';
     const timer = setTimeout(() => { socket.destroy(); reject(Object.assign(new Error(`Gateway broker request timed out after ${timeout}ms.`), { code: 'BROKER_TIMEOUT', exitCode: 6 })); }, timeout);
     socket.setEncoding('utf8');
     socket.on('data', data => { buffer += data; const newline = buffer.indexOf('\n'); if (newline < 0) return; clearTimeout(timer); socket.end(); resolve(JSON.parse(buffer.slice(0, newline))); });
     socket.on('error', error => { clearTimeout(timer); reject(Object.assign(new Error(`Gateway broker is unavailable: ${error.message}`), { code: 'BROKER_UNAVAILABLE', exitCode: 1, cause: error })); });
-    socket.on('connect', () => socket.write(`${JSON.stringify({ method, ...payload })}\n`));
+    socket.on('connect', () => socket.write(`${JSON.stringify({ method, requestId, ...payload })}\n`));
   });
 }

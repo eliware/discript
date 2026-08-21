@@ -97,7 +97,7 @@ async function runBrokerCommand(command, options, stdout) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   const result = await brokerRequest({ token, method: 'command', command, options });
   if (!result.ok) throw Object.assign(new Error(result.error), { code: result.code, exitCode: result.exitCode ?? 1 });
-  if (result.value !== undefined) stdout(result.value);
+  if (result.value !== undefined) writeResult(result.value, options, stdout);
   return result.value;
 }
 
@@ -106,7 +106,7 @@ async function runBrokerScript(source, options, stdout) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   const result = await brokerRequest({ token, method: 'script', source, options });
   if (!result.ok) throw Object.assign(new Error(result.error), { code: result.code, exitCode: result.exitCode ?? 1 });
-  if (result.value !== undefined) stdout(result.value);
+  if (result.value !== undefined) writeResult(result.value, options, stdout);
   return result.value;
 }
 
@@ -116,7 +116,7 @@ async function runDaemon(action, options, stdout) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   if (action === 'start') {
     const broker = await withGatewayRetry(() => startGatewayBroker({ token }));
-    const configuredMcpPort = options.mcp_port ?? (config.daemonMode === 'mcp' ? config.mcp.port : undefined);
+    const configuredMcpPort = options.mcp_port ?? (config.daemonMode === 'mcp' || config.daemonMode === 'hybrid' ? config.mcp.port : undefined);
     if (configuredMcpPort !== undefined && configuredMcpPort !== null) {
       const mcpPort = validateMcpPort(configuredMcpPort);
       const { startMcpServer, closeMcpServer } = await import('./mcp/server.mjs');

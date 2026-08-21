@@ -1,8 +1,7 @@
 import { z, buildResponse } from '@eliware/mcp-server';
-import { randomUUID } from 'node:crypto';
 import { executeInput } from '../../cli/script.mjs';
 import { withTimeout, validateTimeout } from '../../cli/lifecycle.mjs';
-import { structuredError } from '../../errors.mjs';
+import { createRequestId, executionFailure, executionSuccess } from '../../execution/result.mjs';
 
 const inputSchema = {
   source: z.string().min(1).optional().describe('Discript source to evaluate.'),
@@ -25,7 +24,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       }
       const limits = mcpServer.context?.mcpLimits ?? {};
       const log = mcpServer.context?.mcpLog ?? {};
-      const requestId = randomUUID();
+      const requestId = createRequestId();
       const startedAt = Date.now();
       const mode = source === undefined ? 'command' : 'source';
       const effectiveTimeout = timeout ?? limits.timeout;
@@ -45,30 +44,16 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       try {
         release = await limits.limiter?.acquire?.();
         const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal, ...(mcpServer.context?.token !== undefined ? { token: mcpServer.context.token } : {}) }), effectiveTimeout, { onTimeout: () => controller.abort() });
-        const result = {
-          ok: true,
-          requestId,
-          exitCode: 0,
-          value,
+        const result = executionSuccess(value, { requestId,
           warnings: Array.isArray(value?.warnings) ? value.warnings : [],
           diagnostics: Array.isArray(value?.diagnostics) ? value.diagnostics : [],
-        };
+        });
         outcome = result;
         const maxOutputBytes = limits.maxOutputBytes;
         if (maxOutputBytes && Buffer.byteLength(JSON.stringify(result)) > maxOutputBytes) throw Object.assign(new Error(`MCP response exceeded the ${maxOutputBytes}-byte output limit.`), { code: 'MCP_OUTPUT_LIMIT', exitCode: 1 });
         return buildResponse(result);
       } catch (error) {
-        const failure = structuredError(error);
-        const result = {
-          ok: false,
-          requestId,
-          exitCode: failure.exitCode,
-          code: failure.code,
-          error: failure.error,
-          ...(failure.details ? { details: failure.details } : {}),
-          warnings: Array.isArray(error?.warnings) ? error.warnings : [],
-          diagnostics: Array.isArray(error?.diagnostics) ? error.diagnostics : [],
-        };
+        const result = executionFailure(error, { requestId });
         outcome = result;
         return { ...buildResponse(result), isError: true };
       } finally {

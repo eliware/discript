@@ -22,4 +22,15 @@ describe('parseArgs', () => {
       options: { dry_run: true, validate: true },
     });
   });
+
+  test('supports explicit resource ID aliases', () => {
+    expect(parseArgs(['channels', 'list', '--guild-id', '123'])).toEqual({
+      positionals: ['channels', 'list'],
+      options: { guild: '123' },
+    });
+  });
+
+  test('rejects unknown long options', () => {
+    expect(() => parseArgs(['channels', 'list', '--guildd', '123'])).toThrow(expect.objectContaining({ code: 'UNKNOWN_OPTION', exitCode: 2 }));
+  });
 });
