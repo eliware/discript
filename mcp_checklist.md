@@ -40,7 +40,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Preserve Discript error codes in MCP tool failures without exposing tokens or secrets.
 - [x] Add per-request execution timeouts with cancellation and runtime cleanup.
 - [x] Add output-size limits and bounded concurrent execution.
-- [ ] Define behavior for long-running event/timer scripts over MCP.
+- [x] Define behavior for long-running event/timer scripts over MCP. MCP calls are finite by default and clean up registered handlers/timers; `keepAlive: true` retains them until runtime stop or request cancellation/timeout.
 
 ## Phase 4 — Authentication, authorization, and TLS
 

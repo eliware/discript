@@ -23,7 +23,7 @@ describe('MCP run_discript tool', () => {
     expect(JSON.parse(result.content[0].text)).toMatchObject({ ok: true, exitCode: 0 });
     expect(executeInput).toHaveBeenCalledWith(
       { kind: 'source', source: 'guilds = []', origin: 'mcp' },
-      { dry_run: true, dryRun: true, yes: false, rest: true },
+      { dry_run: true, dryRun: true, yes: false, keep_alive: false, keepAlive: false, rest: true },
       { runtime: undefined, signal: expect.any(AbortSignal) },
     );
     expect(JSON.parse(result.content[0].text)).toMatchObject({ warnings: [], diagnostics: [] });

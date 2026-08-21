@@ -9,6 +9,7 @@ const inputSchema = {
   command: z.array(z.string().min(1)).min(1).optional().describe('Direct Discript command tokens, for example ["guilds", "list"].'),
   dryRun: z.boolean().optional().describe('Preview without applying mutations.'),
   force: z.boolean().optional().describe('Approve destructive operations.'),
+  keepAlive: z.boolean().optional().describe('Keep event handlers and timers active until the MCP request ends; defaults to false for finite MCP calls.'),
   timeout: z.number().int().positive().max(300000).optional().describe('Execution timeout in milliseconds.'),
   rest: z.boolean().optional().describe('Prefer REST for supported operations.'),
 };
@@ -18,7 +19,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
     'run_discript',
     'Execute one Discript source program or direct Discord command. Prefer dryRun=true before mutations; destructive operations require force=true.',
     inputSchema,
-    async ({ source, command, dryRun = false, force = false, timeout, rest = false }, extra = {}) => {
+    async ({ source, command, dryRun = false, force = false, keepAlive = false, timeout, rest = false }, extra = {}) => {
       if ((source === undefined) === (command === undefined)) {
         throw Object.assign(new Error('Exactly one of source or command is required.'), { code: 'MCP_INPUT_REQUIRED', exitCode: 2 });
       }
@@ -32,7 +33,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       enforceScope({ source, command, dryRun, force }, extra);
       // Direct commands use the CLI spelling; source evaluation also consumes
       // the camelCase API option when constructing the Discord facade.
-      const options = { dry_run: dryRun, dryRun, yes: force, rest };
+      const options = { dry_run: dryRun, dryRun, yes: force, ...(source !== undefined ? { keep_alive: keepAlive, keepAlive } : {}), rest };
       const input = source === undefined
         ? { kind: 'command', command }
         : { kind: 'source', source, origin: 'mcp' };

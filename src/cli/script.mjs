@@ -12,7 +12,8 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
   const runtime = dependencies.runtime ?? await (async () => { const { createDiscordRuntime } = await import('../runtime.mjs'); return createDiscordRuntime(); })();
   const ownsRuntime = !dependencies.runtime;
   onRuntime(runtime);
-  const timers = new Set();
+    const timers = new Set();
+    const eventHandlers = new Set();
   const signal = dependencies.signal;
   try {
     if (signal?.aborted) throw Object.assign(new Error('Execution was cancelled.'), { code: 'EXECUTION_CANCELLED', exitCode: 130 });
@@ -40,6 +41,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
       on: (eventName, handler) => {
         runtime.client.on(eventName, handler);
+        eventHandlers.add([eventName, handler]);
         handlerCount += 1;
         return { event: eventName, registered: true };
       },
@@ -63,10 +65,20 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
         return evaluate(parse(source), {}, { scope: sharedScope, baseDir: dirname(importedPath) });
       },
     }, { baseDir });
-    if (handlerCount > 0) await runtime.waitForStop();
+    const keepAlive = options.keep_alive ?? options.keepAlive;
+    if (handlerCount > 0 && keepAlive !== false) await waitForStop(runtime, signal);
     return result;
   } finally {
     for (const timer of timers) { clearTimeout(timer); clearInterval(timer); }
+    for (const [eventName, handler] of eventHandlers) runtime.client.off(eventName, handler);
     if (ownsRuntime) await runtime.shutdown();
   }
+}
+
+function waitForStop(runtime, signal) {
+  if (!signal) return runtime.waitForStop();
+  return Promise.race([
+    runtime.waitForStop(),
+    new Promise((_, reject) => signal.addEventListener('abort', () => reject(Object.assign(new Error('Execution was cancelled.'), { code: 'EXECUTION_CANCELLED', exitCode: 130 })), { once: true })),
+  ]);
 }
