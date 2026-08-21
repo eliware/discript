@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.0.10
+
+- Added a focused capability-policy robustness test and corrected empty capability configuration handling.
+- Completed the pre-release validation matrix: full automated tests, lint, audit, package, documentation, direct CLI, socket daemon, MCP stdio, and authenticated HTTPS MCP smokes.
+- Refreshed release verification evidence and continued the public npm release workflow.
+
 ## 1.0.9
 
 - Fixed evaluator member-method binding so native string helpers such as `startsWith` work correctly in scripts.
