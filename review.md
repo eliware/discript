@@ -26,7 +26,7 @@ Result: passed with exit code `0`.
 | `src/evaluator` | 100.00% | 99.26% | 100.00% | 100.00% |
 | `src/parser` | 99.25% | 98.16% | 100.00% | 100.00% |
 
-The suite currently reports 504 passing tests and 9 skipped tests across 82 passing suites, with one live suite skipped unless explicitly enabled.
+The suite currently reports 508 passing tests and 9 skipped tests across 82 passing suites, with the live suite passing when explicitly enabled.
 
 ## Highest-priority attention areas
 

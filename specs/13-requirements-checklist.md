@@ -71,7 +71,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 
 ## Current verification evidence
 
-- [Fully complete] `npm test` passes with 504 tests passed and 9 skipped at the latest local checkpoint.
+- [Fully complete] `npm test` passes with 508 tests passed and 9 skipped at the latest local checkpoint.
 - [Fully complete] Script capability policies, including `DISCRIPT_CAPABILITIES`, read/write/admin enforcement, and script introspection, are implemented and documented.
 - [Fully complete] Language compatibility metadata, feature detection, and version requirements are implemented and documented.
 - [Fully complete] `npm run docs:check` passes with 114 Markdown files, 66 CLI commands, and 157 parsed examples at the latest local checkpoint.
@@ -79,4 +79,4 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
 - [Fully complete] Executable documentation tests parse every `.ds` example and execute representative fundamentals.
 - [Fully complete] CLI command-handler modules have direct operation-level coverage; the command-handler scope reports 100% statements, functions, and lines, with remaining branch gaps in validation/preview/catalog paths.
-- [Fully complete] The live read-only smoke cases were individually verified against the configured `TEST_GUILD`, including guild lookup, runtime lifecycle, dry-run validation, protected moderation, webhook/permission reads, and voice status.
+- [Fully complete] The live read-only smoke cases were verified against the configured `TEST_GUILD`, including guild lookup, runtime lifecycle, dry-run validation, protected moderation, webhook/permission reads, and voice status.
