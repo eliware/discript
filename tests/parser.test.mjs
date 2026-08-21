@@ -93,9 +93,10 @@ describe('parse', () => {
   });
 
   test('parses loop controls and thrown values', () => {
-    expect(parse('while (true) { if (ready) { break } continue }; throw "failed"')).toMatchObject({
+    expect(parse('while (true) { if (ready) { break } continue }; defer cleanup(); throw "failed"')).toMatchObject({
       body: [
         { type: 'WhileStatement' },
+        { type: 'DeferStatement' },
         { type: 'ThrowStatement', value: { type: 'Literal', value: 'failed' } },
       ],
     });

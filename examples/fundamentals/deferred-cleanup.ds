@@ -1,0 +1,12 @@
+/*
+  Deferred cleanup
+
+  Register cleanup immediately after acquiring or creating a resource. The
+  runtime runs deferred callbacks in reverse registration order on success,
+  thrown errors, explicit exit, or cancellation.
+*/
+fn release(name) {
+  print({released: name})
+}
+defer release
+print({phase: "work"})

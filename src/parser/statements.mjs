@@ -26,6 +26,10 @@ export function createStatementParser({ peek, match, take, consume, parseExpress
       take();
       return { type: 'ThrowStatement', value: parseExpression() };
     }
+    if (peek()?.type === 'identifier' && peek().value === 'defer') {
+      take();
+      return { type: 'DeferStatement', value: parseExpression() };
+    }
     if (peek()?.type === 'identifier' && peek().value === 'on') {
       take(); consume('(', 'Expected `(` after `on`.');
       const event = consume('string', 'Expected an event name after `on(`.');

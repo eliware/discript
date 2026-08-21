@@ -15,6 +15,11 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
     if (statement.type === 'BreakStatement') throw new BreakSignal();
     if (statement.type === 'ContinueStatement') throw new ContinueSignal();
     if (statement.type === 'ThrowStatement') throw new ScriptThrow(await evaluateExpression(statement.value));
+    if (statement.type === 'DeferStatement') {
+      const defer = scope.get('defer');
+      if (typeof defer !== 'function') throw runtimeError('Deferred cleanup is unavailable in this execution mode.');
+      return defer(await evaluateExpression(statement.value));
+    }
     if (statement.type === 'Assignment') {
       const value = await evaluateExpression(statement.value);
       const operator = statement.operator ?? '=';

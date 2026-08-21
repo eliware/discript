@@ -17,6 +17,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
   onRuntime(runtime);
     const timers = new Set();
     const eventHandlers = new Set();
+    const deferred = [];
   const signal = dependencies.signal;
   try {
     if (signal?.aborted) throw Object.assign(new Error('Execution was cancelled.'), { code: 'EXECUTION_CANCELLED', exitCode: 130 });
@@ -47,6 +48,11 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
         return (items ?? []).filter(item => item?.[selector] === expected);
       },
       exit: (exitCode = 0, message = null) => { throw new ScriptExit(exitCode, message); },
+      defer: callback => {
+        if (typeof callback !== 'function') throw Object.assign(new Error('defer() expects a function.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+        deferred.push(callback);
+        return { deferred: true, count: deferred.length };
+      },
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
       on: (eventName, handler) => {
         runtime.client.on(eventName, handler);
@@ -78,6 +84,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
     if (handlerCount > 0 && keepAlive !== false) await waitForStop(runtime, signal);
     return result;
   } finally {
+    for (let index = deferred.length - 1; index >= 0; index -= 1) await deferred[index]();
     for (const timer of timers) { clearTimeout(timer); clearInterval(timer); }
     for (const [eventName, handler] of eventHandlers) runtime.client.off(eventName, handler);
     if (ownsRuntime) await runtime.shutdown();

@@ -10,7 +10,7 @@ Every finite Discript invocation follows this lifecycle:
 6. Clear timers and destroy the Discord client.
 7. Return the script or runtime exit status.
 
-Shutdown occurs from a `finally` path, including when parsing, evaluation, a Discord request, or a timer callback fails.
+Shutdown occurs from a `finally` path, including when parsing, evaluation, a Discord request, or a timer callback fails. Scripts can register `defer callback` cleanup functions; they execute in reverse order before listeners, timers, and an owned Discord runtime are released.
 
 ## Sequential operations
 

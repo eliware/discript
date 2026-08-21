@@ -106,6 +106,10 @@ describe('evaluate', () => {
     await expect(evaluate(parse('result = try { throw "bad" } catch (error) { error.message } finally { cleaned = true }; result'))).resolves.toEqual({ ok: false, exitCode: 1, error: { code: 'SCRIPT_THROW', message: 'bad', exitCode: 1 } });
   });
 
+  test('rejects defer when the host does not provide cleanup support', async () => {
+    await expect(evaluate(parse('defer cleanup()'))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+  });
+
   test('runs finally when a try body succeeds', async () => {
     await expect(evaluate(parse('result = try { 7 } catch (error) { 0 } finally { 9 }; result'))).resolves.toEqual({ ok: true, exitCode: 0, value: 7 });
   });

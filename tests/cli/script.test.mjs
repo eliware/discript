@@ -82,4 +82,16 @@ describe('cli/script', () => {
     try { await executeInput({ kind: 'source', source: 'every(10) {}' }, { keep_alive: false }, { runtime: runtime() }); jest.advanceTimersByTime(100); }
     finally { jest.useRealTimers(); }
   });
+
+  test('runs deferred callbacks in reverse order during cleanup', async () => {
+    const output = [];
+    await expect(executeInput({ kind: 'source', source: 'fn first() { print("first") }; fn second() { print("second") }; defer first; defer second; 1' }, {}, { runtime: runtime(), stdout: value => output.push(value) })).resolves.toBe(1);
+    expect(output).toEqual(['second', 'first']);
+  });
+
+  test('runs deferred callbacks when evaluation throws', async () => {
+    const output = [];
+    await expect(executeInput({ kind: 'source', source: 'fn cleanup() { print("cleanup") }; defer cleanup; throw "failure"' }, {}, { runtime: runtime(), stdout: value => output.push(value) })).rejects.toMatchObject({ code: 'SCRIPT_THROW' });
+    expect(output).toEqual(['cleanup']);
+  });
 });
