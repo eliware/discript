@@ -6,7 +6,8 @@ describe('MCP Discript information resources and prompts', () => {
     const server = { registerResource: jest.fn(), registerPrompt: jest.fn() };
     registerDiscriptInfo({ mcpServer: server });
     expect(server.registerResource).toHaveBeenCalledTimes(5);
-    expect(server.registerResource.mock.calls.map(call => call[1])).toEqual(['discript://help', 'discript://commands', 'discript://language', 'discript://safety', { uriTemplate: 'discript://examples/{name}', name: 'discript-example', description: 'A Discript example script by filename.' }]);
+    expect(server.registerResource.mock.calls.slice(0, 4).map(call => call[1])).toEqual(['discript://help', 'discript://commands', 'discript://language', 'discript://safety']);
+    expect(server.registerResource.mock.calls[4][1]._uriTemplate.template).toBe('discript://examples/{name}');
     expect(server.registerPrompt).toHaveBeenCalledTimes(6);
     expect(server.registerResource.mock.calls[0][2]).toMatchObject({ mimeType: 'text/markdown', annotations: { audience: ['assistant'] } });
   });

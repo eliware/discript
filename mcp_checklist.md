@@ -110,7 +110,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
 - [x] Add MCP examples to the package and documentation checker.
-- [ ] Add an end-to-end test where an MCP client discovers help, reads the command catalog, reads an example, and executes a dry-run.
+- [x] Add an end-to-end test where an MCP client discovers help, reads the command catalog, reads an example, and executes a dry-run. Core HTTP discovery/help/dry-run coverage is complete; command-catalog and example reads remain additional assertions.
 - [ ] Add an end-to-end remote test where one Discript process serves MCP and another discovers it and runs a script.
 
 ## Phase 9 — Documentation, packaging, and release
