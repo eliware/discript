@@ -10,3 +10,9 @@ for (index in range(length(values(channels)))) {
   print({index: index, name: keys(channels)[index]})
 }
 print({generatedAt: now(), channelCount: length(channels)})
+
+/* Normalize agent input before using it as a Discord name or lookup key. */
+raw = " general, alerts, lounge "
+names = split(trim(raw), ",")
+names = map(names, name => trim(name))
+print({normalized: join(names, "|"), hasAlerts: includes(names, "alerts"), upper: upper(names[0])})

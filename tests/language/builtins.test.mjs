@@ -11,6 +11,16 @@ describe('language builtins', () => {
     expect(builtins.values({ a: 1, b: 2 })).toEqual([1, 2]);
   });
 
+  test('provides string and collection composition helpers', () => {
+    expect(builtins.split('general,alerts', ',')).toEqual(['general', 'alerts']);
+    expect(builtins.join(['general', 'alerts'], ',')).toBe('general,alerts');
+    expect(builtins.includes('alerts', 'ert')).toBe(true);
+    expect(builtins.includes([1, 2], 2)).toBe(true);
+    expect(builtins.lower('General')).toBe('general');
+    expect(builtins.upper('alerts')).toBe('ALERTS');
+    expect(builtins.trim('  ready  ')).toBe('ready');
+  });
+
   test('creates bounded ascending and descending ranges', () => {
     expect(builtins.range(3)).toEqual([0, 1, 2]);
     expect(builtins.range(2, 7, 2)).toEqual([2, 4, 6]);
@@ -46,5 +56,8 @@ describe('language builtins', () => {
     expect(() => builtins.keys(1)).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));
     expect(() => builtins.range(0, 1, 0)).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));
     expect(() => builtins.range(0, 20001)).toThrow(expect.objectContaining({ code: 'LOOP_LIMIT' }));
+    expect(() => builtins.split(1, ',')).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));
+    expect(() => builtins.join('general', ',')).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));
+    expect(() => builtins.lower(1)).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));
   });
 });

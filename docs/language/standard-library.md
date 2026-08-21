@@ -4,6 +4,9 @@ Discript exposes a small safe standard library to every script:
 
 - `length(value)` returns the length of a string, array, or object.
 - `keys(object)` and `values(object)` return ordinary arrays.
+- `split(string, separator)` and `join(array, separator)` convert between delimited text and arrays.
+- `includes(value, search)` checks strings and arrays.
+- `lower(string)`, `upper(string)`, and `trim(string)` provide common text normalization.
 - `range(end)` or `range(start, end, step)` creates a bounded numeric sequence.
 - `now()` returns the current time as an ISO-8601 string.
 - `race(...)` resolves with the first completed promise.

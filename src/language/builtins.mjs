@@ -14,6 +14,30 @@ export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
       if (!value || typeof value !== 'object') throw Object.assign(new Error('values() expects an object.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
       return Object.values(value);
     },
+    split(value, separator = '') {
+      if (typeof value !== 'string' || typeof separator !== 'string') throw Object.assign(new Error('split() expects strings.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      return value.split(separator);
+    },
+    join(values, separator = '') {
+      if (!Array.isArray(values) || typeof separator !== 'string') throw Object.assign(new Error('join() expects an array and a string separator.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      return values.join(separator);
+    },
+    includes(value, search) {
+      if (typeof value !== 'string' && !Array.isArray(value)) throw Object.assign(new Error('includes() expects a string or array.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      return value.includes(search);
+    },
+    lower(value) {
+      if (typeof value !== 'string') throw Object.assign(new Error('lower() expects a string.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      return value.toLowerCase();
+    },
+    upper(value) {
+      if (typeof value !== 'string') throw Object.assign(new Error('upper() expects a string.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      return value.toUpperCase();
+    },
+    trim(value) {
+      if (typeof value !== 'string') throw Object.assign(new Error('trim() expects a string.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      return value.trim();
+    },
     range(start, end = null, step = 1) {
       const first = end === null ? 0 : Number(start);
       const last = end === null ? Number(start) : Number(end);
