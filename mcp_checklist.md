@@ -103,8 +103,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test configuration precedence, profile selection, CLI overrides, and redacted config output.
 - [ ] Test MCP tool discovery and compact schema validation.
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
-- [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP and static bearer integration are covered; HTTPS, stdio transport, OAuth2, CORS, and failure cases remain pending.
-- [ ] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata.
+- [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, static bearer, and successful OAuth2 introspection integration are covered; HTTPS, stdio transport, CORS, and failure cases remain pending.
+- [ ] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Static bearer, successful OAuth2 introspection, required scopes, and protected-resource metadata are covered; passthrough and rejection cases remain pending.
 - [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Server/client timeouts, output limits, and concurrency bounds are implemented; cancellation remains pending.
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.

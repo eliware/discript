@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
+import { createServer } from 'node:http';
 import { mcpServer } from '@eliware/mcp-server';
 import mcpClient from '@eliware/mcp-client';
 import { closeMcpServer } from '../src/mcp/server.mjs';
@@ -48,6 +49,60 @@ describe('MCP server/client HTTP integration', () => {
     } finally {
       await client.close();
       await closeMcpServer(server);
+    }
+  }, 15000);
+
+  test('accepts an OAuth2 token validated by a local introspection service', async () => {
+    const introspection = createServer((request, response) => {
+      if (request.method !== 'POST' || request.url !== '/introspect') {
+        response.writeHead(404).end();
+        return;
+      }
+      let body = '';
+      request.on('data', chunk => { body += chunk; });
+      request.on('end', () => {
+        expect(request.headers.authorization).toBe(`Basic ${Buffer.from('client:secret').toString('base64')}`);
+        expect(new URLSearchParams(body).get('token')).toBe('oauth-integration-token');
+        expect(new URLSearchParams(body).get('resource')).toBe('http://127.0.0.1/mcp');
+        response.setHeader('content-type', 'application/json');
+        response.end(JSON.stringify({
+          active: true,
+          iss: 'http://127.0.0.1/issuer',
+          aud: ['http://127.0.0.1/mcp'],
+          exp: Math.floor(Date.now() / 1000) + 300,
+          token_type: 'Bearer',
+          sub: 'integration-agent',
+          scope: 'discord:read discord:write',
+          secret_claim: 'must-not-be-forwarded',
+        }));
+      });
+    });
+    await new Promise(resolve => introspection.listen(0, '127.0.0.1', resolve));
+    const introspectionPort = introspection.address().port;
+    const server = await mcpServer({
+      httpPort: 0, endpointPath: '/mcp',
+      auth: {
+        mode: 'oauth2', issuer: 'http://127.0.0.1/issuer', resource: 'http://127.0.0.1/mcp',
+        requiredScopes: ['discord:read'],
+        introspection: {
+          introspectionEndpoint: `http://127.0.0.1:${introspectionPort}/introspect`,
+          clientId: 'client', clientSecret: 'secret',
+        },
+      },
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpInstance.address().port;
+    const client = await mcpClient({ url: `http://127.0.0.1:${port}/mcp`, token: 'oauth-integration-token', reconnect: false });
+    try {
+      expect((await client.listTools()).tools.map(tool => tool.name)).toContain('run_discript');
+      const metadata = await fetch(`http://127.0.0.1:${port}/.well-known/oauth-protected-resource/mcp`);
+      expect(metadata.status).toBe(200);
+      expect(await metadata.json()).toMatchObject({ resource: 'http://127.0.0.1/mcp' });
+    } finally {
+      await client.close();
+      await closeMcpServer(server);
+      await new Promise(resolve => introspection.close(resolve));
     }
   }, 15000);
 });
