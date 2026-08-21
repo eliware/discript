@@ -34,6 +34,10 @@ describe('CLI errors', () => {
     expect(JSON.stringify(result)).not.toContain('oauth-secret');
   });
 
+  test('preserves sanitized script call stacks', () => {
+    expect(structuredError(Object.assign(new Error('missing'), { code: 'RUNTIME_ERROR', exitCode: 1, details: { stack: ['inner', 'outer'] } }))).toMatchObject({ details: { stack: ['inner', 'outer'] } });
+  });
+
   test('creates unique request ids', () => {
     expect(createRequestId()).toEqual(expect.any(String));
     expect(createRequestId()).not.toBe(createRequestId());

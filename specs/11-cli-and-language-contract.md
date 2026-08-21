@@ -54,6 +54,7 @@ The initial language shall support:
 - Array and object spread expressions
 - Array and object destructuring assignments with rest capture
 - Bounded timeout and callback-based retry helpers
+- Runtime failures preserve a sanitized user-function call stack
 
 Example:
 

@@ -37,7 +37,7 @@ function defaultExitCode(code) {
 
 function sanitizeDetails(details) {
   if (!details || typeof details !== 'object') return details === undefined ? undefined : { value: String(details) };
-  const allowed = ['suggestions', 'message', 'discordCode', 'status', 'method', 'path', 'retryAfter'];
+  const allowed = ['suggestions', 'message', 'discordCode', 'status', 'method', 'path', 'retryAfter', 'stack'];
   const filtered = Object.fromEntries(Object.entries(details).filter(([key]) => allowed.includes(key)).map(([key, value]) => [key, typeof value === 'string' ? sanitizeText(value) : value]));
   return Object.keys(filtered).length ? filtered : undefined;
 }

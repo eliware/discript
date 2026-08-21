@@ -13,4 +13,8 @@ describe('functions', () => {
   test('supports multi-step function bodies and local parameter restoration', async () => {
     await expect(evaluate(parse('value = 10; fn add(value, amount) { result = value + amount; return result }; total = add(3, 4); value'))).resolves.toBe(10);
   });
+
+  test('adds user function names to propagated runtime diagnostics', async () => {
+    await expect(evaluate(parse('fn inner() { missing }; fn outer() { inner() }; outer()'))).rejects.toMatchObject({ details: { stack: ['inner', 'outer'] }, scriptStack: ['inner', 'outer'] });
+  });
 });

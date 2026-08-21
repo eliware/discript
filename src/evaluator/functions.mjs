@@ -8,7 +8,12 @@ export function createClosure(statement, { scope, scopeContext, evaluateBlock })
     for (const [index, parameter] of statement.parameters.entries()) localScope.set(parameter, values[index]);
     return scopeContext.run(localScope, async () => {
       try { return await evaluateBlock(statement.body); }
-      catch (error) { if (error instanceof ReturnSignal) return error.value; throw error; }
+      catch (error) {
+        if (error instanceof ReturnSignal) return error.value;
+        error.scriptStack = [...(error.scriptStack ?? []), statement.name];
+        error.details = { ...(error.details ?? {}), stack: error.scriptStack };
+        throw error;
+      }
     });
   };
 }

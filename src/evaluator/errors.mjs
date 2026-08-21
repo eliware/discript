@@ -1,7 +1,7 @@
 export function runtimeError(message) { return Object.assign(new Error(message), { code: 'RUNTIME_ERROR', exitCode: 1 }); }
 
 export function normalizeError(error) {
-  return { code: error?.code ?? 'DISCRIPT_ERROR', message: error?.message ?? String(error), exitCode: error?.exitCode ?? 1 };
+  return { code: error?.code ?? 'DISCRIPT_ERROR', message: error?.message ?? String(error), exitCode: error?.exitCode ?? 1, ...(Array.isArray(error?.scriptStack) && error.scriptStack.length ? { stack: [...error.scriptStack] } : {}) };
 }
 
 export class ScriptExit extends Error {
