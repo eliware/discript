@@ -25,10 +25,12 @@
     "engines": {
         "node": ">=26"
     },
-        "type": "module",
-        "jest": {
-            "setupFiles": ["<rootDir>/tests/setup-env.mjs"]
-        },
+    "type": "module",
+    "jest": {
+        "setupFiles": [
+            "<rootDir>/tests/setup-env.mjs"
+        ]
+    },
     "bugs": {
         "url": "https://github.com/eliware/discript/issues"
     },
