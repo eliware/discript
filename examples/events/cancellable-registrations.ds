@@ -1,0 +1,12 @@
+/*
+  Cancellable registrations
+
+  Event and timer registrations return handles. Cancel a registration when a
+  one-shot workflow no longer needs it; the runtime also cleans up anything
+  left active during shutdown.
+*/
+heartbeat = every(60000, () => print("heartbeat"))
+listener = on("messageCreate", event => print(event.content))
+heartbeat.cancel()
+listener.cancel()
+print({timers: heartbeat.cancel(), listeners: listener.cancel()})

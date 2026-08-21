@@ -28,6 +28,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports array and object destructuring assignments with rest capture.
 - [Fully complete] Discript provides bounded timeout and callback-based retry helpers with documented mutation-safety guidance.
 - [Fully complete] Runtime failures from user functions expose a sanitized script call stack.
+- [Fully complete] Event and timer registrations return idempotent cancellation handles while retaining shutdown cleanup.
 - [Fully complete] Discript supports reusable `fn` functions, `return`, and shared-scope source imports.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.

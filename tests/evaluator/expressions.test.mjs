@@ -102,6 +102,10 @@ describe('collection access and assignment', () => {
     await expect(evaluate(parse('{name, type, ...rest} = channel; {name, type, rest}'), { channel: { name: 'general', type: 'text', position: 2 } })).resolves.toEqual({ name: 'general', type: 'text', rest: { position: 2 } });
   });
 
+  test('evaluates zero-argument arrows', async () => {
+    await expect(evaluate(parse('callback = () => 42; callback()'))).resolves.toBe(42);
+  });
+
   test('rejects destructuring incompatible values', async () => {
     await expect(evaluate(parse('[first] = value'), { value: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
     await expect(evaluate(parse('{name} = value'), { value: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });

@@ -64,7 +64,13 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
   function parsePrimary() {
     const token = peek();
     if (token?.type === 'operator' && (token.value === '!' || token.value === '-')) { take(); return { type: 'UnaryExpression', operator: token.value, argument: parsePrimary() }; }
-    if (match('(')) { const expression = parseExpression(); consume(')', 'Expected `)` after grouped expression.'); return expression; }
+    if (match('(')) {
+      if (match(')') && match('=>')) {
+        const body = peek()?.value === '{' ? { type: 'BlockBody', body: parseBlock() } : { type: 'ExpressionBody', body: parseExpression() };
+        return { type: 'ArrowExpression', parameter: null, body };
+      }
+      const expression = parseExpression(); consume(')', 'Expected `)` after grouped expression.'); return expression;
+    }
     if (token?.type === 'identifier' && token.value === 'await') { take(); return { type: 'AwaitExpression', argument: parsePostfix() }; }
     if (token?.type === 'identifier' && token.value === 'try') {
       take(); const body = parseBlock();

@@ -94,4 +94,10 @@ describe('cli/script', () => {
     await expect(executeInput({ kind: 'source', source: 'fn cleanup() { print("cleanup") }; defer cleanup; throw "failure"' }, {}, { runtime: runtime(), stdout: value => output.push(value) })).rejects.toMatchObject({ code: 'SCRIPT_THROW' });
     expect(output).toEqual(['cleanup']);
   });
+
+  test('cancels individual timers and event handlers', async () => {
+    const active = runtime();
+    await expect(executeInput({ kind: 'source', source: 'timer = every(10, () => print("tick")); timer.cancel(); listener = on("ready", () => print("ready")); listener.cancel()' }, { keep_alive: false }, { runtime: active, stdout: () => {} })).resolves.toBe(true);
+    expect(active.client.listenerCount('ready')).toBe(0);
+  });
 });

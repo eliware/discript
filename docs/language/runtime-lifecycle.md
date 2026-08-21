@@ -82,6 +82,17 @@ Timer delays must be positive integer milliseconds. Timers are cleared during sh
 
 Timer callbacks are invoked asynchronously. Keep callbacks short, catch expected failures, and avoid overlapping mutations from a fast interval.
 
+Timer and event registration return handles with `cancel()`:
+
+```text
+heartbeat = every(60000, () => print("heartbeat"))
+heartbeat.cancel()
+listener = on("messageCreate", event => print(event.content))
+listener.cancel()
+```
+
+Cancellation is idempotent and returns `true` the first time and `false` afterward. Runtime shutdown still clears every remaining registration.
+
 ## Event handlers
 
 Register a Discord client event with `on(eventName, handler)`. The handler receives the Discord event payload as its argument and the same payload is exposed as the `event` script variable:

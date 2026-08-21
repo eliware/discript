@@ -9,7 +9,7 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
       throw runtimeError(`Unsupported unary operator: ${expression.operator}`);
     }
     if (expression.type === 'ArrowExpression') return async value => {
-      const localScope = new Map(scope); localScope.set(expression.parameter, value);
+      const localScope = new Map(scope); if (expression.parameter) localScope.set(expression.parameter, value);
       return scopeContext.run(localScope, async () => expression.body.type === 'ExpressionBody' ? evaluateExpression(expression.body.body) : evaluateBlock(expression.body.body));
     };
     if (expression.type === 'TryExpression') {

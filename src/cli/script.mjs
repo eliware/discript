@@ -27,7 +27,8 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       if (!Number.isInteger(milliseconds) || milliseconds < 1) throw Object.assign(new Error('Timer delay must be a positive integer in milliseconds.'), { code: 'INVALID_TIMER', exitCode: 2 });
       const timer = repeating ? setInterval(() => { void callback(); }, milliseconds) : setTimeout(() => { void callback(); }, milliseconds);
       timers.add(timer);
-      return { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true };
+      let active = true;
+      return { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true, cancel: () => { if (!active) return false; active = false; clearTimeout(timer); clearInterval(timer); timers.delete(timer); return true; } };
     };
     const baseDir = input.origin && !['eval', 'stdin'].includes(input.origin) ? dirname(resolve(input.origin)) : process.cwd();
     const rest = options.rest === true
@@ -56,9 +57,11 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       print: value => { writeResult(value, options, dependencies.stdout ?? console.log); return value; },
       on: (eventName, handler) => {
         runtime.client.on(eventName, handler);
-        eventHandlers.add([eventName, handler]);
+        const registration = [eventName, handler];
+        eventHandlers.add(registration);
         handlerCount += 1;
-        return { event: eventName, registered: true };
+        let active = true;
+        return { event: eventName, registered: true, cancel: () => { if (!active) return false; active = false; runtime.client.off(eventName, handler); eventHandlers.delete(registration); return true; } };
       },
       every: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, true); },
       after: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, false); },

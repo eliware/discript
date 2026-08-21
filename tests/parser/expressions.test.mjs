@@ -62,6 +62,11 @@ describe('parser/expressions', () => {
     });
   });
 
+  test('parses zero-argument arrow callbacks', async () => {
+    const { parse } = await import('../../src/parser.mjs');
+    expect(parse('callback = () => 42')).toMatchObject({ body: [{ type: 'Assignment', value: { type: 'ArrowExpression', parameter: null } }] });
+  });
+
   test('parses shorthand object patterns for destructuring', async () => {
     const { parse } = await import('../../src/parser.mjs');
     expect(parse('[first, second, ...remaining] = values; {name, type, ...rest} = channel')).toMatchObject({
