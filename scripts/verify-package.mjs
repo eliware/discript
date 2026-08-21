@@ -14,6 +14,9 @@ try {
   const archiveFiles = execFileSync('tar', ['-tf', tarball], { encoding: 'utf8' });
   const normalizedArchiveFiles = archiveFiles.split(/\r?\n/).map(file => file.trim().replaceAll('\\', '/'));
   if (!normalizedArchiveFiles.includes('package/docs/README.md')) throw new Error('Packaged documentation is missing docs/README.md.');
+  for (const required of ['package/SPEC.md', 'package/docs/examples/README.md', 'package/docs/mcp/deployment-examples.md', 'package/src/mcp/client.mjs', 'package/src/mcp/server.mjs']) {
+    if (!normalizedArchiveFiles.includes(required)) throw new Error(`Packaged MCP artifact is missing ${required}.`);
+  }
   execFileSync(npmCommand, ['install', '--ignore-scripts', '--no-audit', '--no-fund', tarball], { ...spawnOptions, cwd: directory });
   const binary = join(directory, 'node_modules', '.bin', process.platform === 'win32' ? 'discript.cmd' : 'discript');
   const help = execFileSync(binary, ['--help'], {
