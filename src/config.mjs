@@ -90,6 +90,9 @@ export function validateConfig(config = loadConfig()) {
       throw configurationError('DISCRIPT_CLIENT_URL must be a valid HTTP, HTTPS, or file URL.');
     }
   }
+  if (config.connectionMode === 'mcp-client' && client.transport === 'stdio') {
+    throw configurationError('DISCRIPT_CLIENT_TRANSPORT=stdio requires explicit child-process configuration and is not available from the profile yet.');
+  }
   return config;
 }
 

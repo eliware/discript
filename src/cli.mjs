@@ -30,6 +30,7 @@ export async function run(argv = [], dependencies = {}) {
   if (options.version) return stdout(VERSION);
   if (positionals[0] === 'config') return runConfig(options, stdout);
   if (positionals[0] === 'mcp') return runMcp(options);
+  if (positionals[0] === 'mcp-client') return runMcpClient(positionals[1], options, stdout);
   if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
   const config = loadConfig();
   if (options.broker || (config.connectionMode === 'daemon' && !options.direct)) {
@@ -65,6 +66,13 @@ async function runMcp(options) {
   const { startMcpServer } = await import('./mcp/server.mjs');
   const config = loadConfig();
   return startMcpServer({ config, stdio: options.stdio === true, token: config.token });
+}
+
+async function runMcpClient(action = 'inspect', options, stdout) {
+  const { inspectMcpServer } = await import('./mcp/client.mjs');
+  const result = await inspectMcpServer(loadConfig(), { action: action === 'list-tools' ? 'tools' : action === 'list-resources' ? 'resources' : action === 'list-prompts' ? 'prompts' : action });
+  writeResult(result, options, stdout);
+  return result;
 }
 
 async function runBrokerCommand(command, options, stdout) {

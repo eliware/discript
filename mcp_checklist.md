@@ -76,7 +76,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 ## Phase 6 — Remote MCP client mode
 
-- [ ] Add a local `discript mcp-client` mode using `@eliware/mcp-client`.
+- [x] Add a local `discript mcp-client` mode using `@eliware/mcp-client`.
 - [ ] Support remote Streamable HTTP MCP connections with URL, bearer token, headers, timeout, and reconnect options.
 - [ ] Support remote SSE connections where required for legacy servers.
 - [ ] Support remote stdio connections by launching another Discript process or compatible MCP server.

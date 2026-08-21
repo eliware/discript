@@ -14,6 +14,8 @@ export function helpText() {
     `  discript commands list            List supported direct commands\n` +
     `  discript completion bash          Generate shell completion\n` +
     `  discript mcp --stdio              Run as an MCP stdio server\n` +
+    `  discript mcp-client [inspect]     Inspect a configured remote MCP server\n` +
+    `  discript mcp-client list-tools    List remote MCP tools\n` +
     `  discript daemon start --mcp-port <port>  Start daemon with MCP HTTP\n` +
     `  discript daemon start             Start the shared Gateway broker\n\n` +
     `Options:\n` +
