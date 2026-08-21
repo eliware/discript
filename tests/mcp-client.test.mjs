@@ -18,6 +18,11 @@ describe('MCP client mode', () => {
     expect(createMcpClientOptions({ client: { transport: 'stdio', command: 'discript', args: ['mcp', '--stdio'] } })).toMatchObject({ transport: 'stdio', command: 'discript', args: ['mcp', '--stdio'] });
   });
 
+  test('passes programmatic async token providers through to the MCP client', () => {
+    const tokenProvider = async () => 'rotated-token';
+    expect(createMcpClientOptions({ client: { url: 'https://example.test/mcp', tokenProvider } }).tokenProvider).toBe(tokenProvider);
+  });
+
   test('invokes tools, reads resources, and retrieves prompts', async () => {
     const client = { callTool: jest.fn(async input => input), readResource: jest.fn(async input => input), getPrompt: jest.fn(async input => input), close: jest.fn(async () => {}) };
     const clientFactory = jest.fn(async () => client);

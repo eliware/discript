@@ -50,8 +50,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Support OAuth2 resource-server authentication with issuer and resource/audience validation.
 - [x] Support OAuth2 token introspection with required scopes and sanitized identity metadata.
 - [x] Expose OAuth protected-resource metadata endpoints.
-- [ ] Decide whether Discript needs server-side OAuth only or also OAuth client helpers.
-- [ ] If OAuth client support is needed, add provider discovery, client registration, PKCE, authorization-code exchange, and durable state handling.
+- [x] Decide whether Discript needs server-side OAuth only or also OAuth client helpers. Keep OAuth client flows provider-neutral and delegate discovery, consent, PKCE, refresh, and session storage to the caller's OAuth/OIDC library.
+- [x] If OAuth client support is needed, add provider discovery, client registration, PKCE, authorization-code exchange, and durable state handling. Not required in Discript: programmatic callers supply the resulting token or async token provider to `@eliware/mcp-client`.
 - [x] Add HTTP/HTTPS configuration for daemon MCP mode.
 - [ ] Support inline TLS key/certificate/CA configuration.
 - [x] Support TLS key/certificate/CA files and `TLS_KEY_FILE`, `TLS_CERT_FILE`, and `TLS_CA_FILE` environment variables.
@@ -83,7 +83,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Let client mode discover server instructions, resources, prompts, and tools before execution. Remote script execution now performs capability discovery and verifies `run_discript` before calling it.
 - [x] Add client commands for remote tool invocation, resource reading, prompt retrieval, and server inspection.
 - [x] Support piping Discript source into the remote client without temporary files.
-- [ ] Support client-side static tokens, async token providers, custom headers, and OAuth/PKCE integration where selected. Static tokens and custom headers are complete; async providers and OAuth/PKCE remain pending.
+- [x] Support client-side static tokens, async token providers, custom headers, and OAuth/PKCE integration where selected. Static tokens, custom headers, and programmatic async token providers are supported; OAuth/PKCE remains delegated to the caller's provider-neutral OAuth/OIDC integration.
 - [x] Add remote execution examples for local agents, CI harnesses, and multi-host Discord automation.
 - [x] Define whether remote execution returns raw MCP JSON, normalized Discript JSON, JSONL, or human-readable output. The programmatic client returns normalized Discript JSON; CLI formatting remains local.
 - [x] Preserve remote MCP errors, Discript exit codes, and authentication failures in the local CLI contract.

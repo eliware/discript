@@ -6,6 +6,7 @@ export function createMcpClientOptions(config = {}) {
     url: client.url,
     transport: client.transport,
     token: client.token ?? undefined,
+    tokenProvider: client.tokenProvider,
     headers: client.headers,
     command: client.command ?? undefined,
     args: client.args,
