@@ -28,6 +28,7 @@ export async function run(argv = [], dependencies = {}) {
   const { positionals, options } = parseArgs(argv);
   if (options.help) return stdout(helpText());
   if (options.version) return stdout(VERSION);
+  if (positionals[0] === 'mcp') return runMcp(options);
   if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
   if (options.broker) {
     const brokerInput = await readSource(positionals, options, stdin);
@@ -50,6 +51,12 @@ export async function run(argv = [], dependencies = {}) {
     shutdownHook?.removeHandlers?.();
     errors.removeHandlers();
   }
+}
+
+async function runMcp(options) {
+  const { startMcpServer } = await import('./mcp/server.mjs');
+  const token = loadConfig().token;
+  return startMcpServer({ stdio: options.stdio === true, token });
 }
 
 async function runBrokerCommand(command, options, stdout) {

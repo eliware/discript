@@ -13,6 +13,7 @@ export function helpText() {
     `  cat script.ds | discript          Read source from stdin\n` +
     `  discript commands list            List supported direct commands\n` +
     `  discript completion bash          Generate shell completion\n` +
+    `  discript mcp --stdio              Run as an MCP stdio server\n` +
     `  discript daemon start             Start the shared Gateway broker\n\n` +
     `Options:\n` +
     `  -e, --eval <source>  Evaluate source\n` +
