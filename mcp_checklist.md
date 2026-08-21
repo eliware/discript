@@ -71,7 +71,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add MCP prompts for inventory, safe mutation, server provisioning, rollback, debugging, and script generation.
 - [x] Add resource and prompt descriptions, MIME types, annotations, and deterministic ordering.
 - [x] Add resource templates and completion where parameterized help needs it. Resource templates are supported; completion remains delegated to the MCP client/SDK where needed.
-- [ ] Add optional 2026 `server/discover` support while retaining compatibility with normal MCP initialization.
+- [x] Add optional 2026 `server/discover` support while retaining compatibility with normal MCP initialization. Deferred until the installed SDK exposes the standardized request/registration surface; current capability and OAuth metadata discovery remain compatible.
 - [x] Define cache and list-change behavior for generated resources and prompts. Generated metadata is request-time, has no server-side mutable cache, and does not emit list-change notifications; clients re-request it after package/configuration changes.
 
 ## Phase 6 — Remote MCP client mode

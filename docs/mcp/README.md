@@ -8,6 +8,8 @@ Discript supports both sides of an MCP workflow:
 
 The server exposes one execution tool, `run_discript`, plus help resources and workflow prompts. The client can discover those capabilities before running a script.
 
+Discript uses standard MCP initialization and capability discovery. The installed MCP SDK does not expose a `server/discover` registration surface, so Discript does not invent a private endpoint; instructions, tools, resources, prompts, resource templates, and OAuth protected-resource metadata provide the compatible discovery surface. A future SDK that standardizes `server/discover` can be adopted without changing normal initialization.
+
 ## Local stdio server
 
 ```sh
