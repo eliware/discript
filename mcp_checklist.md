@@ -1,6 +1,6 @@
 # Discript MCP Integration Checklist
 
-This checklist is ordered by dependency. `[x]` means implemented and locally verified. `[ ]` means not complete.
+This checklist is ordered by dependency. `[x]` means implemented and locally verified. `[ ]` means not complete. Configuration names added to `.env.example` are planning/template entries until the loader and CLI consume them.
 
 ## Phase 1 — MCP server foundation
 
@@ -14,7 +14,23 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Validate MCP port input and preserve cross-platform path handling.
 - [x] Add focused `run_discript`, broker lifecycle, and MCP input-validation tests.
 
-## Phase 2 — Transport and execution behavior
+## Phase 2 — Configuration profiles and mode selection
+
+- [x] Expand `.env.example` with direct, daemon, MCP server, TLS, authentication, and remote client profile placeholders.
+- [x] Keep `DISCORD_TOKEN` and `DISCRIPT_INTENTS` as the real application configuration variables.
+- [x] Keep `TEST_GUILD` explicitly marked as test-only rather than part of the normal application profile.
+- [ ] Add a typed configuration profile loader for `DISCRIPT_CONNECTION_MODE` with direct as the default.
+- [ ] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
+- [ ] Add MCP server profile loading for transport, host, port, endpoint, auth, TLS, redirect, and CORS settings.
+- [ ] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
+- [ ] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
+- [ ] Make normal CLI commands use the configured daemon/client profile when selected.
+- [ ] Preserve explicit CLI flags as higher-precedence one-shot overrides.
+- [ ] Add `discript config` and `discript config --json` with complete secret redaction.
+- [ ] Validate incompatible profiles before starting Discord, MCP, or network listeners.
+- [ ] Document precedence: process environment, project `.env`, user `~/.discript.env`, profile defaults, then CLI overrides.
+
+## Phase 3 — Transport and execution behavior
 
 - [ ] Use REST-first execution for MCP direct commands that do not require Gateway state.
 - [ ] Extend REST-first behavior to source-level Discord operations where possible.
@@ -26,7 +42,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add output-size limits and bounded concurrent execution.
 - [ ] Define behavior for long-running event/timer scripts over MCP.
 
-## Phase 3 — Authentication, authorization, and TLS
+## Phase 4 — Authentication, authorization, and TLS
 
 - [ ] Support `auth.mode: none` only for trusted local stdio/development use.
 - [ ] Support static bearer authentication for HTTP deployments.
@@ -44,7 +60,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add authentication, authorization, TLS, CORS, and remote-host trust documentation.
 - [ ] Define scope mapping for read-only, mutating, destructive, and administrative Discript operations.
 
-## Phase 4 — Help, resources, prompts, and discovery
+## Phase 5 — Help, resources, prompts, and discovery
 
 - [ ] Expose server-level instructions describing Discript, safety rules, transports, and execution patterns.
 - [ ] Expose `discript://help` as a generated high-level guide.
@@ -58,7 +74,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add optional 2026 `server/discover` support while retaining compatibility with normal MCP initialization.
 - [ ] Define cache and list-change behavior for generated resources and prompts.
 
-## Phase 5 — Remote MCP client mode
+## Phase 6 — Remote MCP client mode
 
 - [ ] Add a local `discript mcp-client` mode using `@eliware/mcp-client`.
 - [ ] Support remote Streamable HTTP MCP connections with URL, bearer token, headers, timeout, and reconnect options.
@@ -72,7 +88,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Define whether remote execution returns raw MCP JSON, normalized Discript JSON, JSONL, or human-readable output.
 - [ ] Preserve remote MCP errors, Discript exit codes, and authentication failures in the local CLI contract.
 
-## Phase 6 — Security, operations, and observability
+## Phase 7 — Security, operations, and observability
 
 - [ ] Add rate limits and bounded queues for remote HTTP execution.
 - [ ] Add request IDs, execution duration, transport, command/source mode, exit code, and sanitized failure-category logging.
@@ -82,8 +98,9 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Document stable MCP release compatibility versus draft 2026 discovery features.
 - [ ] Define remote server lifecycle, health checks, and failure recovery behavior.
 
-## Phase 7 — Tests and verification
+## Phase 8 — Tests and verification
 
+- [ ] Test configuration precedence, profile selection, CLI overrides, and redacted config output.
 - [ ] Test MCP tool discovery and compact schema validation.
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures.
@@ -96,7 +113,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add an end-to-end test where an MCP client discovers help, reads the command catalog, reads an example, and executes a dry-run.
 - [ ] Add an end-to-end remote test where one Discript process serves MCP and another discovers it and runs a script.
 
-## Phase 8 — Documentation, packaging, and release
+## Phase 9 — Documentation, packaging, and release
 
 - [ ] Add CLI help, command discovery, shell completion, specs, and release notes for server and client modes.
 - [ ] Add authentication and TLS configuration examples for local, private HTTP, HTTPS, and OAuth2 deployments.
@@ -104,4 +121,4 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add CI coverage for local stdio, HTTP, HTTPS, authentication, and remote MCP integration.
 - [ ] Add an MCP operations/release checklist, including secret and certificate handling.
 - [ ] Publish only after all required security, integration, packaging, and CI gates pass.
-- [ ] Commit server integration, security, resources, client mode, tests, documentation, and release work as separate solid checkpoints.
+- [ ] Commit server integration, configuration, security, resources, client mode, tests, documentation, and release work as separate solid checkpoints.
