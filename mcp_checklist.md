@@ -105,7 +105,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures.
 - [ ] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata.
-- [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds.
+- [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Remote client timeouts and output limits are implemented; cancellation and concurrency bounds remain pending.
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.

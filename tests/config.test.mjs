@@ -53,9 +53,9 @@ describe('configuration', () => {
     const config = loadConfig({
       DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_URL: 'https://agent.example/mcp',
       DISCRIPT_CLIENT_TRANSPORT: 'https', DISCRIPT_CLIENT_HEADERS: '{"X-Agent":"discript","X-Run":"1"}',
-      DISCRIPT_CLIENT_RECONNECT: 'false', DISCRIPT_CLIENT_MAX_RECONNECT_ATTEMPTS: '3',
+      DISCRIPT_CLIENT_RECONNECT: 'false', DISCRIPT_CLIENT_MAX_RECONNECT_ATTEMPTS: '3', DISCRIPT_CLIENT_TIMEOUT: '5000', DISCRIPT_CLIENT_MAX_OUTPUT_BYTES: '2048',
     });
-    expect(validateConfig(config).client).toMatchObject({ url: 'https://agent.example/mcp', transport: 'https', headers: { 'X-Agent': 'discript', 'X-Run': '1' }, reconnect: false, maxReconnectAttempts: 3 });
+    expect(validateConfig(config).client).toMatchObject({ url: 'https://agent.example/mcp', transport: 'https', headers: { 'X-Agent': 'discript', 'X-Run': '1' }, reconnect: false, maxReconnectAttempts: 3, timeout: 5000, maxOutputBytes: 2048 });
     expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client' }))).toThrow('requires DISCRIPT_CLIENT_URL');
     expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_TRANSPORT: 'stdio' }))).toThrow('requires DISCRIPT_CLIENT_COMMAND');
     expect(validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_TRANSPORT: 'stdio', DISCRIPT_CLIENT_COMMAND: 'discript', DISCRIPT_CLIENT_ARGS: '["mcp","--stdio"]' })).client).toMatchObject({ command: 'discript', args: ['mcp', '--stdio'] });

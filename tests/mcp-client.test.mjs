@@ -37,4 +37,11 @@ describe('MCP client mode', () => {
     const client = { callTool: jest.fn(async () => ({ isError: true, structuredContent: { ok: false, code: 'MISSING_PERMISSION', exitCode: 5, error: 'Denied' } })), close: jest.fn(async () => {}) };
     await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['roles', 'delete'], clientFactory: async () => client })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5, message: 'Denied' });
   });
+
+  test('enforces request timeout and output limit', async () => {
+    const slow = { listTools: jest.fn(() => new Promise(() => {})), close: jest.fn(async () => {}) };
+    await expect(inspectMcpServer({ client: { url: 'http://localhost/mcp', timeout: 5 } }, { action: 'tools', clientFactory: async () => slow })).rejects.toMatchObject({ code: 'MCP_CLIENT_TIMEOUT', exitCode: 124 });
+    const large = { listTools: jest.fn(async () => ({ tools: ['x'.repeat(100) ] })), close: jest.fn(async () => {}) };
+    await expect(inspectMcpServer({ client: { url: 'http://localhost/mcp', timeout: 100, maxOutputBytes: 20 } }, { action: 'tools', clientFactory: async () => large })).rejects.toMatchObject({ code: 'MCP_OUTPUT_LIMIT' });
+  });
 });

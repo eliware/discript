@@ -59,6 +59,8 @@ export function loadConfig(env = process.env) {
       reconnectBaseDelay: numberValue(env.DISCRIPT_CLIENT_RECONNECT_BASE_DELAY, 1000, 'DISCRIPT_CLIENT_RECONNECT_BASE_DELAY'),
       reconnectMaxDelay: numberValue(env.DISCRIPT_CLIENT_RECONNECT_MAX_DELAY, 60000, 'DISCRIPT_CLIENT_RECONNECT_MAX_DELAY'),
       maxReconnectAttempts: numberValue(env.DISCRIPT_CLIENT_MAX_RECONNECT_ATTEMPTS, null, 'DISCRIPT_CLIENT_MAX_RECONNECT_ATTEMPTS'),
+      timeout: numberValue(env.DISCRIPT_CLIENT_TIMEOUT, 300000, 'DISCRIPT_CLIENT_TIMEOUT'),
+      maxOutputBytes: numberValue(env.DISCRIPT_CLIENT_MAX_OUTPUT_BYTES, 1048576, 'DISCRIPT_CLIENT_MAX_OUTPUT_BYTES'),
     },
   };
 }
