@@ -24,7 +24,7 @@ export function parseArgs(argv = []) {
       const [rawKey, inlineValue] = token.slice(2).split('=', 2);
       const key = rawKey.replaceAll('-', '_');
       if (inlineValue !== undefined) options[key] = inlineValue;
-      else if (['eval', 'timeout', 'duration', 'start', 'reason', 'emoji', 'sticker', 'webhook', 'target', 'allow', 'deny', 'messages', 'invite', 'event', 'guild', 'channel', 'message', 'thread', 'user', 'role', 'content', 'name', 'description', 'topic', 'location', 'event_type', 'output', 'file', 'tags', 'type', 'category', 'parent', 'position', 'limit', 'mcp_port'].includes(key)) options[key] = requireValue(argv, ++index, `--${rawKey}`);
+      else if (['eval', 'timeout', 'duration', 'start', 'reason', 'emoji', 'sticker', 'webhook', 'target', 'allow', 'deny', 'messages', 'invite', 'event', 'guild', 'channel', 'message', 'thread', 'user', 'role', 'content', 'name', 'description', 'topic', 'location', 'event_type', 'output', 'file', 'tags', 'type', 'category', 'parent', 'position', 'limit', 'mcp_port', 'tool', 'arguments', 'uri'].includes(key)) options[key] = requireValue(argv, ++index, `--${rawKey}`);
       else options[key] = true;
     } else {
       throw cliError(`Unknown option: ${token}`, 'INVALID_OPTION', 2);

@@ -69,8 +69,11 @@ async function runMcp(options) {
 }
 
 async function runMcpClient(action = 'inspect', options, stdout) {
-  const { inspectMcpServer } = await import('./mcp/client.mjs');
-  const result = await inspectMcpServer(loadConfig(), { action: action === 'list-tools' ? 'tools' : action === 'list-resources' ? 'resources' : action === 'list-prompts' ? 'prompts' : action });
+  const { callMcpClient, inspectMcpServer } = await import('./mcp/client.mjs');
+  const mappedAction = action === 'list-tools' ? 'tools' : action === 'list-resources' ? 'resources' : action === 'list-prompts' ? 'prompts' : action;
+  const result = ['call', 'read-resource', 'get-prompt'].includes(mappedAction)
+    ? await callMcpClient(loadConfig(), { action: mappedAction, name: options.name ?? options.tool, uri: options.uri, arguments: options.arguments })
+    : await inspectMcpServer(loadConfig(), { action: mappedAction });
   writeResult(result, options, stdout);
   return result;
 }

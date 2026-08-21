@@ -36,3 +36,27 @@ export async function inspectMcpServer(config, { action = 'inspect', clientFacto
     await client.close?.();
   }
 }
+
+export async function callMcpClient(config, { action, name, uri, arguments: rawArguments, clientFactory = mcpClient } = {}) {
+  const client = await clientFactory(createMcpClientOptions(config));
+  try {
+    const argumentsValue = parseArguments(rawArguments);
+    if (action === 'call') return { result: await client.callTool({ name, arguments: argumentsValue }) };
+    if (action === 'read-resource') return { result: await client.readResource({ uri }) };
+    if (action === 'get-prompt') return { result: await client.getPrompt({ name, arguments: argumentsValue }) };
+    throw Object.assign(new Error(`Unknown MCP client action: ${action}`), { code: 'INVALID_MCP_CLIENT_ACTION', exitCode: 2 });
+  } finally {
+    await client.close?.();
+  }
+}
+
+function parseArguments(value) {
+  if (value === undefined || value === null || value === '') return {};
+  try {
+    const result = JSON.parse(value);
+    if (!result || Array.isArray(result) || typeof result !== 'object') throw new Error('not an object');
+    return result;
+  } catch {
+    throw Object.assign(new Error('--arguments must be a JSON object.'), { code: 'INVALID_MCP_ARGUMENTS', exitCode: 2 });
+  }
+}

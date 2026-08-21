@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from '@jest/globals';
-import { createMcpClientOptions, inspectMcpServer } from '../src/mcp/client.mjs';
+import { callMcpClient, createMcpClientOptions, inspectMcpServer } from '../src/mcp/client.mjs';
 
 describe('MCP client mode', () => {
   test('maps configured remote client settings', () => {
@@ -16,5 +16,15 @@ describe('MCP client mode', () => {
 
   test('rejects unsupported profile stdio transport', () => {
     expect(() => createMcpClientOptions({ client: { transport: 'stdio' } })).toThrow('not yet available');
+  });
+
+  test('invokes tools, reads resources, and retrieves prompts', async () => {
+    const client = { callTool: jest.fn(async input => input), readResource: jest.fn(async input => input), getPrompt: jest.fn(async input => input), close: jest.fn(async () => {}) };
+    const clientFactory = jest.fn(async () => client);
+    await expect(callMcpClient({ client: { url: 'http://localhost/mcp' } }, { action: 'call', name: 'run_discript', arguments: '{"source":"guilds list"}', clientFactory })).resolves.toEqual({ result: { name: 'run_discript', arguments: { source: 'guilds list' } } });
+    await expect(callMcpClient({ client: { url: 'http://localhost/mcp' } }, { action: 'read-resource', uri: 'discript://help', clientFactory })).resolves.toEqual({ result: { uri: 'discript://help' } });
+    await expect(callMcpClient({ client: { url: 'http://localhost/mcp' } }, { action: 'get-prompt', name: 'safe-mutation', arguments: '{"guild":"123"}', clientFactory })).resolves.toEqual({ result: { name: 'safe-mutation', arguments: { guild: '123' } } });
+    expect(client.close).toHaveBeenCalledTimes(3);
+    await expect(callMcpClient({ client: { url: 'http://localhost/mcp' } }, { action: 'call', name: 'x', arguments: 'bad', clientFactory })).rejects.toThrow('--arguments must be a JSON object');
   });
 });

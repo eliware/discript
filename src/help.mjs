@@ -16,6 +16,9 @@ export function helpText() {
     `  discript mcp --stdio              Run as an MCP stdio server\n` +
     `  discript mcp-client [inspect]     Inspect a configured remote MCP server\n` +
     `  discript mcp-client list-tools    List remote MCP tools\n` +
+    `  discript mcp-client call --tool <name> --arguments <json>\n` +
+    `  discript mcp-client read-resource --uri <uri>\n` +
+    `  discript mcp-client get-prompt --name <name> --arguments <json>\n` +
     `  discript daemon start --mcp-port <port>  Start daemon with MCP HTTP\n` +
     `  discript daemon start             Start the shared Gateway broker\n\n` +
     `Options:\n` +
