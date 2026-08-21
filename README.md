@@ -1,6 +1,8 @@
 # Discript
 
-Discript is an early-stage scripting language and CLI for programmatic Discord interaction, designed for developers, AI agents, and coding harnesses.
+Discript is a scripting language and CLI for safe, programmatic Discord automation. It is designed for developers, AI agents, and coding harnesses that need repeatable commands, composable scripts, structured results, and explicit control over side effects.
+
+At its core, Discript parses and runs `.ds` programs or commands from files, stdin, or inline CLI input. The same engine can connect directly to Discord for one-shot work, reuse a long-lived daemon connection over a local socket, or expose and consume the engine through MCP stdio and HTTP/HTTPS transports.
 
 ## Requirements
 
@@ -25,8 +27,6 @@ npm install ./eliware-discript-*.tgz
 ```
 
 The package is public and publishes to npm from `v*` Git tags through the standard Eliware release workflow. The npm package name is `@eliware/discript` because the unscoped `discript` name is unavailable for publishing.
-
-## Usage
 
 ## Documentation
 
@@ -323,7 +323,7 @@ npm start -- examples/list-guilds.ds --json
 
 More agent-oriented templates are included in `examples/`: `safe-channel-workflow.ds` demonstrates preview/force/try/exit handling, and `event-monitor.ds` demonstrates persistent event and timer handlers.
 
-The current language slice supports literals, variables, property access, function calls, and sequential statements. The CLI and language runtime use the same Discord capability layer.
+The language supports literals, variables, property access, function calls, sequential statements, functions, conditionals, loops, imports, environment access, async helpers, timers, event handlers, comments, dry-run/approval options, and script-level exit statuses. The CLI and language runtime use the same Discord capability layer. See [docs/language/reference.md](docs/language/reference.md) for the implemented contract.
 
 ## Development
 

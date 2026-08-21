@@ -1,7 +1,7 @@
 {
     "name": "@eliware/discript",
     "version": "1.0.9",
-    "description": "Discord scripting language and automation CLI for developers and AI agents.",
+  "description": "Safe Discord scripting language and CLI for developers, AI agents, and automation.",
     "private": false,
     "main": "bin/discript.mjs",
     "scripts": {
@@ -21,7 +21,15 @@
         "type": "git",
         "url": "git+ssh://git@github.com/eliware/discript.git"
     },
-    "keywords": [],
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "automation",
+    "scripting-language",
+    "cli",
+    "ai-agents",
+    "mcp"
+  ],
     "engines": {
         "node": ">=26"
     },
