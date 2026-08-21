@@ -1,0 +1,10 @@
+/*
+  Bounded asynchronous work
+
+  `mapLimit` keeps at most three callbacks active while preserving input
+  order. Use it for independent read operations; keep dependent mutations
+  sequential and respect Discord rate limits.
+*/
+items = [1, 2, 3, 4, 5]
+results = mapLimit(items, 3, item => item * 10)
+print(results)

@@ -28,5 +28,22 @@ export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
       return result;
     },
     now() { return clock().toISOString(); },
+    race(...operations) { return Promise.race(operations); },
+    allSettled(...operations) { return Promise.allSettled(operations); },
+    async mapLimit(items, limit, callback) {
+      if (!Array.isArray(items) || typeof callback !== 'function') throw Object.assign(new Error('mapLimit() expects an array and callback.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      const concurrency = Number(limit);
+      if (!Number.isInteger(concurrency) || concurrency < 1) throw Object.assign(new Error('mapLimit() limit must be a positive integer.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      const results = new Array(items.length);
+      let next = 0;
+      async function worker() {
+        while (next < items.length) {
+          const index = next++;
+          results[index] = await callback(items[index]);
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+      return results;
+    },
   };
 }

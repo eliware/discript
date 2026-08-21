@@ -49,6 +49,14 @@ print(results)
 
 Only parallelize independent work. Do not parallelize mutations that depend on ordering, share a target resource, or could exceed Discord rate limits. If one operation rejects, the combined result rejects and normal cleanup still runs.
 
+`race()` resolves with the first completed operation. `allSettled()` waits for every operation and returns status/value or status/reason records. Both receive already-started operation arguments, so use `mapLimit(items, limit, callback)` when processing a collection with bounded concurrency:
+
+```text
+reports = mapLimit(channels, 3, channel => discord.channels.get(channel.id))
+```
+
+The limit should account for Discord rate limits and the cost of the operation. Preserve input order in the returned array.
+
 ## Collection helpers
 
 The runtime provides async helpers for agent-friendly collection processing:
