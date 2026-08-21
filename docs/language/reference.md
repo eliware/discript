@@ -73,7 +73,7 @@ env.set("DISCRIPT_LAST_RUN", "agent")
 env.clear("DISCRIPT_LAST_RUN")
 ```
 
-Built-ins are `print(value)`, `exit(code, message)`, `env`, and the `discord` API root. Environment values are strings or absent/null-like values.
+Built-ins include `print(value)`, `exit(code, message)`, `env`, `args`, `defer callback`, `length`, `keys`, `values`, `range`, `now`, `race`, `allSettled`, `mapLimit`, and the `discord` API root. Environment values are strings or absent/null-like values. See the [standard library](standard-library.md) for helper contracts.
 
 ## Operation options and errors
 

@@ -43,6 +43,13 @@ The initial language shall support:
 - Basic conditionals and iteration
 - Errors that can be caught or reported
 - Event handler declarations for long-running scripts
+- Array indexes, computed member access, and member/index assignment
+- Compound assignment, modulo, exponentiation, and null-coalescing operators
+- `break`, `continue`, `throw`, `finally`, and deferred cleanup callbacks
+- Positional script arguments through the `args` array
+- Explicit aliased imports and named exports
+- Bounded standard-library helpers and bounded asynchronous collection mapping
+- Source locations on parser tokens and syntax diagnostics
 
 Example:
 

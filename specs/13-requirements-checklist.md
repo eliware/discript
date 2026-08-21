@@ -16,6 +16,13 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports explicit async helpers including `sleep` and `parallel`.
 - [Fully complete] Discript supports conditionals, comparisons, arithmetic, bounded `while` loops, and bounded `for-in` loops.
 - [Fully complete] Discript supports arrow callback syntax, callback blocks, and general-purpose async `map`, `filter`, and `reduce` helpers.
+- [Fully complete] Discript supports array indexes, computed member access, and assignment to variables, members, and indexes.
+- [Fully complete] Discript supports compound assignment, modulo, exponentiation, and null-coalescing operators.
+- [Fully complete] Discript supports `break`, `continue`, `throw`, `try/catch/finally`, and reverse-order deferred cleanup callbacks.
+- [Fully complete] Discript exposes positional script arguments through the `args` array for file, inline, and stdin execution.
+- [Fully complete] Discript supports explicit named exports and aliased imports while preserving legacy shared-scope imports.
+- [Fully complete] Discript provides bounded `length`, `keys`, `values`, `range`, `now`, `race`, `allSettled`, and `mapLimit` helpers.
+- [Fully complete] Parser tokens and syntax failures include source location metadata when a source position is available.
 - [Fully complete] Discript supports reusable `fn` functions, `return`, and shared-scope source imports.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.
@@ -49,7 +56,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Repository visibility is public on GitHub.
 - [Fully complete] Main-branch CI passes on Ubuntu and Windows for the last pushed checkpoint.
 - [Fully complete] The latest release commit was pushed and validated by GitHub Actions on Ubuntu and Windows.
-- [Fully complete] The package is configured as public `@eliware/discript` with `publishConfig.access=public`; the current repository version is `1.0.6` and the release workflow validates tarball installation before publishing.
+- [Fully complete] The package is configured as public `@eliware/discript` with `publishConfig.access=public`; the current repository version is `1.0.9` and the release workflow validates tarball installation before publishing.
 - [Fully complete] Resolve public npm registry visibility for the published scoped package.
 - [Fully complete] Run release validation for the post-1.0.3 local changes; subsequent local changes continue to pass package, docs, lint, and CI validation.
 - [Fully complete] Push the accumulated local release-ready commits after approval.
@@ -57,8 +64,8 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 
 ## Current verification evidence
 
-- [Fully complete] `npm test -- --runInBand` passes with 305 tests passed and 9 skipped.
-- [Fully complete] `npm run docs:check` passes with 107 Markdown files, 66 CLI commands, and 65 parsed examples.
+- [Fully complete] `npm test` passes with 467 tests passed and 9 skipped at the latest local checkpoint.
+- [Fully complete] `npm run docs:check` passes with 114 Markdown files, 66 CLI commands, and 148 parsed examples at the latest local checkpoint.
 - [Fully complete] `npm run package:check` passes with an isolated tarball install and packaged `docs/README.md` assertion.
 - [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
 - [Fully complete] Executable documentation tests parse every `.ds` example and execute representative fundamentals.
