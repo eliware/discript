@@ -1,0 +1,13 @@
+/*
+  Destructuring
+
+  Unpack selected fields from a Discord-shaped object or positions from a
+  collection. Rest captures the remaining values/properties in a new value.
+*/
+channel = {name: "general", type: "text", position: 2, topic: "Welcome"}
+{name, type, ...metadata} = channel
+print({name: name, type: type, metadata: metadata})
+
+ids = ["guild-1", "channel-1", "message-1"];
+[guildId, channelId, ...messageIds] = ids
+print({guild: guildId, channel: channelId, messages: messageIds})

@@ -25,6 +25,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Parser tokens and syntax failures include source location metadata when a source position is available.
 - [Fully complete] Discript supports lazy conditional expressions and optional member, index, and call access.
 - [Fully complete] Discript supports array and object spread expressions with non-mutating composition.
+- [Fully complete] Discript supports array and object destructuring assignments with rest capture.
 - [Fully complete] Discript supports reusable `fn` functions, `return`, and shared-scope source imports.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.

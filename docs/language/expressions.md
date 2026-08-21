@@ -33,3 +33,12 @@ voicePlan = {...defaults, type: "voice"}
 ```
 
 Later object properties override earlier spread properties. Array spread requires an iterable; object spread requires an object.
+
+Array and object patterns can unpack results:
+
+```ds
+{name, type, ...metadata} = channel
+[first, second, ...remaining] = values
+```
+
+Object patterns select named properties; array patterns select positions. Rest captures unconsumed values or properties. The source must be compatible with the pattern.

@@ -44,6 +44,11 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
       }
       return value;
     }
+    if (statement.type === 'DestructuringAssignment') {
+      const value = await evaluateExpression(statement.value);
+      await assignPattern(statement.pattern, value);
+      return value;
+    }
     if (statement.type === 'ExpressionStatement') return evaluateExpression(statement.expression);
     if (statement.type === 'EventStatement') {
       const register = scope.get('on');
@@ -89,6 +94,35 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
     if (object === null || object === undefined) throw runtimeError('Cannot assign a property on a null value.');
     const property = target.type === 'IndexExpression' ? await evaluateExpression(target.property) : target.property;
     object[property] = value;
+  }
+
+  async function assignPattern(pattern, value) {
+    if (pattern.type === 'Identifier') { scope.set(pattern.name, value); return; }
+    if (pattern.type === 'ArrayExpression') {
+      const values = Array.isArray(value) ? value : value && typeof value[Symbol.iterator] === 'function' ? [...value] : null;
+      if (!values) throw runtimeError('Array destructuring expects an iterable value.');
+      let index = 0;
+      for (const element of pattern.elements) {
+        if (element.type === 'SpreadElement') { await assignPattern(element.argument, values.slice(index)); index = values.length; }
+        else { await assignPattern(element, values[index]); index += 1; }
+      }
+      return;
+    }
+    if (pattern.type === 'ObjectExpression') {
+      if (value === null || typeof value !== 'object') throw runtimeError('Object destructuring expects an object value.');
+      const consumed = new Set();
+      for (const property of pattern.properties) {
+        if (property.type === 'SpreadProperty') {
+          const rest = Object.fromEntries(Object.entries(value).filter(([key]) => !consumed.has(key)));
+          await assignPattern(property.argument, rest);
+        } else {
+          consumed.add(property.key);
+          await assignPattern(property.value, value[property.key]);
+        }
+      }
+      return;
+    }
+    throw runtimeError('Invalid destructuring pattern.');
   }
 
   function applyAssignmentOperator(operator, left, right) {

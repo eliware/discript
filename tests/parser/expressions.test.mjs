@@ -61,4 +61,14 @@ describe('parser/expressions', () => {
       ],
     });
   });
+
+  test('parses shorthand object patterns for destructuring', async () => {
+    const { parse } = await import('../../src/parser.mjs');
+    expect(parse('[first, second, ...remaining] = values; {name, type, ...rest} = channel')).toMatchObject({
+      body: [
+        { type: 'DestructuringAssignment', pattern: { type: 'ArrayExpression' } },
+        { type: 'DestructuringAssignment', pattern: { type: 'ObjectExpression', properties: [{ type: 'Property', value: { type: 'Identifier', name: 'name' } }, { type: 'Property' }, { type: 'SpreadProperty' }] } },
+      ],
+    });
+  });
 });

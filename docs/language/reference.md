@@ -25,6 +25,8 @@ Conditional expressions use `test ? consequent : alternate` and evaluate only th
 
 Array expressions support spread elements (`[...items]`), and object expressions support spread properties (`{...defaults, mode: "safe"}`). Spread creates a new value and does not mutate its source.
 
+Destructuring assignments use array or object patterns on the left side. Rest patterns (`...remaining`) capture the remaining array values or object properties. Destructuring assigns into ordinary script variables and returns the original source value.
+
 ```text
 settings = {name: "general", position: 0}
 names = ["rules", "welcome", "general"]

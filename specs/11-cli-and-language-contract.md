@@ -52,6 +52,7 @@ The initial language shall support:
 - Source locations on parser tokens and syntax diagnostics
 - Conditional expressions and optional member/index/call access
 - Array and object spread expressions
+- Array and object destructuring assignments with rest capture
 
 Example:
 

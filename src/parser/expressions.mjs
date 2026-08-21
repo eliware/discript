@@ -89,7 +89,11 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
       if (!match('}')) {
         do {
           if (match('...')) properties.push({ type: 'SpreadProperty', argument: parseExpression() });
-          else { const key = consume('identifier', 'Expected an object property name.'); consume(':', 'Expected `:` after object property name.'); properties.push({ type: 'Property', key: key.value, value: parseExpression() }); }
+          else {
+            const key = consume('identifier', 'Expected an object property name.');
+            const value = match(':') ? parseExpression() : { type: 'Identifier', name: key.value };
+            properties.push({ type: 'Property', key: key.value, value });
+          }
         } while (match(','));
         consume('}', 'Expected `}` after object properties.');
       }

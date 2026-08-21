@@ -96,6 +96,16 @@ describe('collection access and assignment', () => {
     await expect(evaluate(parse('[...value]'), { value: 1 })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
     await expect(evaluate(parse('{...value}'), { value: 1 })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
   });
+
+  test('destructures arrays, objects, and rest values', async () => {
+    await expect(evaluate(parse('[first, second, ...remaining] = values; {first, second, remaining}'), { values: [1, 2, 3, 4] })).resolves.toEqual({ first: 1, second: 2, remaining: [3, 4] });
+    await expect(evaluate(parse('{name, type, ...rest} = channel; {name, type, rest}'), { channel: { name: 'general', type: 'text', position: 2 } })).resolves.toEqual({ name: 'general', type: 'text', rest: { position: 2 } });
+  });
+
+  test('rejects destructuring incompatible values', async () => {
+    await expect(evaluate(parse('[first] = value'), { value: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+    await expect(evaluate(parse('{name} = value'), { value: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+  });
 });
 
 describe('core language contract', () => {
