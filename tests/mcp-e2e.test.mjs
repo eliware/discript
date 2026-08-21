@@ -70,6 +70,30 @@ describe('MCP server/client HTTP integration', () => {
     }
   }, 15000);
 
+  test('enforces bearer passthrough and advertises the configured CORS origin', async () => {
+    const server = await mcpServer({
+      httpPort: 0, endpointPath: '/mcp', auth: { mode: 'bearer-passthrough' },
+      allowedOrigins: ['https://agent.example'],
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpInstance.address().port;
+    try {
+      const cors = await fetch(`http://127.0.0.1:${port}/mcp`, { method: 'OPTIONS', headers: { origin: 'https://agent.example' } });
+      expect(cors.status).toBe(204);
+      expect(cors.headers.get('access-control-allow-origin')).toBe('https://agent.example');
+      const unauthorized = await fetch(`http://127.0.0.1:${port}/mcp`, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } } }),
+      });
+      expect(unauthorized.status).toBe(401);
+      const client = await mcpClient({ url: `http://127.0.0.1:${port}/mcp`, token: 'passthrough-token', reconnect: false });
+      try { expect((await client.listTools()).tools.map(tool => tool.name)).toContain('run_discript'); }
+      finally { await client.close(); }
+    } finally {
+      await closeMcpServer(server);
+    }
+  }, 15000);
+
   test('accepts an OAuth2 token validated by a local introspection service', async () => {
     const introspection = createServer((request, response) => {
       if (request.method !== 'POST' || request.url !== '/introspect') {
