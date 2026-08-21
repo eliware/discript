@@ -1,6 +1,6 @@
 {
     "name": "@eliware/discript",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "Discord scripting language and automation CLI for developers and AI agents.",
     "private": false,
     "main": "bin/discript.mjs",
