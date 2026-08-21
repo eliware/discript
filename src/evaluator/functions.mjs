@@ -6,7 +6,7 @@ export function createClosure(statement, { scope, scopeContext, evaluateBlock, c
   const capturedScope = scopeContext.getStore() ?? scope;
   return async (...values) => {
     const localScope = createChildScope(capturedScope);
-    for (const [index, parameter] of statement.parameters.entries()) localScope.set(parameter, values[index]);
+    for (const [index, parameter] of statement.parameters.entries()) localScope.values.set(parameter, values[index]);
     return scopeContext.run(localScope, async () => {
       try { return await evaluateBlock(statement.body); }
       catch (error) {

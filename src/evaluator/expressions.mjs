@@ -11,7 +11,7 @@ export function createExpressionEvaluator({ scope, scopeContext, createChildScop
     if (expression.type === 'ArrowExpression') {
       const capturedScope = scopeContext.getStore() ?? scope;
       return async value => {
-      const localScope = createChildScope(capturedScope); if (expression.parameter) localScope.set(expression.parameter, value);
+      const localScope = createChildScope(capturedScope); if (expression.parameter) localScope.values.set(expression.parameter, value);
       return scopeContext.run(localScope, async () => expression.body.type === 'ExpressionBody' ? evaluateExpression(expression.body.body) : evaluateBlock(expression.body.body));
       };
     }
