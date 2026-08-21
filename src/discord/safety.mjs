@@ -1,6 +1,6 @@
 export function createSafety({ client, dryRun, yes, capabilities = null }) {
   const requireCapability = capability => {
-    if (capabilities && !capabilities.has(capability)) throw Object.assign(new Error(`Capability required: ${capability}.`), { code: 'CAPABILITY_REQUIRED', exitCode: 5, details: { capability } });
+    if (capabilities && !hasCapability(capabilities, capability)) throw Object.assign(new Error(`Capability required: ${capability}.`), { code: 'CAPABILITY_REQUIRED', exitCode: 5, details: { capability } });
   };
   const requireApproval = (action, operationOptions = {}) => {
     if (dryRun || operationOptions.dryRun === true) return;
@@ -27,4 +27,10 @@ export function createSafety({ client, dryRun, yes, capabilities = null }) {
     if (highest?.position !== undefined && targetHighest?.position !== undefined && targetHighest.position >= highest.position) throw Object.assign(new Error('Bot role hierarchy prevents this member moderation.'), { code: 'MEMBER_HIERARCHY', exitCode: 5 });
   };
   return { requireApproval, requireCapability, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember };
+}
+
+function hasCapability(capabilities, capability) {
+  if (capabilities.has(capability)) return true;
+  if (capability === 'discord:read') return capabilities.has('discord:write') || capabilities.has('discord:admin');
+  return capability === 'discord:write' && capabilities.has('discord:admin');
 }

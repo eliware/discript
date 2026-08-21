@@ -119,13 +119,19 @@ function createCapabilities(values) {
   const allowed = values ? new Set(values) : null;
   return {
     list: () => allowed ? [...allowed] : ['discord:read', 'discord:write', 'discord:admin'],
-    has: capability => !allowed || allowed.has(String(capability)),
+    has: capability => !allowed || hasCapability(allowed, String(capability)),
     require: capability => {
       const name = String(capability);
       if (allowed && !allowed.has(name)) throw Object.assign(new Error(`Capability required: ${name}.`), { code: 'CAPABILITY_REQUIRED', exitCode: 5, details: { capability: name } });
       return true;
     },
   };
+}
+
+function hasCapability(allowed, capability) {
+  if (allowed.has(capability)) return true;
+  if (capability === 'discord:read') return allowed.has('discord:write') || allowed.has('discord:admin');
+  return capability === 'discord:write' && allowed.has('discord:admin');
 }
 
 function waitForStop(runtime, signal) {

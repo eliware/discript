@@ -39,6 +39,7 @@ describe('mutation safety matrix', () => {
     expect(() => writeOnly('Deleting a channel', { force: true })).toThrow(expect.objectContaining({ code: 'CAPABILITY_REQUIRED', details: { capability: 'discord:admin' } }));
     const readOnly = safety({ capabilities: new Set(['discord:read']) }).requireApproval;
     expect(() => readOnly('Creating a channel')).toThrow(expect.objectContaining({ code: 'CAPABILITY_REQUIRED', details: { capability: 'discord:write' } }));
+    expect(() => safety({ capabilities: new Set(['discord:admin']) }).requireApproval('Deleting a channel', { force: true })).not.toThrow();
   });
 
   test('permission checks fail closed when bot permission state is unavailable', () => {

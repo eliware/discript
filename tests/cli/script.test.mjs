@@ -53,6 +53,11 @@ describe('cli/script', () => {
     await expect(executeInput({ kind: 'source', source: 'filter([{ok: true}, {ok: false}], "ok", true)' }, {}, { runtime: active })).resolves.toEqual([{ ok: true }]);
   });
 
+  test('exposes hierarchical capability introspection to scripts', async () => {
+    const active = runtime();
+    await expect(executeInput({ kind: 'source', source: '{write: capabilities.has("discord:write"), read: capabilities.has("discord:read"), admin: capabilities.has("discord:admin")}' }, {}, { runtime: active, capabilities: ['discord:admin'] })).resolves.toEqual({ write: true, read: true, admin: true });
+  });
+
   test('supports async collection helpers', async () => {
     const active = runtime();
     await expect(executeInput({ kind: 'source', source: 'map([1, 2], x => x * 2)' }, {}, { runtime: active })).resolves.toEqual([2, 4]);
