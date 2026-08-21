@@ -3,7 +3,7 @@
 ## MCP server foundation
 
 - [x] Add `@eliware/mcp-server` integration behind a Discript MCP module.
-- [x] Define a stable `run_discript` tool with compact inputs for source, command, dry-run, force, timeout, output mode, and target context.
+- [x] Define a stable `run_discript` tool with compact inputs for source, command, dry-run, force, timeout, and REST preference. Output mode and daemon target context remain later extensions.
 - [x] Route tool execution through the existing Discript engine so CLI, scripts, broker, and MCP share identical behavior.
 - [x] Add stdio mode with `discript mcp --stdio` for local MCP clients.
 - [ ] Add daemon HTTP mode with `discript daemon start --mcp-port <port>`.
