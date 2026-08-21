@@ -1,0 +1,13 @@
+/*
+  Script arguments
+
+  Run with:
+    discript examples/fundamentals/script-arguments.ds guild-id preview
+
+  Arguments are strings. Use environment variables for secrets and arguments
+  for ordinary per-run inputs.
+*/
+guildId = args[0]
+mode = args[1] ?? "read-only"
+if (guildId == null) { exit(2, "usage: script-arguments.ds <guild-id> [mode]") }
+print({guild: guildId, mode: mode})

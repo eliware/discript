@@ -33,6 +33,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       : null;
     const result = await evaluate(parse(input.source), {
       env: createEnvironment(),
+      args: input.args ?? [],
       json: createJsonHelpers(),
       discord: createDiscordApi(runtime.client, { ...options, rest }),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),

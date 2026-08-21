@@ -12,6 +12,10 @@ describe('evaluate', () => {
     })).resolves.toEqual({ id: '123' });
   });
 
+  test('exposes script arguments as an indexed array', async () => {
+    await expect(evaluate(parse('args[0] + ":" + args[1]'), { args: ['guild-1', 'preview'] })).resolves.toBe('guild-1:preview');
+  });
+
   test('evaluates nested statements through the statement callback', async () => {
     await expect(evaluate(parse('if (true) { value = 42 }; value'))).resolves.toBe(42);
     await expect(evaluate(parse('if (false) { value = 0 } else if (true) { value = 43 }; value'))).resolves.toBe(43);
