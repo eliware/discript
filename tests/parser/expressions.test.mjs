@@ -52,6 +52,15 @@ describe('parser/expressions', () => {
     });
   });
 
+  test('binds unary operators around complete member and call expressions', async () => {
+    const { parse } = await import('../../src/parser.mjs');
+    expect(parse('result = !language.supports("closures")').body[0].value).toMatchObject({
+      type: 'UnaryExpression',
+      operator: '!',
+      argument: { type: 'CallExpression', callee: { type: 'MemberExpression', property: 'supports' } },
+    });
+  });
+
   test('parses array and object spread elements', async () => {
     const { parse } = await import('../../src/parser.mjs');
     expect(parse('items = [0, ...source, 4]; config = {...defaults, mode: "safe"}')).toMatchObject({

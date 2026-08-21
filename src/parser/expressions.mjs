@@ -63,7 +63,7 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
   }
   function parsePrimary() {
     const token = peek();
-    if (token?.type === 'operator' && (token.value === '!' || token.value === '-')) { take(); return { type: 'UnaryExpression', operator: token.value, argument: parsePrimary() }; }
+    if (token?.type === 'operator' && (token.value === '!' || token.value === '-')) { take(); return { type: 'UnaryExpression', operator: token.value, argument: parsePostfix() }; }
     if (match('(')) {
       if (match(')') && match('=>')) {
         const body = peek()?.value === '{' ? { type: 'BlockBody', body: parseBlock() } : { type: 'ExpressionBody', body: parseExpression() };

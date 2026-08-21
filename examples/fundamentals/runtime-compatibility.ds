@@ -4,4 +4,4 @@
 */
 language.requireVersion("1.0");
 print({version: language.version, closures: language.supports("closures"), modules: language.supports("modules")});
-if (language.supports("future-feature") == false) { print({skipped: "future-feature"}) }
+if (!language.supports("future-feature")) { print({skipped: "future-feature"}) }
