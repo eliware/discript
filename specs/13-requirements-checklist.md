@@ -64,7 +64,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 
 ## Current verification evidence
 
-- [Fully complete] `npm test` passes with 467 tests passed and 9 skipped at the latest local checkpoint.
+- [Fully complete] `npm test` passes with 471 tests passed and 9 skipped at the latest local checkpoint.
 - [Fully complete] `npm run docs:check` passes with 114 Markdown files, 66 CLI commands, and 148 parsed examples at the latest local checkpoint.
 - [Fully complete] `npm run package:check` passes with an isolated tarball install and packaged `docs/README.md` assertion.
 - [Fully complete] CI runs `npm run docs:check` before tests on both configured operating systems.
