@@ -47,6 +47,9 @@ export function loadConfig(env = process.env) {
       tlsCaFile: stringValue(env.DISCRIPT_MCP_TLS_CA_FILE, null),
       httpRedirect: booleanValue(env.DISCRIPT_MCP_HTTP_REDIRECT, false),
       allowedOrigins: listValue(env.DISCRIPT_MCP_ALLOWED_ORIGINS),
+      executionTimeout: numberValue(env.DISCRIPT_MCP_EXECUTION_TIMEOUT, 300000, 'DISCRIPT_MCP_EXECUTION_TIMEOUT'),
+      maxConcurrent: numberValue(env.DISCRIPT_MCP_MAX_CONCURRENT, 4, 'DISCRIPT_MCP_MAX_CONCURRENT'),
+      maxOutputBytes: numberValue(env.DISCRIPT_MCP_MAX_OUTPUT_BYTES, 1048576, 'DISCRIPT_MCP_MAX_OUTPUT_BYTES'),
     },
     client: {
       url: stringValue(env.DISCRIPT_CLIENT_URL, null),

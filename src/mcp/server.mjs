@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { mcpServer } from '@eliware/mcp-server';
+import { createConcurrencyLimiter } from './limits.mjs';
 
 const toolsDir = join(dirname(fileURLToPath(import.meta.url)), 'tools');
 
@@ -39,7 +40,11 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
     tls,
     httpRedirect: Boolean(mcp.httpRedirect),
     allowedOrigins: mcp.allowedOrigins ?? [],
-    context: { token: token ?? config.token ?? null, ...context },
+    context: {
+      token: token ?? config.token ?? null,
+      mcpLimits: { timeout: mcp.executionTimeout ?? 300000, maxOutputBytes: mcp.maxOutputBytes ?? 1048576, limiter: createConcurrencyLimiter(mcp.maxConcurrent ?? 4) },
+      ...context,
+    },
     stdio,
   };
 }

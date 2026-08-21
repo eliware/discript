@@ -68,4 +68,11 @@ describe('MCP server profile mapping', () => {
     const options = createMcpServerOptions({ mcp: { authMode: 'oauth2', oauthIssuer: 'https://auth', oauthResource: 'https://resource', oauthRequiredScopes: ['discord:read'], oauthIntrospectionEndpoint: 'https://auth/introspect', oauthClientId: 'client', oauthClientSecret: 'secret' } });
     expect(options.auth).toMatchObject({ mode: 'oauth2', issuer: 'https://auth', resource: 'https://resource', requiredScopes: ['discord:read'], introspection: { introspectionEndpoint: 'https://auth/introspect', clientId: 'client', clientSecret: 'secret' } });
   });
+
+  test('maps MCP execution safety limits into server context', () => {
+    const options = createMcpServerOptions({ mcp: { executionTimeout: 1000, maxConcurrent: 2, maxOutputBytes: 4096 } });
+    expect(options.context.mcpLimits.timeout).toBe(1000);
+    expect(options.context.mcpLimits.maxOutputBytes).toBe(4096);
+    expect(options.context.mcpLimits.limiter.limit).toBe(2);
+  });
 });

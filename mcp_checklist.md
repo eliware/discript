@@ -38,8 +38,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Require explicit MCP approval for destructive operations through `force: true`.
 - [ ] Return structured MCP results containing value, success state, exit code, warnings, and diagnostics.
 - [ ] Preserve Discript error codes in MCP tool failures without exposing tokens or secrets.
-- [ ] Add per-request execution timeouts with cancellation and runtime cleanup.
-- [ ] Add output-size limits and bounded concurrent execution.
+- [ ] Add per-request execution timeouts with cancellation and runtime cleanup. Timeouts and runtime cleanup are implemented; cancellation remains pending.
+- [x] Add output-size limits and bounded concurrent execution.
 - [ ] Define behavior for long-running event/timer scripts over MCP.
 
 ## Phase 4 — Authentication, authorization, and TLS
@@ -105,7 +105,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures.
 - [ ] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata.
-- [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Remote client timeouts and output limits are implemented; cancellation and concurrency bounds remain pending.
+- [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Server/client timeouts, output limits, and concurrency bounds are implemented; cancellation remains pending.
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.

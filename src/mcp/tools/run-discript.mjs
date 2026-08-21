@@ -20,14 +20,21 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       if ((source === undefined) === (command === undefined)) {
         throw Object.assign(new Error('Exactly one of source or command is required.'), { code: 'MCP_INPUT_REQUIRED', exitCode: 2 });
       }
-      validateTimeout(timeout);
+      const limits = mcpServer.context?.mcpLimits ?? {};
+      const effectiveTimeout = timeout ?? limits.timeout;
+      validateTimeout(effectiveTimeout);
+      const release = await limits.limiter?.acquire?.();
       const options = { dry_run: dryRun, yes: force, rest };
       const input = source === undefined
         ? { kind: 'command', command }
         : { kind: 'source', source, origin: 'mcp' };
-      const value = await withTimeout(executeInput(input, options, { runtime }), timeout);
-      return buildResponse({ ok: true, exitCode: 0, value });
+      try {
+        const value = await withTimeout(executeInput(input, options, { runtime }), effectiveTimeout);
+        const result = { ok: true, exitCode: 0, value };
+        const maxOutputBytes = limits.maxOutputBytes;
+        if (maxOutputBytes && Buffer.byteLength(JSON.stringify(result)) > maxOutputBytes) throw Object.assign(new Error(`MCP response exceeded the ${maxOutputBytes}-byte output limit.`), { code: 'MCP_OUTPUT_LIMIT', exitCode: 1 });
+        return buildResponse(result);
+      } finally { release?.(); }
     },
   );
 }
-
