@@ -9,7 +9,18 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
     if (statement.type === 'ImportStatement') {
       const load = scope.get('importScript');
       if (typeof load !== 'function') throw runtimeError('Script imports are unavailable in this execution mode.');
-      return load(statement.path, scope, baseDir);
+      const imported = await load(statement.path, scope, baseDir);
+      if (statement.alias) scope.set(statement.alias, imported);
+      return imported;
+    }
+    if (statement.type === 'ExportStatement') {
+      const value = await evaluateStatement(statement.declaration);
+      const exports = scope.get('exports');
+      if (!exports || typeof exports !== 'object') throw runtimeError('Exports are unavailable in this execution mode.');
+      const name = statement.declaration.name ?? statement.declaration.target?.name;
+      if (!name) throw runtimeError('Only named declarations can be exported.');
+      exports[name] = await evaluateExpression({ type: 'Identifier', name });
+      return value;
     }
     if (statement.type === 'ReturnStatement') throw new ReturnSignal(statement.value === null ? undefined : await evaluateExpression(statement.value));
     if (statement.type === 'BreakStatement') throw new BreakSignal();

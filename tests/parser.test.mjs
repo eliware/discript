@@ -102,6 +102,15 @@ describe('parse', () => {
     });
   });
 
+  test('parses aliased imports and exports', () => {
+    expect(parse('export fn greet(name) { return name }; import tools from "./tools.ds"')).toMatchObject({
+      body: [
+        { type: 'ExportStatement', declaration: { type: 'FunctionDeclaration', name: 'greet' } },
+        { type: 'ImportStatement', alias: 'tools', path: './tools.ds' },
+      ],
+    });
+  });
+
   test('rejects malformed core forms', () => {
     expect(() => parse('fn () {}')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
     expect(() => parse('for (item of items) {}')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));

@@ -1,0 +1,8 @@
+/*
+  Aliased module import
+
+  Explicit module exports avoid depending on names leaking into the caller's
+  shared scope. The imported module value is an object containing its exports.
+*/
+import helpers from "./exported-module.ds"
+print(helpers.greeting("Discord"))

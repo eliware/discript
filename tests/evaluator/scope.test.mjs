@@ -49,6 +49,18 @@ describe('script imports', () => {
     }
   });
 
+  test('supports named exports and aliased imports', async () => {
+    const shared = new Map();
+    const load = async () => ({ triple: async value => value * 3 });
+    shared.set('importScript', load);
+    await expect(evaluate(parse('import tools from "tools.ds"; tools.triple(7)'), {}, { scope: shared })).resolves.toBe(21);
+
+    const exports = {};
+    const moduleScope = new Map([['exports', exports]]);
+    await expect(evaluate(parse('export fn triple(value) { return value * 3 }'), {}, { scope: moduleScope })).resolves.toEqual(expect.any(Function));
+    expect(exports.triple).toEqual(expect.any(Function));
+  });
+
   test('rejects imports without a loader', async () => {
     await expect(evaluate(parse('import "shared.ds"'))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
   });

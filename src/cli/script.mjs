@@ -77,7 +77,11 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       importScript: async (sourcePath, sharedScope, importerBaseDir = baseDir) => {
         const importedPath = resolve(importerBaseDir, sourcePath);
         const source = await readFile(importedPath, 'utf8');
-        return evaluate(parse(source), {}, { scope: sharedScope, baseDir: dirname(importedPath) });
+        const moduleExports = {};
+        sharedScope.set('exports', moduleExports);
+        await evaluate(parse(source), {}, { scope: sharedScope, baseDir: dirname(importedPath) });
+        sharedScope.delete('exports');
+        return moduleExports;
       },
     }, { baseDir });
     const keepAlive = options.keep_alive ?? options.keepAlive;

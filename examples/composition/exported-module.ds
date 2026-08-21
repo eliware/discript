@@ -1,0 +1,10 @@
+/*
+  Exported module
+
+  A module can explicitly export a function. Import it with an alias from a
+  caller: `import helpers from "./exported-module.ds"` and call
+  `helpers.greeting(...)`. Existing side-effect imports remain supported.
+*/
+export fn greeting(name) {
+  return "Hello " + name
+}

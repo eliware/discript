@@ -2,7 +2,19 @@ export function createStatementParser({ peek, match, take, consume, parseExpress
   return function parseStatement() {
     if (peek()?.type === 'identifier' && peek().value === 'import') {
       take();
+      if (peek()?.type === 'identifier') {
+        const alias = take().value;
+        if (peek()?.type !== 'identifier' || peek().value !== 'from') throw syntaxError('Expected `from` after an import alias.');
+        take();
+        return { type: 'ImportStatement', alias, path: consume('string', 'Expected a source path after `from`.').value };
+      }
       return { type: 'ImportStatement', path: consume('string', 'Expected a source path after `import`.').value };
+    }
+    if (peek()?.type === 'identifier' && peek().value === 'export') {
+      take();
+      const exported = parseStatement();
+      if (!['FunctionDeclaration', 'Assignment'].includes(exported.type)) throw syntaxError('Only functions and assignments can be exported.');
+      return { type: 'ExportStatement', declaration: exported };
     }
     if (peek()?.type === 'identifier' && peek().value === 'fn') {
       take();
