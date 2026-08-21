@@ -4,6 +4,7 @@ import { mcpServer } from '@eliware/mcp-server';
 import { createConcurrencyLimiter } from './limits.mjs';
 
 const toolsDir = join(dirname(fileURLToPath(import.meta.url)), 'tools');
+const closePromises = new WeakMap();
 
 export function createMcpServerOptions(config = {}, { stdio = false, port, transport, token, context = {}, ...options } = {}) {
   const mcp = config.mcp ?? {};
@@ -62,11 +63,18 @@ export async function startMcpServer({ config = {}, stdio = false, httpPort, tra
 }
 
 export async function closeMcpServer(server) {
-  await server?.transport?.close?.();
-  await Promise.all([
-    closeHttpInstance(server?.httpInstance),
-    closeHttpInstance(server?.httpsInstance),
-  ]);
+  if (!server) return;
+  const existing = closePromises.get(server);
+  if (existing) return existing;
+  const closing = (async () => {
+    await server.transport?.close?.();
+    await Promise.all([
+      closeHttpInstance(server.httpInstance),
+      closeHttpInstance(server.httpsInstance),
+    ]);
+  })();
+  closePromises.set(server, closing);
+  return closing;
 }
 
 function closeHttpInstance(instance) {

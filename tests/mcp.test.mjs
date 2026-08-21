@@ -4,7 +4,7 @@ const executeInput = jest.fn(async (input, options) => ({ input, options }));
 jest.unstable_mockModule('../src/cli/script.mjs', () => ({ executeInput }));
 
 const { default: registerRunDiscript } = await import('../src/mcp/tools/run-discript.mjs');
-const { createMcpServerOptions } = await import('../src/mcp/server.mjs');
+const { closeMcpServer, createMcpServerOptions, startMcpServer } = await import('../src/mcp/server.mjs');
 
 describe('MCP run_discript tool', () => {
   function registeredTool(context = {}) {
@@ -126,5 +126,11 @@ describe('MCP server profile mapping', () => {
     expect(options.context.mcpLimits.maxOutputBytes).toBe(4096);
     expect(options.context.mcpLimits.limiter.limit).toBe(2);
     expect(options.context.mcpLimits.limiter.maxPending).toBe(32);
+  });
+
+  test('coordinates repeated and concurrent MCP shutdown calls', async () => {
+    const server = await startMcpServer({ config: { mcp: { authMode: 'none' } }, httpPort: 0 });
+    await Promise.all([closeMcpServer(server), closeMcpServer(server), closeMcpServer(server)]);
+    await closeMcpServer(server);
   });
 });

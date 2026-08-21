@@ -93,7 +93,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add rate limits and bounded queues for remote HTTP execution. MCP execution has bounded concurrency and a configurable pending queue (`DISCRIPT_MCP_MAX_PENDING`); Discord API-native rate-limit backoff remains delegated to Discord.js.
 - [x] Add request IDs, execution duration, transport, command/source mode, exit code, and sanitized failure-category logging. MCP execution responses and logs include correlation IDs, duration, mode, status, and sanitized error codes; transport is supplied by the MCP server layer.
 - [ ] Never log Discord tokens, MCP bearer tokens, OAuth secrets, TLS key material, or sensitive tool arguments/results.
-- [ ] Add graceful shutdown coordination between MCP server, broker, Discord runtime, and child MCP client processes.
+- [ ] Add graceful shutdown coordination between MCP server, broker, Discord runtime, and child MCP client processes. MCP shutdown is now idempotent and concurrency-safe, and broker callbacks already coordinate listener teardown; full child-process and cross-component shutdown verification remains pending.
 - [x] Define trust boundaries for stdio child processes and remote HTTP callers.
 - [x] Document stable MCP release compatibility versus draft 2026 discovery features.
 - [ ] Define remote server lifecycle, health checks, and failure recovery behavior. A read-only `/healthz` endpoint is implemented; lifecycle and failure-recovery policy remain pending.
@@ -105,7 +105,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, static bearer, OAuth2 introspection, bearer-passthrough, and configured CORS integration are covered; HTTPS, stdio transport, TLS, and other failure cases remain pending.
 - [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata.
-- [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Server/client timeouts, cancellation signaling, output limits, and concurrency bounds are covered; broker duplicate-startup and full shutdown cases remain pending.
+- [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Broker reuse/duplicate-startup, MCP shutdown idempotence, client/server timeouts, cancellation signaling, output limits, and concurrency bounds are covered; full cross-component shutdown cases remain pending.
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping. Structured success/failure results and sanitized error mapping are covered; dry-run/force approval coverage remains pending.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
