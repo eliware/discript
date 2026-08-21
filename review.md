@@ -4,7 +4,7 @@ Reviewed against the current `main` worktree and the latest `npm run test:gaps` 
 
 ## Executive summary
 
-Discript has a strong early product foundation: it combines a Discord-focused scripting language, direct CLI commands, reusable scripts, environment access, structured output, guarded mutations, and agent-oriented workflows. The parser/evaluator design is well decomposed and the project now has broad documentation, examples, package publishing, and a disposable test-guild workflow.
+Discript has a strong early product foundation: it combines a Discord-focused scripting language, direct CLI commands, reusable scripts, environment access, structured output, guarded mutations, capability policies, runtime compatibility metadata, and agent-oriented workflows. The parser/evaluator design is well decomposed and the project now has broad documentation, examples, package publishing, and a disposable test-guild workflow.
 
 The main maturity gap is not feature breadth. It is confidence in the code paths connecting user input to live Discord behavior. The parser and evaluator internals are well covered, but runtime startup/shutdown, script execution, CLI dispatch, command handlers, and several Discord adapters have low automated coverage. The requirements checklist currently presents a higher level of completion than the test evidence supports for those integration and safety boundaries.
 
@@ -20,13 +20,13 @@ Result: passed with exit code `0`.
 
 | Scope | Statements | Branches | Functions | Lines |
 | --- | ---: | ---: | ---: | ---: |
-| Overall | 65.88% | 59.18% | 75.80% | 77.92% |
-| `src` | 71.84% | 61.13% | 75.00% | 74.26% |
-| `src/discord` | 65.52% | 58.34% | 81.35% | 77.39% |
+| Overall | 89.80% | 83.03% | 92.78% | 95.58% |
+| `src` | 89.26% | 78.52% | 91.66% | 93.22% |
+| `src/discord` | 90.51% | 84.81% | 99.18% | 99.58% |
 | `src/evaluator` | 100.00% | 99.26% | 100.00% | 100.00% |
-| `src/parser` | 99.49% | 100.00% | 95.83% | 99.18% |
+| `src/parser` | 99.25% | 98.16% | 100.00% | 100.00% |
 
-The suite currently reports 160 passing tests and 9 skipped tests across 63 suites, with one live suite skipped unless explicitly enabled.
+The suite currently reports 500 passing tests and 9 skipped tests across 82 passing suites, with one live suite skipped unless explicitly enabled.
 
 ## Highest-priority attention areas
 
@@ -57,16 +57,13 @@ The project has the right safety model—dry-run for previews and explicit `--ye
 
 This should cover every mutating command, not only the underlying adapter methods.
 
-### 3. Guild-channel adapter coverage and decomposition
+### 3. Remaining adapter and command-path coverage
 
-`src/discord/guild-channels.mjs` is one of the largest and least-covered modules:
-
-- 139 lines
-- 21.21% statement coverage
-- 29.94% branch coverage
-- 25% function coverage
-
-It owns several capabilities—channels, webhooks, permissions, threads, and channel messages. Decomposing it into focused modules or adding complete 1:1 tests would reduce the risk of regressions in provisioning and cleanup workflows.
+The channel adapter now has focused lifecycle, dry-run, validation, webhook,
+permission, and thread tests in its existing 1:1 test file. The remaining
+lower-confidence areas are smaller command-dispatch branches and error paths
+in several Discord resource adapters. Continue adding tests to the existing
+mapped files rather than creating edge-case test files.
 
 ### 4. CLI command-handler coverage
 
@@ -82,7 +79,7 @@ The repository now has `npm run docs:check`, which verifies:
 
 - Relative Markdown links
 - All 66 CLI catalog commands are named in the CLI reference
-- All 65 `.ds` examples parse
+- All 157 `.ds` examples parse
 
 This catches structural drift but not semantic drift such as incorrect option forwarding, permissions, return shapes, or examples that parse but fail at runtime. Add executable documentation checks for representative read-only, dry-run, and approved workflows.
 
@@ -96,7 +93,7 @@ CI currently runs tests, lint, package packing, and tarball installation, but do
 
 - Parser modules are decomposed and very well tested.
 - Evaluator modules have effectively complete coverage.
-- The language supports composition, imports, callbacks, timers, event handlers, and exit-code branching.
+- The language supports composition, imports, callbacks, timers, event handlers, exit-code branching, lexical closures, capability introspection, and runtime compatibility checks.
 - Discord capability breadth is good for an early release.
 - Channel provisioning supports text, voice, categories, parent changes, uncategorized channels, and ordering.
 - Destructive operations have an explicit approval model.
@@ -107,14 +104,11 @@ CI currently runs tests, lint, package packing, and tarball installation, but do
 
 ## Recommended order of work
 
-1. Add runtime and CLI integration tests.
-2. Build the mutation safety matrix across direct commands and scripts.
-3. Decompose or fully test `guild-channels.mjs`.
-4. Raise direct command-handler coverage and verify option forwarding.
-5. Run a deterministic live smoke suite against `TEST_GUILD`.
-6. Add `docs:check` to CI and executable checks for key examples.
-7. Decide whether `docs/` belongs in the npm package.
-8. Refresh the requirements checklist using separate implementation, test, live-test, documentation, and CI evidence.
+1. Expand remaining command-dispatch and Discord-adapter error-path tests.
+2. Run a deterministic live smoke suite against `TEST_GUILD` before releases.
+3. Add executable documentation checks for representative read-only, dry-run, and approved workflows.
+4. Decide whether `docs/` belongs in the npm package.
+5. Refresh the requirements checklist using separate implementation, test, live-test, documentation, and CI evidence.
 
 ## Bottom line
 
