@@ -51,4 +51,14 @@ describe('parser/expressions', () => {
       ],
     });
   });
+
+  test('parses array and object spread elements', async () => {
+    const { parse } = await import('../../src/parser.mjs');
+    expect(parse('items = [0, ...source, 4]; config = {...defaults, mode: "safe"}')).toMatchObject({
+      body: [
+        { type: 'Assignment', value: { type: 'ArrayExpression', elements: [{ type: 'Literal' }, { type: 'SpreadElement' }, { type: 'Literal' }] } },
+        { type: 'Assignment', value: { type: 'ObjectExpression', properties: [{ type: 'SpreadProperty' }, { type: 'Property' }] } },
+      ],
+    });
+  });
 });

@@ -38,8 +38,28 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
       if (expression.operator === '+') return left + right; if (expression.operator === '-') return left - right; if (expression.operator === '*') return left * right; if (expression.operator === '/') return left / right; if (expression.operator === '%') return left % right; if (expression.operator === '**') return left ** right;
       throw runtimeError(`Unsupported operator: ${expression.operator}`);
     }
-    if (expression.type === 'ArrayExpression') return Promise.all(expression.elements.map(evaluateExpression));
-    if (expression.type === 'ObjectExpression') return Object.fromEntries(await Promise.all(expression.properties.map(async property => [property.key, await evaluateExpression(property.value)])));
+    if (expression.type === 'ArrayExpression') {
+      const values = [];
+      for (const element of expression.elements) {
+        const value = await evaluateExpression(element.type === 'SpreadElement' ? element.argument : element);
+        if (element.type === 'SpreadElement') {
+          if (!value || typeof value[Symbol.iterator] !== 'function') throw runtimeError('Array spread expects an iterable value.');
+          values.push(...value);
+        } else values.push(value);
+      }
+      return values;
+    }
+    if (expression.type === 'ObjectExpression') {
+      const value = {};
+      for (const property of expression.properties) {
+        if (property.type === 'SpreadProperty') {
+          const spread = await evaluateExpression(property.argument);
+          if (!spread || typeof spread !== 'object') throw runtimeError('Object spread expects an object value.');
+          Object.assign(value, spread);
+        } else value[property.key] = await evaluateExpression(property.value);
+      }
+      return value;
+    }
     if (expression.type === 'Identifier') { if (!scope.has(expression.name)) throw runtimeError('Unknown variable: ' + expression.name); return scope.get(expression.name); }
     if (expression.type === 'MemberExpression') {
       const object = await evaluateExpression(expression.object);

@@ -76,8 +76,25 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
     }
     if (token?.type === 'string' || token?.type === 'number') { take(); return { type: 'Literal', value: token.value }; }
     if (token?.type === 'identifier') { take(); if (token.value === 'true' || token.value === 'false') return { type: 'Literal', value: token.value === 'true' }; if (token.value === 'null') return { type: 'Literal', value: null }; return { type: 'Identifier', name: token.value }; }
-    if (match('[')) { const elements = []; if (!match(']')) { do elements.push(parseExpression()); while (match(',')); consume(']', 'Expected `]` after array elements.'); } return { type: 'ArrayExpression', elements }; }
-    if (match('{')) { const properties = []; if (!match('}')) { do { const key = consume('identifier', 'Expected an object property name.'); consume(':', 'Expected `:` after object property name.'); properties.push({ key: key.value, value: parseExpression() }); } while (match(',')); consume('}', 'Expected `}` after object properties.'); } return { type: 'ObjectExpression', properties }; }
+    if (match('[')) {
+      const elements = [];
+      if (!match(']')) {
+        do elements.push(match('...') ? { type: 'SpreadElement', argument: parseExpression() } : parseExpression()); while (match(','));
+        consume(']', 'Expected `]` after array elements.');
+      }
+      return { type: 'ArrayExpression', elements };
+    }
+    if (match('{')) {
+      const properties = [];
+      if (!match('}')) {
+        do {
+          if (match('...')) properties.push({ type: 'SpreadProperty', argument: parseExpression() });
+          else { const key = consume('identifier', 'Expected an object property name.'); consume(':', 'Expected `:` after object property name.'); properties.push({ type: 'Property', key: key.value, value: parseExpression() }); }
+        } while (match(','));
+        consume('}', 'Expected `}` after object properties.');
+      }
+      return { type: 'ObjectExpression', properties };
+    }
     throw syntaxError('Expected an expression.');
   }
   return { parseExpression, parseBinary };

@@ -22,3 +22,14 @@ kind = channel == null ? "not-found" : channel.type
 ```
 
 Use ordinary access when absence should be treated as an error. See the [optional access example](../../examples/fundamentals/optional-and-conditional.ds).
+
+Array and object spread compose values without mutating the source:
+
+```ds
+base = ["general", "rules"]
+channels = [...base, "alerts"]
+defaults = {dryRun: true, type: "text"}
+voicePlan = {...defaults, type: "voice"}
+```
+
+Later object properties override earlier spread properties. Array spread requires an iterable; object spread requires an object.

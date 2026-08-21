@@ -86,6 +86,16 @@ describe('collection access and assignment', () => {
   test('reports ordinary null access as a runtime error', async () => {
     await expect(evaluate(parse('user.profile'), { user: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
   });
+
+  test('expands array and object spread values', async () => {
+    await expect(evaluate(parse('[0, ...items, 3]'), { items: [1, 2] })).resolves.toEqual([0, 1, 2, 3]);
+    await expect(evaluate(parse('{...defaults, mode: "safe"}'), { defaults: { retries: 2, mode: 'preview' } })).resolves.toEqual({ retries: 2, mode: 'safe' });
+  });
+
+  test('rejects spreading non-iterable values', async () => {
+    await expect(evaluate(parse('[...value]'), { value: 1 })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+    await expect(evaluate(parse('{...value}'), { value: 1 })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+  });
 });
 
 describe('core language contract', () => {

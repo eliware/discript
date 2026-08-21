@@ -1,0 +1,12 @@
+/*
+  Spread values
+
+  Array spread combines collections while object spread merges configuration.
+  Later object properties override earlier values, which is useful for
+  applying a per-run safety or target override to a shared plan.
+*/
+baseChannels = ["general", "rules"]
+channels = [...baseChannels, "alerts"]
+defaults = {dryRun: true, force: false, type: "text"}
+plan = {...defaults, name: "preview", type: "voice"}
+print({channels: channels, plan: plan})

@@ -23,6 +23,8 @@ Compound assignments `+=`, `-=`, `*=`, `/=`, and `%=` update an existing variabl
 
 Conditional expressions use `test ? consequent : alternate` and evaluate only the selected branch. Optional access uses `?.`, `?.[index]`, and `?.()`; it returns an absent value when the receiver or callable is null-like. Ordinary access through a null value raises a runtime error.
 
+Array expressions support spread elements (`[...items]`), and object expressions support spread properties (`{...defaults, mode: "safe"}`). Spread creates a new value and does not mutate its source.
+
 ```text
 settings = {name: "general", position: 0}
 names = ["rules", "welcome", "general"]
