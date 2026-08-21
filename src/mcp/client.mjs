@@ -53,12 +53,25 @@ export async function callMcpClient(config, { action, name, uri, arguments: rawA
 export async function runRemoteDiscript(config, { source, command, dryRun = false, force = false, timeout, rest = false, clientFactory = mcpClient } = {}) {
   const client = await clientFactory(createMcpClientOptions(config));
   try {
+    await discoverExecutionServer(client, config, timeout);
     const response = await requestWithLimits(client.callTool({ name: 'run_discript', arguments: {
       ...(source !== undefined ? { source } : { command }), dryRun, force,
       ...(timeout !== undefined ? { timeout } : {}), rest,
     } }), config, timeout);
     return bounded(config, normalizeRemoteResponse(response));
   } finally { await client.close?.(); }
+}
+
+async function discoverExecutionServer(client, config, timeout) {
+  const tools = await requestWithLimits(client.listTools(), config, timeout);
+  if (!tools?.tools?.some(tool => tool?.name === 'run_discript')) {
+    throw Object.assign(new Error('Remote MCP server does not expose the run_discript tool.'), { code: 'REMOTE_TOOL_UNAVAILABLE', exitCode: 1 });
+  }
+  await Promise.all([
+    client.getInstructions?.(),
+    client.listResources?.() ? requestWithLimits(client.listResources(), config, timeout) : undefined,
+    client.listPrompts?.() ? requestWithLimits(client.listPrompts(), config, timeout) : undefined,
+  ]);
 }
 
 function normalizeRemoteResponse(response) {

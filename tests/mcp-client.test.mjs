@@ -29,18 +29,25 @@ describe('MCP client mode', () => {
   });
 
   test('runs source remotely and preserves structured results', async () => {
-    const client = { callTool: jest.fn(async input => ({ structuredContent: { ok: true, exitCode: 0, value: input.arguments } })), close: jest.fn(async () => {}) };
+    const client = { listTools: jest.fn(async () => ({ tools: [{ name: 'run_discript' }] })), listResources: jest.fn(async () => ({ resources: [] })), listPrompts: jest.fn(async () => ({ prompts: [] })), getInstructions: jest.fn(() => 'help'), callTool: jest.fn(async input => ({ structuredContent: { ok: true, exitCode: 0, value: input.arguments } })), close: jest.fn(async () => {}) };
     await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { source: 'guilds list', dryRun: true, clientFactory: async () => client })).resolves.toEqual({ ok: true, exitCode: 0, value: { source: 'guilds list', dryRun: true, force: false, rest: false } });
+    expect(client.listTools).toHaveBeenCalled();
   });
 
   test('normalizes standard MCP text tool results', async () => {
-    const client = { callTool: jest.fn(async () => ({ content: [{ type: 'text', text: JSON.stringify({ ok: true, requestId: 'request-1', exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] }) }] })), close: jest.fn(async () => {}) };
+    const client = { listTools: jest.fn(async () => ({ tools: [{ name: 'run_discript' }] })), callTool: jest.fn(async () => ({ content: [{ type: 'text', text: JSON.stringify({ ok: true, requestId: 'request-1', exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] }) }] })), close: jest.fn(async () => {}) };
     await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['guilds', 'list'], clientFactory: async () => client })).resolves.toEqual({ ok: true, requestId: 'request-1', exitCode: 0, value: { guilds: [] }, warnings: [], diagnostics: [] });
   });
 
   test('preserves remote failures and exit codes', async () => {
-    const client = { callTool: jest.fn(async () => ({ isError: true, structuredContent: { ok: false, code: 'MISSING_PERMISSION', exitCode: 5, error: 'Denied' } })), close: jest.fn(async () => {}) };
+    const client = { listTools: jest.fn(async () => ({ tools: [{ name: 'run_discript' }] })), callTool: jest.fn(async () => ({ isError: true, structuredContent: { ok: false, code: 'MISSING_PERMISSION', exitCode: 5, error: 'Denied' } })), close: jest.fn(async () => {}) };
     await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['roles', 'delete'], clientFactory: async () => client })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5, message: 'Denied' });
+  });
+
+  test('fails before execution when the remote lacks run_discript', async () => {
+    const client = { listTools: jest.fn(async () => ({ tools: [{ name: 'other_tool' }] })), callTool: jest.fn(), close: jest.fn(async () => {}) };
+    await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['guilds', 'list'], clientFactory: async () => client })).rejects.toMatchObject({ code: 'REMOTE_TOOL_UNAVAILABLE', exitCode: 1 });
+    expect(client.callTool).not.toHaveBeenCalled();
   });
 
   test('enforces request timeout and output limit', async () => {

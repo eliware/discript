@@ -80,7 +80,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Support remote Streamable HTTP MCP connections with URL, bearer token, headers, timeout, and reconnect options.
 - [x] Support remote SSE connections where required for legacy servers.
 - [x] Support remote stdio connections by launching another Discript process or compatible MCP server.
-- [ ] Let client mode discover server instructions, resources, prompts, and tools before execution.
+- [x] Let client mode discover server instructions, resources, prompts, and tools before execution. Remote script execution now performs capability discovery and verifies `run_discript` before calling it.
 - [x] Add client commands for remote tool invocation, resource reading, prompt retrieval, and server inspection.
 - [x] Support piping Discript source into the remote client without temporary files.
 - [ ] Support client-side static tokens, async token providers, custom headers, and OAuth/PKCE integration where selected. Static tokens and custom headers are complete; async providers and OAuth/PKCE remain pending.
@@ -101,7 +101,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 ## Phase 8 — Tests and verification
 
 - [x] Test configuration precedence, profile selection, CLI overrides, and redacted config output. Configuration/profile parsing, MCP and client profile mapping, direct/client routing overrides, argument precedence, and secret-redacted inspection are covered by focused tests.
-- [ ] Test MCP tool discovery and compact schema validation.
+- [x] Test MCP tool discovery and compact schema validation. Includes remote preflight discovery and missing-tool failure behavior.
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, stdio, HTTPS listener and certificate rejection, malformed HTTP, static bearer, OAuth2 introspection, bearer-passthrough, and configured CORS integration are covered; remaining authorization and transport failure cases are pending.
 - [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Includes tool-level read/write/admin scope enforcement.
