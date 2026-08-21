@@ -100,7 +100,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 ## Phase 8 — Tests and verification
 
-- [ ] Test configuration precedence, profile selection, CLI overrides, and redacted config output.
+- [x] Test configuration precedence, profile selection, CLI overrides, and redacted config output. Configuration/profile parsing, MCP and client profile mapping, direct/client routing overrides, argument precedence, and secret-redacted inspection are covered by focused tests.
 - [ ] Test MCP tool discovery and compact schema validation.
 - [ ] Test resources, prompts, server instructions, and discovery metadata.
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, stdio, HTTPS listener and certificate rejection, malformed HTTP, static bearer, OAuth2 introspection, bearer-passthrough, and configured CORS integration are covered; remaining authorization and transport failure cases are pending.
