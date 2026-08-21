@@ -102,6 +102,14 @@ describe('evaluate', () => {
     await expect(evaluate(parse('values = [1, 2, 3, 4]; total = 0; for (value in values) { if (value == 2) { continue } if (value == 4) { break } total = total + value }; total'))).resolves.toBe(4);
   });
 
+  test('preserves closure state while keeping parameters local to each call', async () => {
+    await expect(evaluate(parse('count = 0; fn next() { count += 1; return count }; first = next(); second = next(); [first, second, count]'))).resolves.toEqual([1, 2, 2]);
+  });
+
+  test('does not leak function locals into the captured scope', async () => {
+    await expect(evaluate(parse('fn make(value) { local = value; return local }; result = make(7); try { local } catch (error) { "missing" }'))).resolves.toMatchObject({ ok: false, error: { message: 'Unknown variable: local' } });
+  });
+
   test('throws script values and catches them with finally cleanup', async () => {
     await expect(evaluate(parse('result = try { throw "bad" } catch (error) { error.message } finally { cleaned = true }; result'))).resolves.toEqual({ ok: false, exitCode: 1, error: { code: 'SCRIPT_THROW', message: 'bad', exitCode: 1 } });
   });

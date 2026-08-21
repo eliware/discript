@@ -1,4 +1,4 @@
-export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, evaluateExpression, normalizeError, runtimeError, ScriptExit }) {
+export function createExpressionEvaluator({ scope, scopeContext, createChildScope, evaluateBlock, evaluateExpression, normalizeError, runtimeError, ScriptExit }) {
   return async function evaluateExpressionNode(expression) {
     if (expression.type === 'Literal') return expression.value;
     if (expression.type === 'AwaitExpression') return evaluateExpression(expression.argument);
@@ -8,10 +8,13 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
       if (expression.operator === '-') return -value;
       throw runtimeError(`Unsupported unary operator: ${expression.operator}`);
     }
-    if (expression.type === 'ArrowExpression') return async value => {
-      const localScope = new Map(scope); if (expression.parameter) localScope.set(expression.parameter, value);
+    if (expression.type === 'ArrowExpression') {
+      const capturedScope = scopeContext.getStore() ?? scope;
+      return async value => {
+      const localScope = createChildScope(capturedScope); if (expression.parameter) localScope.set(expression.parameter, value);
       return scopeContext.run(localScope, async () => expression.body.type === 'ExpressionBody' ? evaluateExpression(expression.body.body) : evaluateBlock(expression.body.body));
-    };
+      };
+    }
     if (expression.type === 'TryExpression') {
       let result;
       try {

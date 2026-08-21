@@ -1,0 +1,15 @@
+/*
+  Closures keep access to the scope where a function was declared.
+  Use this pattern for small stateful helpers without global bookkeeping.
+*/
+fn counter(start) {
+  current = start
+  fn next() {
+    current += 1
+    return current
+  }
+  return next
+}
+
+next = counter(10)
+print({first: next(), second: next()})

@@ -1,9 +1,9 @@
 import { BreakSignal, ContinueSignal, ScriptThrow } from './errors.mjs';
 
-export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, evaluateExpression, runtimeError, ReturnSignal, createClosure, baseDir }) {
+export function createStatementEvaluator({ scope, scopeContext, createChildScope, evaluateBlock, evaluateExpression, runtimeError, ReturnSignal, createClosure, baseDir }) {
   return async function evaluateStatement(statement) {
     if (statement.type === 'FunctionDeclaration') {
-      const closure = createClosure(statement, { scope, scopeContext, evaluateBlock });
+      const closure = createClosure(statement, { scope, scopeContext, createChildScope, evaluateBlock });
       scope.set(statement.name, closure); return closure;
     }
     if (statement.type === 'ImportStatement') {
