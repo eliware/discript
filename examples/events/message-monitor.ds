@@ -7,3 +7,4 @@ on("messageCreate") {
 // This example demonstrates Gateway event handlers and timers.
 // Run it with: discript examples/events/message-monitor.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates binding an event payload and emitting a compact record for each message event. */

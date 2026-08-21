@@ -9,3 +9,4 @@ channels = guild.channels.list()
 // This example demonstrates Discord API operations with safety controls.
 // Run it with: discript examples/discord/guild-summary.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates composing guild, channel, role, and member reads into one summary object. */

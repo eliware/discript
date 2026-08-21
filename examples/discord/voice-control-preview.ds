@@ -8,3 +8,4 @@ preview
 // This example demonstrates Discord API operations with safety controls.
 // Run it with: discript examples/discord/voice-control-preview.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates previewing member voice controls without applying mute, move, or disconnect operations. */

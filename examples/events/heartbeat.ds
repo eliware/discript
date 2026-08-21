@@ -10,3 +10,4 @@ every(30000) {
 // This example demonstrates Gateway event handlers and timers.
 // Run it with: discript examples/events/heartbeat.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates a repeating timer and structured heartbeat output for a long-running process. */

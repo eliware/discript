@@ -6,3 +6,4 @@ print({id: message.id, author: message.author, content: message.content})
 // This example demonstrates Discord API operations with safety controls.
 // Run it with: discript examples/discord/channel-messages.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates channel lookup, message listing, and selecting message fields for a compact report. */

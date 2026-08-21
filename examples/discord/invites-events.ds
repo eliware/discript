@@ -6,3 +6,4 @@ events = discord.guilds.get(guildId).scheduledEvents.list()
 // This example demonstrates Discord API operations with safety controls.
 // Run it with: discript examples/discord/invites-events.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates reading two different guild resource collections and combining their results. */

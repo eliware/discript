@@ -12,3 +12,4 @@ if (result.ok == false) {
 // This example demonstrates core Discript syntax and runtime behavior.
 // Run it with: discript examples/fundamentals/errors-and-status.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates `try`/`catch`, structured errors, and choosing a script exit status. */

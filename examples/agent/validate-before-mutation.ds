@@ -13,3 +13,4 @@ discord.channels.get(channelId).send(content, {dryRun: true})
 // This example demonstrates agent-friendly input, structured output, and safe automation.
 // Run it with: discript examples/agent/validate-before-mutation.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: The workflow separates validation from mutation so an agent can inspect the proposed target before approving a change. */

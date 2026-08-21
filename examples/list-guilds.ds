@@ -4,3 +4,4 @@ guilds
 // This example demonstrates Discript scripting fundamentals.
 // Run it with: discript examples/list-guilds.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This is the smallest Discord read example: connect, list guilds, print the result, and shut down. */

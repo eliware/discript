@@ -5,3 +5,4 @@ preview
 // This example demonstrates Discord API operations with safety controls.
 // Run it with: discript examples/discord/dry-run-message.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: Use `dryRun: true` to preview a message mutation while guaranteeing that Discord is not changed. */

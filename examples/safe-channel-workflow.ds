@@ -20,3 +20,4 @@ result
 // This example demonstrates Discript scripting fundamentals.
 // Run it with: discript examples/safe-channel-workflow.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates a reusable safe mutation workflow with preview and explicit approval paths. */

@@ -7,3 +7,4 @@ stickers = discord.guilds.get(guildId).stickers.list()
 // This example demonstrates Discord API operations with safety controls.
 // Run it with: discript examples/discord/emoji-sticker-inventory.ds (or pipe it to discript for stdin mode).
 // Read the final value and comments together to follow the data flow.
+/* Tutorial focus: This demonstrates nested guild collections and normalized emoji/sticker inventory values. */
