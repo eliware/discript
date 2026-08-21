@@ -1,6 +1,11 @@
 import { describe, expect, test } from '@jest/globals';
 import { createServer } from 'node:http';
+import https from 'node:https';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { mcpServer } from '@eliware/mcp-server';
 import mcpClient from '@eliware/mcp-client';
 import { closeMcpServer, startMcpServer } from '../src/mcp/server.mjs';
@@ -108,6 +113,34 @@ describe('MCP server/client HTTP integration', () => {
       await client.close();
     }
   }, 20000);
+
+  test('discovers a Discript server over HTTPS with TLS files', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'discript-mcp-tls-'));
+    const keyFile = join(directory, 'key.pem');
+    const certFile = join(directory, 'cert.pem');
+    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', keyFile, '-out', certFile, '-subj', '/CN=localhost', '-days', '1'], { stdio: 'ignore' });
+    const server = await mcpServer({
+      httpPort: null, httpsPort: 0, endpointPath: '/mcp', tls: { keyFile, certFile }, auth: { mode: 'none' },
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpsInstance.address().port;
+    try {
+      const response = await new Promise((resolve, reject) => {
+        const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'https-test', version: '1' } } });
+        const request = https.request(`https://localhost:${port}/mcp`, { method: 'POST', rejectUnauthorized: false, headers: { accept: 'application/json, text/event-stream', 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) } }, response => {
+          let text = ''; response.setEncoding('utf8'); response.on('data', chunk => { text += chunk; });
+          response.on('end', () => resolve({ status: response.statusCode, body: text }));
+        });
+        request.on('error', reject); request.end(body);
+      });
+      expect(response.status).toBe(200);
+      expect(response.body).toContain('Discript');
+    } finally {
+      await closeMcpServer(server);
+      await rm(directory, { recursive: true, force: true });
+    }
+  }, 30000);
 
   test('accepts an OAuth2 token validated by a local introspection service', async () => {
     const introspection = createServer((request, response) => {
