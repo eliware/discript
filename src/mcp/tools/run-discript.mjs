@@ -25,7 +25,9 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       const effectiveTimeout = timeout ?? limits.timeout;
       validateTimeout(effectiveTimeout);
       const release = await limits.limiter?.acquire?.();
-      const options = { dry_run: dryRun, yes: force, rest };
+      // Direct commands use the CLI spelling; source evaluation also consumes
+      // the camelCase API option when constructing the Discord facade.
+      const options = { dry_run: dryRun, dryRun, yes: force, rest };
       const input = source === undefined
         ? { kind: 'command', command }
         : { kind: 'source', source, origin: 'mcp' };

@@ -23,7 +23,7 @@ describe('MCP run_discript tool', () => {
     expect(JSON.parse(result.content[0].text)).toMatchObject({ ok: true, exitCode: 0 });
     expect(executeInput).toHaveBeenCalledWith(
       { kind: 'source', source: 'guilds = []', origin: 'mcp' },
-      { dry_run: true, yes: false, rest: true },
+      { dry_run: true, dryRun: true, yes: false, rest: true },
       { runtime: undefined },
     );
     expect(JSON.parse(result.content[0].text)).toMatchObject({ warnings: [], diagnostics: [] });
@@ -46,6 +46,16 @@ describe('MCP run_discript tool', () => {
       warnings: ['check environment'],
       diagnostics: [{ phase: 'startup' }],
     });
+  });
+
+  test('passes force approval and preview flags to both execution layers', async () => {
+    const tool = registeredTool();
+    await tool.handler({ command: ['roles', 'delete'], force: true, dryRun: false });
+    expect(executeInput).toHaveBeenLastCalledWith(
+      { kind: 'command', command: ['roles', 'delete'] },
+      { dry_run: false, dryRun: false, yes: true, rest: false },
+      { runtime: undefined },
+    );
   });
 
   test('requires exactly one execution input', async () => {

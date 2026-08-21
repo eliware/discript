@@ -34,8 +34,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 - [ ] Use REST-first execution for MCP direct commands that do not require Gateway state.
 - [ ] Extend REST-first behavior to source-level Discord operations where possible.
-- [ ] Enforce dry-run and force behavior identically across CLI, scripts, and MCP.
-- [ ] Require explicit MCP approval for destructive operations through `force: true`.
+- [x] Enforce dry-run and force behavior identically across CLI, scripts, and MCP.
+- [x] Require explicit MCP approval for destructive operations through `force: true`.
 - [x] Return structured MCP results containing value, success state, exit code, warnings, and diagnostics.
 - [x] Preserve Discript error codes in MCP tool failures without exposing tokens or secrets.
 - [ ] Add per-request execution timeouts with cancellation and runtime cleanup. Timeouts and runtime cleanup are implemented; cancellation remains pending.
