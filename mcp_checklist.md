@@ -116,7 +116,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 ## Phase 9 — Documentation, packaging, and release
 
 - [ ] Add CLI help, command discovery, shell completion, specs, and release notes for server and client modes.
-- [ ] Add authentication and TLS configuration examples for local, private HTTP, HTTPS, and OAuth2 deployments.
+- [x] Add authentication and TLS configuration examples for local, private HTTP, HTTPS, and OAuth2 deployments. Added `docs/mcp/deployment-examples.md` with stdio, loopback HTTP, static bearer HTTPS, and OAuth2 introspection profiles.
 - [ ] Add packaging checks ensuring MCP dependencies and examples are included correctly.
 - [ ] Add CI coverage for local stdio, HTTP, HTTPS, authentication, and remote MCP integration.
 - [ ] Add an MCP operations/release checklist, including secret and certificate handling.
