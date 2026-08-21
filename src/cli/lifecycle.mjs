@@ -1,10 +1,13 @@
-export async function withTimeout(promise, timeout) {
+export async function withTimeout(promise, timeout, { onTimeout } = {}) {
   if (timeout === undefined) return promise;
   const timeoutMs = validateTimeout(timeout);
   let timer;
   try {
     return await Promise.race([promise, new Promise((_, reject) => {
-      timer = setTimeout(() => reject(Object.assign(new Error(`Execution exceeded ${timeoutMs}ms.`), { code: 'EXECUTION_TIMEOUT', exitCode: 6 })), timeoutMs);
+      timer = setTimeout(() => {
+        try { onTimeout?.(); }
+        finally { reject(Object.assign(new Error(`Execution exceeded ${timeoutMs}ms.`), { code: 'EXECUTION_TIMEOUT', exitCode: 6 })); }
+      }, timeoutMs);
     })]);
   } finally { clearTimeout(timer); }
 }

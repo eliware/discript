@@ -13,7 +13,9 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
   const ownsRuntime = !dependencies.runtime;
   onRuntime(runtime);
   const timers = new Set();
+  const signal = dependencies.signal;
   try {
+    if (signal?.aborted) throw Object.assign(new Error('Execution was cancelled.'), { code: 'EXECUTION_CANCELLED', exitCode: 130 });
     let handlerCount = 0;
     const registerTimer = (delay, callback, repeating) => {
       const milliseconds = Number(delay);
@@ -43,7 +45,11 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       },
       every: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, true); },
       after: (delay, callback) => { handlerCount += 1; return registerTimer(delay, callback, false); },
-      sleep: delay => new Promise(resolve => setTimeout(resolve, Number(delay))),
+      sleep: delay => new Promise((resolve, reject) => {
+        const timer = setTimeout(resolve, Number(delay));
+        const cancel = () => { clearTimeout(timer); reject(Object.assign(new Error('Execution was cancelled.'), { code: 'EXECUTION_CANCELLED', exitCode: 130 })); };
+        signal?.addEventListener('abort', cancel, { once: true });
+      }),
       parallel: (...operations) => Promise.all(operations),
       map: async (items, callback) => Promise.all((items ?? []).map(item => callback(item))),
       reduce: async (items, callback, initial) => {

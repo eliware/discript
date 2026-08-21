@@ -24,7 +24,7 @@ describe('MCP run_discript tool', () => {
     expect(executeInput).toHaveBeenCalledWith(
       { kind: 'source', source: 'guilds = []', origin: 'mcp' },
       { dry_run: true, dryRun: true, yes: false, rest: true },
-      { runtime: undefined },
+      { runtime: undefined, signal: expect.any(AbortSignal) },
     );
     expect(JSON.parse(result.content[0].text)).toMatchObject({ warnings: [], diagnostics: [] });
   });
@@ -54,8 +54,19 @@ describe('MCP run_discript tool', () => {
     expect(executeInput).toHaveBeenLastCalledWith(
       { kind: 'command', command: ['roles', 'delete'] },
       { dry_run: false, dryRun: false, yes: true, rest: false },
-      { runtime: undefined },
+      { runtime: undefined, signal: expect.any(AbortSignal) },
     );
+  });
+
+  test('aborts an MCP execution when its timeout expires', async () => {
+    let signal;
+    executeInput.mockImplementationOnce(async (_input, _options, dependencies) => {
+      signal = dependencies.signal;
+      return new Promise(() => {});
+    });
+    const result = await registeredTool().handler({ source: 'sleep(1000)', timeout: 5 });
+    expect(signal.aborted).toBe(true);
+    expect(JSON.parse(result.content[0].text)).toMatchObject({ ok: false, code: 'EXECUTION_TIMEOUT', exitCode: 6 });
   });
 
   test('requires exactly one execution input', async () => {

@@ -31,8 +31,9 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       const input = source === undefined
         ? { kind: 'command', command }
         : { kind: 'source', source, origin: 'mcp' };
+      const controller = new AbortController();
       try {
-        const value = await withTimeout(executeInput(input, options, { runtime }), effectiveTimeout);
+        const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal }), effectiveTimeout, { onTimeout: () => controller.abort() });
         const result = {
           ok: true,
           exitCode: 0,
