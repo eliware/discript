@@ -1,6 +1,7 @@
 import { z, buildResponse } from '@eliware/mcp-server';
 import { executeInput } from '../../cli/script.mjs';
 import { withTimeout, validateTimeout } from '../../cli/lifecycle.mjs';
+import { structuredError } from '../../errors.mjs';
 
 const inputSchema = {
   source: z.string().min(1).optional().describe('Discript source to evaluate.'),
@@ -30,10 +31,28 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
         : { kind: 'source', source, origin: 'mcp' };
       try {
         const value = await withTimeout(executeInput(input, options, { runtime }), effectiveTimeout);
-        const result = { ok: true, exitCode: 0, value };
+        const result = {
+          ok: true,
+          exitCode: 0,
+          value,
+          warnings: Array.isArray(value?.warnings) ? value.warnings : [],
+          diagnostics: Array.isArray(value?.diagnostics) ? value.diagnostics : [],
+        };
         const maxOutputBytes = limits.maxOutputBytes;
         if (maxOutputBytes && Buffer.byteLength(JSON.stringify(result)) > maxOutputBytes) throw Object.assign(new Error(`MCP response exceeded the ${maxOutputBytes}-byte output limit.`), { code: 'MCP_OUTPUT_LIMIT', exitCode: 1 });
         return buildResponse(result);
+      } catch (error) {
+        const failure = structuredError(error);
+        const result = {
+          ok: false,
+          exitCode: failure.exitCode,
+          code: failure.code,
+          error: failure.error,
+          ...(failure.details ? { details: failure.details } : {}),
+          warnings: Array.isArray(error?.warnings) ? error.warnings : [],
+          diagnostics: Array.isArray(error?.diagnostics) ? error.diagnostics : [],
+        };
+        return { ...buildResponse(result), isError: true };
       } finally { release?.(); }
     },
   );

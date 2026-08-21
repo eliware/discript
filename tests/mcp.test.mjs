@@ -26,6 +26,26 @@ describe('MCP run_discript tool', () => {
       { dry_run: true, yes: false, rest: true },
       { runtime: undefined },
     );
+    expect(JSON.parse(result.content[0].text)).toMatchObject({ warnings: [], diagnostics: [] });
+  });
+
+  test('returns sanitized structured execution failures with exit codes', async () => {
+    executeInput.mockRejectedValueOnce(Object.assign(new Error('missing access token'), {
+      code: 'DISCORD_TOKEN_MISSING', exitCode: 4,
+      details: { message: 'missing access token', token: 'must-not-leak' },
+      warnings: ['check environment'], diagnostics: [{ phase: 'startup' }],
+    }));
+    const result = await registeredTool().handler({ source: 'guilds list' });
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      ok: false,
+      exitCode: 4,
+      code: 'DISCORD_TOKEN_MISSING',
+      error: 'missing access token',
+      details: { message: 'missing access token' },
+      warnings: ['check environment'],
+      diagnostics: [{ phase: 'startup' }],
+    });
   });
 
   test('requires exactly one execution input', async () => {

@@ -62,13 +62,19 @@ export async function runRemoteDiscript(config, { source, command, dryRun = fals
 }
 
 function normalizeRemoteResponse(response) {
-  const payload = response?.structuredContent ?? response;
+  const payload = response?.structuredContent ?? parseToolText(response) ?? response;
   if (response?.isError || payload?.ok === false) {
     throw Object.assign(new Error(payload?.error ?? 'Remote Discript execution failed.'), {
       code: payload?.code ?? 'REMOTE_DISCRIPT_ERROR', exitCode: payload?.exitCode ?? 1, details: payload?.details,
     });
   }
   return payload?.ok === true && 'value' in payload ? payload : { ok: true, exitCode: 0, value: payload };
+}
+
+function parseToolText(response) {
+  const text = response?.content?.find?.(item => item?.type === 'text')?.text;
+  if (typeof text !== 'string') return undefined;
+  try { return JSON.parse(text); } catch { return undefined; }
 }
 
 function requestWithLimits(promise, config, timeout = config.client?.timeout) {

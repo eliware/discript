@@ -36,8 +36,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Extend REST-first behavior to source-level Discord operations where possible.
 - [ ] Enforce dry-run and force behavior identically across CLI, scripts, and MCP.
 - [ ] Require explicit MCP approval for destructive operations through `force: true`.
-- [ ] Return structured MCP results containing value, success state, exit code, warnings, and diagnostics.
-- [ ] Preserve Discript error codes in MCP tool failures without exposing tokens or secrets.
+- [x] Return structured MCP results containing value, success state, exit code, warnings, and diagnostics.
+- [x] Preserve Discript error codes in MCP tool failures without exposing tokens or secrets.
 - [ ] Add per-request execution timeouts with cancellation and runtime cleanup. Timeouts and runtime cleanup are implemented; cancellation remains pending.
 - [x] Add output-size limits and bounded concurrent execution.
 - [ ] Define behavior for long-running event/timer scripts over MCP.
@@ -106,7 +106,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. HTTP, static bearer, and OAuth2 introspection success/rejection integration are covered; HTTPS, stdio transport, CORS, and other failure cases remain pending.
 - [ ] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Static bearer and OAuth2 introspection success/rejection, required scopes, and protected-resource metadata are covered; passthrough cases remain pending.
 - [ ] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Server/client timeouts, output limits, and concurrency bounds are implemented; cancellation remains pending.
-- [ ] Test dry-run, force approval, structured results, and sanitized error mapping.
+- [ ] Test dry-run, force approval, structured results, and sanitized error mapping. Structured success/failure results and sanitized error mapping are covered; dry-run/force approval coverage remains pending.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
 - [x] Add MCP examples to the package and documentation checker.
