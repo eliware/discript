@@ -1,0 +1,15 @@
+/*
+  Diagnostic call stacks
+
+  When a user-defined function fails, the structured error includes the
+  innermost-to-outermost script function names in `details.stack`. This lets
+  an agent report the failing workflow layer without exposing Node internals.
+*/
+fn lookup() {
+  missingResource.name
+}
+fn validate() {
+  lookup()
+}
+result = try { validate() } catch (error) { error }
+print(result)
