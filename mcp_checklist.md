@@ -20,7 +20,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Keep `DISCORD_TOKEN` and `DISCRIPT_INTENTS` as the real application configuration variables.
 - [x] Keep `TEST_GUILD` explicitly marked as test-only rather than part of the normal application profile.
 - [x] Add a typed configuration profile loader for `DISCRIPT_CONNECTION_MODE` with direct as the default.
-- [x] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
+- [x] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket`, `mcp`, or `hybrid`). Hybrid runs the local socket broker and MCP listener on one Discord runtime.
 - [x] Add MCP server profile loading for transport, port, endpoint, static/bearer auth, TLS files, redirect, and CORS settings.
 - [x] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
 - [x] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
@@ -44,7 +44,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 ## Phase 4 — Authentication, authorization, and TLS
 
-- [x] Support `auth.mode: none` as the local/development default; remote-use policy enforcement remains pending.
+- [x] Support `auth.mode: none` as the local/development default; document that unauthenticated HTTP is for trusted local/private networks and require bearer/OAuth/TLS controls for remote exposure.
 - [x] Support static bearer authentication for HTTP deployments.
 - [x] Support bearer-passthrough mode for forwarding validated-at-the-edge tokens to backend operations.
 - [x] Support OAuth2 resource-server authentication with issuer and resource/audience validation.
@@ -105,7 +105,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Test resources, prompts, server instructions, and discovery metadata. The HTTP/stdio/remote integration tests cover instructions, tool/resource/prompt listing, generated help resources, examples, command catalog, and discovery preflight.
 - [x] Test stdio, HTTP, HTTPS, authentication, authorization, CORS, and TLS failures. Integration tests cover HTTP, stdio, HTTPS listener and certificate rejection, malformed HTTP, static bearer, OAuth2 introspection, bearer-passthrough, configured CORS, and inactive/insufficient authorization; unit tests cover operation-scope rejection.
 - [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Includes tool-level read/write/admin scope enforcement.
-- [x] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Broker reuse/duplicate-startup, concurrent broker and MCP shutdown, client/server timeouts, cancellation signaling, output limits, and concurrency bounds are covered.
+- [x] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Broker reuse/duplicate-startup, concurrent broker execution on one runtime, concurrent broker and MCP shutdown, client/server timeouts, cancellation signaling, output limits, and concurrency bounds are covered.
 - [x] Test dry-run, force approval, structured results, and sanitized error mapping. MCP unit and end-to-end tests cover dry-run, force propagation, structured success/failure results, exit codes, scope failures, output limits, and credential-safe error mapping.
 - [x] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup. CI runs the MCP suite on Linux and Windows; transport/process tests cover stdio child cleanup, HTTP/HTTPS listeners, Unix broker paths, Windows named-pipe path generation, and the package verifier is Node-native rather than Unix-`tar` dependent.
 - [x] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases. `npm run test:live` passed 8 read-only tests and `npm run test:live:mutations` passed 9 explicitly gated tests against the configured test guild.

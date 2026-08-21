@@ -4,7 +4,7 @@ Use the profile in `.env` or `~/.discript.env`:
 
 ```dotenv
 DISCRIPT_CONNECTION_MODE=daemon
-DISCRIPT_DAEMON_MODE=mcp
+DISCRIPT_DAEMON_MODE=hybrid
 DISCRIPT_MCP_TRANSPORT=https
 DISCRIPT_MCP_PORT=8443
 DISCRIPT_MCP_TLS_KEY_FILE=/run/secrets/mcp.key
@@ -31,3 +31,4 @@ When an authenticated request includes OAuth scopes, `run_discript` maps executi
 MCP script calls are finite by default, even when a script registers event handlers or timers; those registrations are cleaned up when the call returns. Pass `keepAlive: true` only when the caller intentionally wants the request to remain active, and provide a timeout or cancellation path for operational control.
 
 Generated help resources and prompts are read from the installed command catalog and examples at request time. The server does not maintain a mutable resource cache or emit list-change notifications; clients that need fresh metadata should re-request `resources/list`, `resources/read`, or `prompts/list` after a package/configuration change.
+`hybrid` keeps the local socket broker available to normal Discript CLI calls while exposing the same runtime through MCP. Use `mcp` when the MCP listener is the intended daemon interface; use `socket` for local-only operation.
