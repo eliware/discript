@@ -5,6 +5,7 @@ import { describe, expect, test } from '@jest/globals';
 import { evaluate } from '../../src/evaluator.mjs';
 import { parse } from '../../src/parser/index.mjs';
 import { createEnvironment } from '../../src/env.mjs';
+import { createLanguageBuiltins } from '../../src/language/builtins.mjs';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const examples = join(root, 'examples');
@@ -38,8 +39,10 @@ describe('executable documentation', () => {
       map: async (items, callback) => Promise.all(items.map(item => callback(item))),
       filter: async (items, callback) => (await Promise.all(items.map(async item => [item, await callback(item)]))).filter(([, keep]) => keep).map(([item]) => item),
       reduce: async (items, callback, initial) => { let value = initial; for (const item of items) value = await callback(value, item); return value; },
+      ...createLanguageBuiltins(),
+      capabilities: { list: () => ['discord:read'], has: capability => capability === 'discord:read', require: () => true },
     };
-    const names = ['hello', 'values', 'functions', 'conditionals', 'loops', 'while', 'callbacks', 'parallel', 'exit-codes'];
+    const names = ['hello', 'values', 'functions', 'closures', 'runtime-compatibility', 'conditionals', 'loops', 'while', 'callbacks', 'parallel', 'standard-library', 'exit-codes'];
     for (const name of names) {
       const file = join(examples, 'fundamentals', `${name}.ds`);
       await expect(evaluate(parse(await readFile(file, 'utf8')), globals, { baseDir: dirname(file) })).resolves.toBeDefined();

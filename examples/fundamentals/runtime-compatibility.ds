@@ -2,6 +2,6 @@
   Check language capabilities before using newer syntax or workflows.
   This lets a script fail with a useful structured error on older runtimes.
 */
-language.requireVersion("1.0")
-print({version: language.version, closures: language.supports("closures"), modules: language.supports("modules")})
-if (!language.supports("future-feature")) { print({skipped: "future-feature"}) }
+language.requireVersion("1.0");
+print({version: language.version, closures: language.supports("closures"), modules: language.supports("modules")});
+if (language.supports("future-feature") == false) { print({skipped: "future-feature"}) }
