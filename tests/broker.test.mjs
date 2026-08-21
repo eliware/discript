@@ -30,4 +30,21 @@ describe('Gateway broker', () => {
   test('refuses an exhausted session-start budget', async () => {
     await expect(startGatewayBroker({ token: 'test', endpoint: `/tmp/discript-limit-${process.pid}.sock`, limits: { remaining: 0, resetAfter: 1234 } })).rejects.toMatchObject({ code: 'GATEWAY_SESSION_LIMIT', exitCode: 6, resetAfter: 1234 });
   });
+
+  test('serves concurrent executions through one Gateway runtime', async () => {
+    const endpoint = brokerEndpoint(`concurrent-${process.pid}`, tmpdir(), platform());
+    const client = new EventEmitter();
+    client.login = jest.fn(async () => queueMicrotask(() => client.emit('clientReady')));
+    client.isReady = () => true;
+    client.destroy = jest.fn(async () => undefined);
+    const broker = await startGatewayBroker({ token: 'test', endpoint, runtimeOptions: { client }, limits: { remaining: 1, resetAfter: 0 } });
+    const results = await Promise.all([
+      brokerRequest({ token: 'test', endpoint, method: 'script', source: '1' }),
+      brokerRequest({ token: 'test', endpoint, method: 'script', source: '2' }),
+    ]);
+    expect(results.map(result => result.value)).toEqual([1, 2]);
+    expect(new Set(results.map(result => result.requestId)).size).toBe(2);
+    expect(client.login).toHaveBeenCalledTimes(1);
+    await broker.close();
+  });
 });
