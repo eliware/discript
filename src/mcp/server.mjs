@@ -31,6 +31,10 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
   };
   return {
     ...options,
+    configureApp: async app => {
+      app.get('/healthz', (_request, response) => response.json({ ok: true, service: 'discript-mcp', ready: context.runtime?.client?.isReady?.() ?? true }));
+      await options.configureApp?.(app);
+    },
     ...(stdio ? { httpPort: null, httpsPort: undefined } : {
       httpPort: configuredHttpPort,
       httpsPort: configuredHttpsPort ?? undefined,

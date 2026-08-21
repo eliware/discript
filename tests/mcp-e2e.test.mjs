@@ -2,20 +2,17 @@ import { describe, expect, test } from '@jest/globals';
 import { createServer } from 'node:http';
 import { mcpServer } from '@eliware/mcp-server';
 import mcpClient from '@eliware/mcp-client';
-import { closeMcpServer } from '../src/mcp/server.mjs';
+import { closeMcpServer, startMcpServer } from '../src/mcp/server.mjs';
 
 describe('MCP server/client HTTP integration', () => {
   test('discovers help and executes a dry-run through the real transport', async () => {
-    const server = await mcpServer({
-      httpPort: 0,
-      endpointPath: '/mcp',
-      auth: { mode: 'none' },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
-      log: { debug() {}, info() {}, warn() {}, error() {} },
-    });
+    const server = await startMcpServer({ config: { mcp: { authMode: 'none' } }, httpPort: 0 });
     const port = server.httpInstance.address().port;
     const client = await mcpClient({ url: `http://127.0.0.1:${port}/mcp`, reconnect: false });
     try {
+      const health = await fetch(`http://127.0.0.1:${port}/healthz`);
+      expect(health.status).toBe(200);
+      expect(await health.json()).toMatchObject({ ok: true, service: 'discript-mcp', ready: true });
       const tools = await client.listTools();
       const resources = await client.listResources();
       const prompts = await client.listPrompts();

@@ -21,3 +21,5 @@ discript daemon start
 ```
 
 For OAuth2, set `DISCRIPT_MCP_AUTH_MODE=oauth2` and provide issuer, resource, introspection endpoint, and (when required by the provider) client credentials. For HTTP-to-HTTPS redirects, configure both `DISCRIPT_MCP_HTTP_PORT` and `DISCRIPT_MCP_HTTPS_PORT` and set `DISCRIPT_MCP_HTTP_REDIRECT=true`.
+
+The listener also exposes a read-only `GET /healthz` endpoint. It reports the service name and whether the shared Discord runtime is ready; it does not require MCP tool authentication and should be protected by the network boundary when exposed beyond localhost.

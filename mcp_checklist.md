@@ -96,7 +96,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add graceful shutdown coordination between MCP server, broker, Discord runtime, and child MCP client processes.
 - [x] Define trust boundaries for stdio child processes and remote HTTP callers.
 - [x] Document stable MCP release compatibility versus draft 2026 discovery features.
-- [ ] Define remote server lifecycle, health checks, and failure recovery behavior.
+- [ ] Define remote server lifecycle, health checks, and failure recovery behavior. A read-only `/healthz` endpoint is implemented; lifecycle and failure-recovery policy remain pending.
 
 ## Phase 8 — Tests and verification
 
