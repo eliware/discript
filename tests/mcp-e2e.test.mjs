@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import https from 'node:https';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -113,6 +114,35 @@ describe('MCP server/client HTTP integration', () => {
       await client.close();
     }
   }, 20000);
+
+  test('discovers and executes through a separate HTTP server process', async () => {
+    const probe = createServer();
+    await new Promise(resolve => probe.listen(0, '127.0.0.1', resolve));
+    const port = probe.address().port;
+    await new Promise(resolve => probe.close(resolve));
+    const child = spawn(process.execPath, [fileURLToPath(new URL('../bin/discript.mjs', import.meta.url)), 'mcp'], {
+      env: { ...process.env, DISCRIPT_MCP_PORT: String(port), DISCRIPT_MCP_AUTH_MODE: 'none' },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let client;
+    try {
+      for (let attempt = 0; attempt < 40; attempt += 1) {
+        try {
+          const health = await fetch(`http://127.0.0.1:${port}/healthz`);
+          if (health.ok) break;
+        } catch { /* The child may still be starting. */ }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      client = await mcpClient({ url: `http://127.0.0.1:${port}/mcp`, reconnect: false });
+      expect((await client.listTools()).tools.map(tool => tool.name)).toContain('run_discript');
+      const result = await client.callTool({ name: 'run_discript', arguments: { source: '1' } });
+      expect(JSON.parse(result.content[0].text)).toMatchObject({ ok: true, exitCode: 0 });
+    } finally {
+      await client?.close();
+      child.kill('SIGTERM');
+      await new Promise(resolve => child.once('close', resolve));
+    }
+  }, 30000);
 
   test('discovers a Discript server over HTTPS with TLS files', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'discript-mcp-tls-'));

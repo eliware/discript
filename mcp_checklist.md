@@ -111,7 +111,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
 - [x] Add MCP examples to the package and documentation checker.
 - [x] Add an end-to-end test where an MCP client discovers help, reads the command catalog, reads an example, and executes a dry-run. Core HTTP discovery/help/dry-run coverage is complete; command-catalog and example reads remain additional assertions.
-- [ ] Add an end-to-end remote test where one Discript process serves MCP and another discovers it and runs a script.
+- [x] Add an end-to-end remote test where one Discript process serves MCP and another discovers it and runs a script. A separate CLI child process is started over HTTP and exercised by an MCP client.
 
 ## Phase 9 — Documentation, packaging, and release
 
