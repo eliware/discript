@@ -52,6 +52,14 @@ describe('MCP server profile mapping', () => {
     expect(options).toMatchObject({ httpPort: null, httpsPort: 9443, tls: { keyFile: '/run/key.pem', certFile: '/run/cert.pem', caFile: '/run/ca.pem' }, auth: { mode: 'bearer-passthrough' } });
   });
 
+  test('maps separate HTTP and HTTPS listeners for redirects', () => {
+    const options = createMcpServerOptions({ mcp: {
+      transport: 'http', port: 8765, httpPort: 8080, httpsPort: 8443,
+      httpRedirect: true, tlsKeyFile: '/run/key.pem', tlsCertFile: '/run/cert.pem',
+    } });
+    expect(options).toMatchObject({ httpPort: 8080, httpsPort: 8443, httpRedirect: true });
+  });
+
   test('stdio disables network listeners regardless of profile transport', () => {
     expect(createMcpServerOptions({ mcp: { transport: 'https', port: 9443 } }, { stdio: true })).toMatchObject({ stdio: true, httpPort: null, httpsPort: undefined });
   });

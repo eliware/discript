@@ -55,7 +55,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add HTTP/HTTPS configuration for daemon MCP mode.
 - [ ] Support inline TLS key/certificate/CA configuration.
 - [x] Support TLS key/certificate/CA files and `TLS_KEY_FILE`, `TLS_CERT_FILE`, and `TLS_CA_FILE` environment variables.
-- [ ] Support HTTP-to-HTTPS redirects with separately configurable HTTP and HTTPS listeners; the current redirect flag is passed through but needs profile-level dual-listener configuration.
+- [x] Support HTTP-to-HTTPS redirects with separately configurable HTTP and HTTPS listeners.
 - [x] Add configurable CORS `allowedOrigins`.
 - [ ] Add authentication, authorization, TLS, CORS, and remote-host trust documentation.
 - [ ] Define scope mapping for read-only, mutating, destructive, and administrative Discript operations.

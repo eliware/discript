@@ -8,6 +8,8 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
   const mcp = config.mcp ?? {};
   const selectedTransport = transport ?? mcp.transport ?? 'http';
   const selectedPort = port ?? mcp.port ?? 8765;
+  const configuredHttpPort = mcp.httpPort ?? (selectedTransport === 'https' ? null : selectedPort);
+  const configuredHttpsPort = mcp.httpsPort ?? (selectedTransport === 'https' ? selectedPort : null);
   const authMode = mcp.authMode ?? 'none';
   const auth = authMode === 'none'
     ? { mode: 'none' }
@@ -19,9 +21,10 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
   };
   return {
     ...options,
-    ...(stdio ? { httpPort: null, httpsPort: undefined } : selectedTransport === 'https'
-      ? { httpPort: null, httpsPort: selectedPort }
-      : { httpPort: selectedPort, httpsPort: undefined }),
+    ...(stdio ? { httpPort: null, httpsPort: undefined } : {
+      httpPort: configuredHttpPort,
+      httpsPort: configuredHttpsPort ?? undefined,
+    }),
     endpointPath: mcp.endpoint ?? '/mcp',
     auth,
     tls,
