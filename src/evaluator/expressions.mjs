@@ -43,16 +43,30 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
     if (expression.type === 'Identifier') { if (!scope.has(expression.name)) throw runtimeError('Unknown variable: ' + expression.name); return scope.get(expression.name); }
     if (expression.type === 'MemberExpression') {
       const object = await evaluateExpression(expression.object);
+      if (object === null || object === undefined) {
+        if (expression.optional) return undefined;
+        throw runtimeError(`Cannot read property '${expression.property}' from a null value.`);
+      }
       const value = object?.[expression.property];
       return typeof value === 'function' ? value.bind(object) : value;
     }
     if (expression.type === 'IndexExpression') {
       const object = await evaluateExpression(expression.object);
+      if (object === null || object === undefined) {
+        if (expression.optional) return undefined;
+        throw runtimeError('Cannot index a null value.');
+      }
       const property = await evaluateExpression(expression.property);
       const value = object?.[property];
       return typeof value === 'function' ? value.bind(object) : value;
     }
-    if (expression.type === 'CallExpression') { const callee = await evaluateExpression(expression.callee); if (typeof callee !== 'function') throw runtimeError('The expression is not callable.'); return callee(...await Promise.all(expression.arguments.map(evaluateExpression))); }
+    if (expression.type === 'CallExpression') {
+      const callee = await evaluateExpression(expression.callee);
+      if (callee === null || callee === undefined) { if (expression.optional) return undefined; throw runtimeError('The expression is not callable.'); }
+      if (typeof callee !== 'function') throw runtimeError('The expression is not callable.');
+      return callee(...await Promise.all(expression.arguments.map(evaluateExpression)));
+    }
+    if (expression.type === 'ConditionalExpression') return (await evaluateExpression(expression.test)) ? evaluateExpression(expression.consequent) : evaluateExpression(expression.alternate);
     throw runtimeError(`Unsupported expression: ${expression.type}`);
   };
 }

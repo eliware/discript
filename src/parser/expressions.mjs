@@ -1,5 +1,13 @@
 export function createExpressionParser({ peek, match, take, consume, syntaxError, precedence, parseBlock }) {
-  function parseExpression() { return parseBinary(0); }
+  function parseExpression() {
+    let expression = parseBinary(0);
+    if (match('?')) {
+      const consequent = parseExpression();
+      consume(':', 'Expected `:` after the conditional expression.');
+      expression = { type: 'ConditionalExpression', test: expression, consequent, alternate: parseExpression() };
+    }
+    return expression;
+  }
   function parseBinary(minPrecedence) {
     let expression = parsePostfix();
     while (peek()?.type === 'operator' && precedence(peek().value) >= minPrecedence) {
@@ -15,6 +23,18 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
       if (match('.')) {
         const property = consume('identifier', 'Expected a property name after `.`');
         expression = { type: 'MemberExpression', object: expression, property: property.value };
+        continue;
+      }
+      if (match('?.')) {
+        if (match('(')) expression = { type: 'CallExpression', callee: expression, optional: true, arguments: parseArguments() };
+        else if (match('[')) {
+          const property = parseExpression();
+          consume(']', 'Expected `]` after the optional index expression.');
+          expression = { type: 'IndexExpression', object: expression, property, optional: true };
+        } else {
+          const property = consume('identifier', 'Expected a property name after `?.`');
+          expression = { type: 'MemberExpression', object: expression, property: property.value, optional: true };
+        }
         continue;
       }
       if (match('[')) {

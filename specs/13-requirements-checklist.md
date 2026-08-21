@@ -23,6 +23,7 @@ Each line represents one requirement and is marked `Fully complete`, `Half compl
 - [Fully complete] Discript supports explicit named exports and aliased imports while preserving legacy shared-scope imports.
 - [Fully complete] Discript provides bounded `length`, `keys`, `values`, `range`, `now`, `race`, `allSettled`, and `mapLimit` helpers.
 - [Fully complete] Parser tokens and syntax failures include source location metadata when a source position is available.
+- [Fully complete] Discript supports lazy conditional expressions and optional member, index, and call access.
 - [Fully complete] Discript supports reusable `fn` functions, `return`, and shared-scope source imports.
 - [Fully complete] Discript supports event listener declarations with `on("event") { ... }`, payload binding, persistent runtime wait, and signal-based cleanup.
 - [Fully complete] Discript supports `every` and `after` timers, intentional long-running execution, and timer cleanup during shutdown.

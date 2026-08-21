@@ -21,6 +21,8 @@ From lowest to highest precedence: `??`; `||`; `&&`; `==` and `!=`; `<`, `<=`, `
 
 Compound assignments `+=`, `-=`, `*=`, `/=`, and `%=` update an existing variable, member, or index. `??` returns its right side only when the left side is `null`; an unknown identifier is still an error.
 
+Conditional expressions use `test ? consequent : alternate` and evaluate only the selected branch. Optional access uses `?.`, `?.[index]`, and `?.()`; it returns an absent value when the receiver or callable is null-like. Ordinary access through a null value raises a runtime error.
+
 ```text
 settings = {name: "general", position: 0}
 names = ["rules", "welcome", "general"]

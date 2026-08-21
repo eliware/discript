@@ -1,0 +1,11 @@
+/*
+  Conditional and optional access
+
+  Conditional expressions choose one branch lazily. Optional member, index,
+  and call access returns null-like undefined when a Discord result is absent,
+  while ordinary access still reports a runtime error for null values.
+*/
+profile = null
+display = profile?.name ?? "unknown"
+status = profile == null ? "offline" : "online"
+print({display: display, status: status})

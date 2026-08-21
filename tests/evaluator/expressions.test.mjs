@@ -71,6 +71,21 @@ describe('collection access and assignment', () => {
     await expect(evaluate(parse('missing ?? (3 ** 2)'), { missing: null })).resolves.toBe(9);
     await expect(evaluate(parse('value = false; value ?? true'))).resolves.toBe(false);
   });
+
+  test('evaluates conditional expressions lazily', async () => {
+    await expect(evaluate(parse('true ? "yes" : missing'))).resolves.toBe('yes');
+    await expect(evaluate(parse('false ? missing : "no"'))).resolves.toBe('no');
+  });
+
+  test('short-circuits optional member, index, and call access', async () => {
+    await expect(evaluate(parse('user?.profile?.name'), { user: null })).resolves.toBeUndefined();
+    await expect(evaluate(parse('user?.[key]'), { user: null, key: 'name' })).resolves.toBeUndefined();
+    await expect(evaluate(parse('user?.get?.()'), { user: {} })).resolves.toBeUndefined();
+  });
+
+  test('reports ordinary null access as a runtime error', async () => {
+    await expect(evaluate(parse('user.profile'), { user: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+  });
 });
 
 describe('core language contract', () => {

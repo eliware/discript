@@ -50,6 +50,7 @@ The initial language shall support:
 - Explicit aliased imports and named exports
 - Bounded standard-library helpers and bounded asynchronous collection mapping
 - Source locations on parser tokens and syntax diagnostics
+- Conditional expressions and optional member/index/call access
 
 Example:
 

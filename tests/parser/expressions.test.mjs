@@ -41,4 +41,14 @@ describe('parser/expressions', () => {
     });
     expect(precedence('**')).toBeGreaterThan(precedence('*'));
   });
+
+  test('parses conditional expressions and optional chains', async () => {
+    const { parse } = await import('../../src/parser.mjs');
+    expect(parse('label = ready ? "yes" : "no"; result = user?.profile?.[key]?.name?.()')).toMatchObject({
+      body: [
+        { type: 'Assignment', name: 'label', value: { type: 'ConditionalExpression' } },
+        { type: 'Assignment', name: 'result', value: { type: 'CallExpression', optional: true } },
+      ],
+    });
+  });
 });
