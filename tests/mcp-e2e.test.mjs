@@ -34,4 +34,20 @@ describe('MCP server/client HTTP integration', () => {
       await closeMcpServer(server);
     }
   }, 15000);
+
+  test('accepts a configured static bearer token', async () => {
+    const server = await mcpServer({
+      httpPort: 0, endpointPath: '/mcp', auth: { mode: 'static', token: 'integration-secret' },
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpInstance.address().port;
+    const client = await mcpClient({ url: `http://127.0.0.1:${port}/mcp`, token: 'integration-secret', reconnect: false });
+    try {
+      expect((await client.listTools()).tools.map(tool => tool.name)).toContain('run_discript');
+    } finally {
+      await client.close();
+      await closeMcpServer(server);
+    }
+  }, 15000);
 });
