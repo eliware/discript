@@ -6,7 +6,7 @@ describe('REST transport', () => {
     const request = jest.fn(async () => ({ id: '1' }));
     const api = createDiscordRest({ token: 'test-token', rest: { request } });
     await expect(api.request('/guilds/1')).resolves.toEqual({ id: '1' });
-    expect(request).toHaveBeenCalledWith({ fullRoute: '/guilds/1' });
+    expect(request).toHaveBeenCalledWith({ method: 'GET', fullRoute: '/guilds/1' });
   });
 
   test('rejects without a token', () => {

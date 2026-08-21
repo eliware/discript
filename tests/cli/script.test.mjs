@@ -37,6 +37,6 @@ describe('cli/script', () => {
       { rest: true },
       { runtime: active, token: 'test-token', rest: { request }, stdout: () => {} },
     )).resolves.toEqual([{ id: 'guild-1', name: 'Test Guild' }]);
-    expect(request).toHaveBeenCalledWith({ fullRoute: '/users/@me/guilds' });
+    expect(request).toHaveBeenCalledWith({ method: 'GET', fullRoute: '/users/@me/guilds' });
   });
 });
