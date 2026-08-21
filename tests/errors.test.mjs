@@ -20,4 +20,16 @@ describe('CLI errors', () => {
       details: { discordCode: 50001, status: 403, method: 'GET', path: '/guilds/1' },
     });
   });
+
+  test('redacts credentials embedded in error text and allowed details', () => {
+    const error = Object.assign(new Error('request failed DISCORD_TOKEN=discord-secret Bearer bearer-secret'), {
+      code: 'REMOTE_ERROR', details: { message: 'oauth_secret=oauth-secret', path: '/mcp' },
+    });
+    const result = structuredError(error);
+    expect(result.error).toBe('request failed DISCORD_TOKEN=[redacted] Bearer [redacted]');
+    expect(result.details.message).toBe('oauth_secret=[redacted]');
+    expect(JSON.stringify(result)).not.toContain('discord-secret');
+    expect(JSON.stringify(result)).not.toContain('bearer-secret');
+    expect(JSON.stringify(result)).not.toContain('oauth-secret');
+  });
 });

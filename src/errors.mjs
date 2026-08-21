@@ -7,7 +7,7 @@ export function formatError(error, options = {}) {
 export function structuredError(error) {
   const code = normalizeCode(error);
   const payload = {
-    error: error?.message || String(error),
+    error: sanitizeText(error?.message || String(error)),
     code,
     exitCode: Number.isInteger(error?.exitCode) ? error.exitCode : defaultExitCode(code),
   };
@@ -38,6 +38,13 @@ function defaultExitCode(code) {
 function sanitizeDetails(details) {
   if (!details || typeof details !== 'object') return details === undefined ? undefined : { value: String(details) };
   const allowed = ['suggestions', 'message', 'discordCode', 'status', 'method', 'path', 'retryAfter'];
-  const filtered = Object.fromEntries(Object.entries(details).filter(([key]) => allowed.includes(key)));
+  const filtered = Object.fromEntries(Object.entries(details).filter(([key]) => allowed.includes(key)).map(([key, value]) => [key, typeof value === 'string' ? sanitizeText(value) : value]));
   return Object.keys(filtered).length ? filtered : undefined;
+}
+
+function sanitizeText(value) {
+  return String(value)
+    .replace(/(DISCORD_TOKEN|[A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|API[_-]?KEY))\s*[:=]\s*([^\s,;]+)/gi, '$1=[redacted]')
+    .replace(/("(?:token|secret|password|api[_-]?key)"\s*:\s*")([^"]+)(")/gi, '$1[redacted]$3')
+    .replace(/(Bearer\s+)[A-Za-z0-9._~+/=-]+/gi, '$1[redacted]');
 }
