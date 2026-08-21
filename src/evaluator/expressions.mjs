@@ -31,10 +31,11 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
       const left = await evaluateExpression(expression.left);
       if (expression.operator === '&&') return left && await evaluateExpression(expression.right);
       if (expression.operator === '||') return left || await evaluateExpression(expression.right);
+      if (expression.operator === '??') return left ?? await evaluateExpression(expression.right);
       const right = await evaluateExpression(expression.right);
       if (expression.operator === '==') return left === right; if (expression.operator === '!=') return left !== right;
       if (expression.operator === '>') return left > right; if (expression.operator === '<') return left < right; if (expression.operator === '>=') return left >= right; if (expression.operator === '<=') return left <= right;
-      if (expression.operator === '+') return left + right; if (expression.operator === '-') return left - right; if (expression.operator === '*') return left * right; if (expression.operator === '/') return left / right;
+      if (expression.operator === '+') return left + right; if (expression.operator === '-') return left - right; if (expression.operator === '*') return left * right; if (expression.operator === '/') return left / right; if (expression.operator === '%') return left % right; if (expression.operator === '**') return left ** right;
       throw runtimeError(`Unsupported operator: ${expression.operator}`);
     }
     if (expression.type === 'ArrayExpression') return Promise.all(expression.elements.map(evaluateExpression));

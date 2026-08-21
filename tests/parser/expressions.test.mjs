@@ -29,4 +29,16 @@ describe('parser/expressions', () => {
     const { parse } = await import('../../src/parser.mjs');
     expect(() => parse('1 = value')).toThrow('assignment targets');
   });
+
+  test('parses extended operators and compound assignments', async () => {
+    const { parse, precedence } = await import('../../src/parser.mjs');
+    expect(parse('count += 1; values[0] %= 2; result = missing ?? 3 ** 2')).toMatchObject({
+      body: [
+        { type: 'Assignment', name: 'count', operator: '+=' },
+        { type: 'Assignment', target: { type: 'IndexExpression' }, operator: '%=' },
+        { type: 'Assignment', name: 'result', value: { type: 'BinaryExpression', operator: '??' } },
+      ],
+    });
+    expect(precedence('**')).toBeGreaterThan(precedence('*'));
+  });
 });

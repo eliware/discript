@@ -1,0 +1,14 @@
+/*
+  Operators and compound assignment
+
+  Use modulo for batching, exponentiation for numeric calculations, `??`
+  for null defaults, and compound assignment for counters. An absent
+  identifier is still an error; initialize optional values to null explicitly.
+*/
+retries = 1
+retries += 2
+batch = retries % 2
+scale = 2 ** 3
+configured = null
+limit = configured ?? 10
+print({retries: retries, batch: batch, scale: scale, limit: limit})

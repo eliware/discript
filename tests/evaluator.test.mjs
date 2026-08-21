@@ -74,7 +74,7 @@ describe('evaluate', () => {
     await expect(evaluate(program([{ type: 'UnknownStatement' }]))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
     await expect(evaluate(program([{ type: 'ExpressionStatement', expression: expr('UnknownExpression') }]))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
     await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'UnaryExpression', operator: '+', argument: { type: 'Literal', value: 1 } } }]))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
-    await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'BinaryExpression', operator: '%', left: { type: 'Literal', value: 1 }, right: { type: 'Literal', value: 1 } } }]))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+    await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'BinaryExpression', operator: '%', left: { type: 'Literal', value: 5 }, right: { type: 'Literal', value: 2 } } }]))).resolves.toBe(1);
     await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'CallExpression', callee: { type: 'Literal', value: 1 }, arguments: [] } }]))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
     await expect(evaluate(program([{ type: 'ExpressionStatement', expression: { type: 'Identifier', name: 'missing' } }]))).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
   });

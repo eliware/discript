@@ -65,6 +65,12 @@ describe('collection access and assignment', () => {
   test('rejects assignment through a null member', async () => {
     await expect(evaluate(parse('missing.name = "value"'), { missing: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
   });
+
+  test('evaluates modulo, exponentiation, null coalescing, and compound assignment', async () => {
+    await expect(evaluate(parse('count = 2; count += 3; count *= 2; count %= 4; count'))).resolves.toBe(2);
+    await expect(evaluate(parse('missing ?? (3 ** 2)'), { missing: null })).resolves.toBe(9);
+    await expect(evaluate(parse('value = false; value ?? true'))).resolves.toBe(false);
+  });
 });
 
 describe('core language contract', () => {

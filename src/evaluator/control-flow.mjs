@@ -17,8 +17,15 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
     if (statement.type === 'ThrowStatement') throw new ScriptThrow(await evaluateExpression(statement.value));
     if (statement.type === 'Assignment') {
       const value = await evaluateExpression(statement.value);
-      if (statement.name) scope.set(statement.name, value);
-      else await assignTarget(statement.target, value);
+      const operator = statement.operator ?? '=';
+      if (operator === '=') {
+        if (statement.name) scope.set(statement.name, value);
+        else await assignTarget(statement.target, value);
+      } else {
+        const current = statement.name ? await evaluateExpression({ type: 'Identifier', name: statement.name }) : await evaluateExpression(statement.target);
+        await assignTarget(statement.name ? { type: 'IdentifierTarget', name: statement.name } : statement.target, applyAssignmentOperator(operator, current, value));
+        return statement.name ? await evaluateExpression({ type: 'Identifier', name: statement.name }) : evaluateExpression(statement.target);
+      }
       return value;
     }
     if (statement.type === 'ExpressionStatement') return evaluateExpression(statement.expression);
@@ -61,9 +68,19 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
   };
 
   async function assignTarget(target, value) {
+    if (target.type === 'IdentifierTarget') { scope.set(target.name, value); return; }
     const object = await evaluateExpression(target.object);
     if (object === null || object === undefined) throw runtimeError('Cannot assign a property on a null value.');
     const property = target.type === 'IndexExpression' ? await evaluateExpression(target.property) : target.property;
     object[property] = value;
+  }
+
+  function applyAssignmentOperator(operator, left, right) {
+    if (operator === '+=') return left + right;
+    if (operator === '-=') return left - right;
+    if (operator === '*=') return left * right;
+    if (operator === '/=') return left / right;
+    if (operator === '%=') return left % right;
+    throw runtimeError(`Unsupported assignment operator: ${operator}`);
   }
 }
