@@ -1,0 +1,12 @@
+/*
+  Standard library helpers
+
+  length(), keys(), values(), range(), and now() are deterministic, bounded
+  language helpers. They are useful for reports and batch planning without
+  granting scripts filesystem or process access.
+*/
+channels = {general: "text", lounge: "voice"}
+for (index in range(length(values(channels)))) {
+  print({index: index, name: keys(channels)[index]})
+}
+print({generatedAt: now(), channelCount: length(channels)})

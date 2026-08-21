@@ -8,6 +8,7 @@ import { createDiscordApi } from "../discord.mjs";
 import { createDiscordRest } from "../rest.mjs";
 import { createEnvironment } from "../env.mjs";
 import { createJsonHelpers } from './json.mjs';
+import { createLanguageBuiltins } from '../language/builtins.mjs';
 export async function executeInput(input, options, dependencies, onRuntime = () => {}) {
   if (input.kind === 'command') return executeDirectCommand(input.command, options, dependencies);
   if (options.dry_run) return { dryRun: true, source: input.source };
@@ -34,6 +35,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
     const result = await evaluate(parse(input.source), {
       env: createEnvironment(),
       args: input.args ?? [],
+      ...createLanguageBuiltins(),
       json: createJsonHelpers(),
       discord: createDiscordApi(runtime.client, { ...options, rest }),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),

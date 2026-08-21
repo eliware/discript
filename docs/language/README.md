@@ -10,4 +10,5 @@
 - `events-and-handlers.md` — listeners, handler scope, and process lifetime.
 - `errors-and-status.md` — exceptions, `exit()`, and branchable status values.
 - `module-system.md` — imports and reusable script modules.
+- `standard-library.md` — bounded collection, range, and time helpers.
 - `grammar.md` — maintained grammar reference.
