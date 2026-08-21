@@ -1,5 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import { createServer } from 'node:http';
+import { fileURLToPath } from 'node:url';
 import { mcpServer } from '@eliware/mcp-server';
 import mcpClient from '@eliware/mcp-client';
 import { closeMcpServer, startMcpServer } from '../src/mcp/server.mjs';
@@ -93,6 +94,20 @@ describe('MCP server/client HTTP integration', () => {
       await closeMcpServer(server);
     }
   }, 15000);
+
+  test('discovers a Discript server over a stdio child process', async () => {
+    const client = await mcpClient({
+      transport: 'stdio', command: process.execPath,
+      args: [fileURLToPath(new URL('../bin/discript.mjs', import.meta.url)), 'mcp', '--stdio'],
+      reconnect: false,
+    });
+    try {
+      expect((await client.listTools()).tools.map(tool => tool.name)).toContain('run_discript');
+      expect(client.getInstructions?.()).toContain('Discript is a Discord scripting runtime');
+    } finally {
+      await client.close();
+    }
+  }, 20000);
 
   test('accepts an OAuth2 token validated by a local introspection service', async () => {
     const introspection = createServer((request, response) => {
