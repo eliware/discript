@@ -1,0 +1,18 @@
+// Build a structured announcement plan across all text channels.
+// An AI agent can review the candidates before sending any messages.
+guildId = env.TEST_GUILD
+message = env.ANNOUNCEMENT
+if (message == null) {
+  message = "Maintenance starts in 10 minutes."
+}
+guild = discord.guilds.get(guildId)
+channels = await guild.channels.list()
+results = []
+
+for (channel in channels) {
+  if (channel.type == 0) {
+    results.push({channel: channel.name, channelId: channel.id, status: "candidate"})
+  }
+}
+
+print({guild: guildId, message: message, candidates: results})

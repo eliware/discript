@@ -12,6 +12,6 @@ export async function evaluate(program, globals = {}, { scope: sharedScope, base
   let evaluateExpression;
   async function evaluateBlock(statements) { let result; for (const statement of statements) result = await evaluateStatement(statement); return result; }
   evaluateExpression = createExpressionEvaluator({ scope, scopeContext, evaluateBlock, evaluateExpression: expression => evaluateExpression(expression), normalizeError, runtimeError, ScriptExit });
-  evaluateStatement = createStatementEvaluator({ scope, scopeContext, evaluateBlock, evaluateExpression: expression => evaluateExpression(expression), evaluateStatement: statement => evaluateStatement(statement), runtimeError, ReturnSignal, createClosure, baseDir });
+  evaluateStatement = createStatementEvaluator({ scope, scopeContext, evaluateBlock, evaluateExpression: expression => evaluateExpression(expression), runtimeError, ReturnSignal, createClosure, baseDir });
   return scopeContext.run(baseScope, () => evaluateBlock(program.body));
 }

@@ -1,0 +1,20 @@
+// Find channels by a naming convention, preview the cleanup, then apply it
+// only when DISCRIPT_APPLY=true. Destructive operations require force: true.
+guildId = env.TEST_GUILD
+apply = env.DISCRIPT_APPLY == "true"
+guild = discord.guilds.get(guildId)
+channels = await guild.channels.list()
+deleted = []
+
+for (channel in channels) {
+  if (channel.name.startsWith("tmp-")) {
+    options = {dryRun: true}
+    if (apply) {
+      options = {force: true}
+    }
+    result = discord.channels.get(channel.id).delete(options)
+    deleted.push({name: channel.name, result: result})
+  }
+}
+
+print({apply: apply, deleted: deleted})

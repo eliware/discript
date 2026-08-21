@@ -43,6 +43,11 @@ describe('collection helpers', () => {
 });
 
 describe('core language contract', () => {
+  test('preserves the receiver for member method calls', async () => {
+    await expect(evaluate(parse('"discript-test-1".startsWith("discript-test-")'))).resolves.toBe(true);
+    await expect(evaluate(parse('"discript-test-1".endsWith("-1")'))).resolves.toBe(true);
+  });
+
   test('combines comments, grouped expressions, precedence, logical operators, and else-if', async () => {
     const source = `
       // choose the middle branch

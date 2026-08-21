@@ -5,7 +5,7 @@ import { join } from 'node:path';
 // Load the project-local file first, then the user-level fallback. dotenv does
 // not overwrite existing values, so shell exports and local configuration win.
 dotenv.config({ quiet: true });
-dotenv.config({ path: join(homedir(), '.discript.env'), quiet: true });
+if (process.env.DISCRIPT_TEST_MODE !== '1') dotenv.config({ path: join(homedir(), '.discript.env'), quiet: true });
 
 
 import { log, registerHandlers, registerSignals } from '@eliware/common';

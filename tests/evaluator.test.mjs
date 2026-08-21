@@ -12,6 +12,11 @@ describe('evaluate', () => {
     })).resolves.toEqual({ id: '123' });
   });
 
+  test('evaluates nested statements through the statement callback', async () => {
+    await expect(evaluate(parse('if (true) { value = 42 }; value'))).resolves.toBe(42);
+    await expect(evaluate(parse('if (false) { value = 0 } else if (true) { value = 43 }; value'))).resolves.toBe(43);
+  });
+
   test('supports environment globals supplied by the host', async () => {
     const values = {};
     const env = (await import('../src/env.mjs')).createEnvironment(values);
