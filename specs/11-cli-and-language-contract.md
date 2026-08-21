@@ -56,6 +56,7 @@ The initial language shall support:
 - Bounded timeout and callback-based retry helpers
 - Runtime failures preserve a sanitized user-function call stack
 - Event and timer registrations return idempotent cancellation handles
+- Aliased modules execute in isolated per-run scopes and are cached; legacy side-effect imports remain supported
 
 Example:
 

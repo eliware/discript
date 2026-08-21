@@ -18,6 +18,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
     const timers = new Set();
     const eventHandlers = new Set();
     const deferred = [];
+    const moduleCache = new Map();
   const signal = dependencies.signal;
   try {
     if (signal?.aborted) throw Object.assign(new Error('Execution was cancelled.'), { code: 'EXECUTION_CANCELLED', exitCode: 130 });
@@ -77,13 +78,22 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
         for (const item of items ?? []) accumulator = await callback(accumulator, item);
         return accumulator;
       },
-      importScript: async (sourcePath, sharedScope, importerBaseDir = baseDir) => {
+      importScript: async (sourcePath, sharedScope, importerBaseDir = baseDir, isolated = false) => {
         const importedPath = resolve(importerBaseDir, sourcePath);
+        if (isolated && moduleCache.has(importedPath)) return moduleCache.get(importedPath);
         const source = await readFile(importedPath, 'utf8');
         const moduleExports = {};
-        sharedScope.set('exports', moduleExports);
-        await evaluate(parse(source), {}, { scope: sharedScope, baseDir: dirname(importedPath) });
-        sharedScope.delete('exports');
+        if (isolated) {
+          moduleCache.set(importedPath, moduleExports);
+          const moduleScope = new Map(sharedScope);
+          moduleScope.set('exports', moduleExports);
+          try { await evaluate(parse(source), {}, { scope: moduleScope, baseDir: dirname(importedPath) }); }
+          catch (error) { moduleCache.delete(importedPath); throw error; }
+        } else {
+          sharedScope.set('exports', moduleExports);
+          try { await evaluate(parse(source), {}, { scope: sharedScope, baseDir: dirname(importedPath) }); }
+          finally { sharedScope.delete('exports'); }
+        }
         return moduleExports;
       },
     }, { baseDir });

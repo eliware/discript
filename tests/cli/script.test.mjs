@@ -1,5 +1,8 @@
 import { describe, expect, jest, test } from '@jest/globals';
 import { EventEmitter } from 'node:events';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const { executeInput } = await import('../../src/cli/script.mjs');
 
@@ -99,5 +102,16 @@ describe('cli/script', () => {
     const active = runtime();
     await expect(executeInput({ kind: 'source', source: 'timer = every(10, () => print("tick")); timer.cancel(); listener = on("ready", () => print("ready")); listener.cancel()' }, { keep_alive: false }, { runtime: active, stdout: () => {} })).resolves.toBe(true);
     expect(active.client.listenerCount('ready')).toBe(0);
+  });
+
+  test('isolates and caches aliased modules while preserving private closure state', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'discript-module-'));
+    try {
+      const modulePath = join(directory, 'counter.ds');
+      const entryPath = join(directory, 'entry.ds');
+      await writeFile(modulePath, 'secret = "private"; count = 0; export fn next() { count += 1; return {count: count, secret: secret} }');
+      await writeFile(entryPath, 'import first from "./counter.ds"; import second from "./counter.ds"; a = first.next(); b = second.next(); same = first == second; {a: a, b: b, same: same}');
+      await expect(executeInput({ kind: 'source', source: await readFile(entryPath, 'utf8'), origin: entryPath }, {}, { runtime: runtime() })).resolves.toEqual({ a: { count: 1, secret: 'private' }, b: { count: 1, secret: 'private' }, same: true });
+    } finally { await rm(directory, { recursive: true, force: true }); }
   });
 });

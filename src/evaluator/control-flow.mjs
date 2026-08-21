@@ -9,7 +9,7 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
     if (statement.type === 'ImportStatement') {
       const load = scope.get('importScript');
       if (typeof load !== 'function') throw runtimeError('Script imports are unavailable in this execution mode.');
-      const imported = await load(statement.path, scope, baseDir);
+      const imported = await load(statement.path, scope, baseDir, Boolean(statement.alias));
       if (statement.alias) scope.set(statement.alias, imported);
       return imported;
     }
