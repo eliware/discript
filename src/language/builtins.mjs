@@ -88,7 +88,7 @@ export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
       if (!Array.isArray(items) || typeof callback !== 'function') throw Object.assign(new Error('mapLimit() expects an array and callback.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
       const concurrency = Number(limit);
       if (!Number.isInteger(concurrency) || concurrency < 1) throw Object.assign(new Error('mapLimit() limit must be a positive integer.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
-      const results = new Array(items.length);
+      const results = Array.from({ length: items.length });
       let next = 0;
       async function worker() {
         while (next < items.length) {

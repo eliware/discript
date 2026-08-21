@@ -44,7 +44,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       try {
         release = await limits.limiter?.acquire?.();
         const scopes = extra.mcpAuth?.scopes || extra._meta?.mcpAuth?.scopes;
-        const capabilities = Array.isArray(scopes) ? scopes : undefined;
+        const capabilities = Array.isArray(scopes) && scopes.length > 0 ? scopes : undefined;
         const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal, capabilities, ...(mcpServer.context?.token !== undefined ? { token: mcpServer.context.token } : {}) }), effectiveTimeout, { onTimeout: () => controller.abort() });
         const result = executionSuccess(value, { requestId,
           warnings: Array.isArray(value?.warnings) ? value.warnings : [],

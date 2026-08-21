@@ -12,7 +12,7 @@ export function createClosure(statement, { scope, scopeContext, evaluateBlock, c
       catch (error) {
         if (error instanceof ReturnSignal) return error.value;
         error.scriptStack = [...(error.scriptStack ?? []), statement.name];
-        error.details = { ...(error.details ?? {}), stack: error.scriptStack };
+        error.details = { ...error.details, stack: error.scriptStack };
         throw error;
       }
     });

@@ -58,6 +58,11 @@ describe('cli/script', () => {
     await expect(executeInput({ kind: 'source', source: '{write: capabilities.has("discord:write"), read: capabilities.has("discord:read"), admin: capabilities.has("discord:admin")}' }, {}, { runtime: active, capabilities: ['discord:admin'] })).resolves.toEqual({ write: true, read: true, admin: true });
   });
 
+  test('treats an empty capability list as the default unrestricted policy', async () => {
+    const active = runtime();
+    await expect(executeInput({ kind: 'source', source: '{read: capabilities.has("discord:read"), write: capabilities.has("discord:write"), admin: capabilities.has("discord:admin")}' }, {}, { runtime: active, capabilities: [] })).resolves.toEqual({ read: true, write: true, admin: true });
+  });
+
   test('supports async collection helpers', async () => {
     const active = runtime();
     await expect(executeInput({ kind: 'source', source: 'map([1, 2], x => x * 2)' }, {}, { runtime: active })).resolves.toEqual([2, 4]);

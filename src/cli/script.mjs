@@ -44,7 +44,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       args: input.args ?? [],
       ...createLanguageBuiltins(),
       json: createJsonHelpers(),
-      discord: createDiscordApi(runtime.client, { ...options, rest, capabilities: dependencies.capabilities ? new Set(dependencies.capabilities) : null }),
+      discord: createDiscordApi(runtime.client, { ...options, rest, capabilities: dependencies.capabilities?.length ? new Set(dependencies.capabilities) : null }),
       capabilities: createCapabilities(dependencies.capabilities),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
       filter: async (items, selector, expected) => {
@@ -116,7 +116,7 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
 }
 
 function createCapabilities(values) {
-  const allowed = values ? new Set(values) : null;
+  const allowed = values?.length ? new Set(values) : null;
   return {
     list: () => allowed ? [...allowed] : ['discord:read', 'discord:write', 'discord:admin'],
     has: capability => !allowed || hasCapability(allowed, String(capability)),

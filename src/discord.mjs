@@ -14,7 +14,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
     return loadedVoiceModule;
   };
   const { mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite } = createNormalization();
-  const { requireApproval, requireCapability, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember } = createSafety({ client, dryRun, yes, capabilities });
+  const { requireApproval, requirePermission, requireChannelPermission, requireManageableRole, requireManageableMember } = createSafety({ client, dryRun, yes, capabilities });
   const resolveMessage = async (channelId, messageId) => {
     const channel = client.channels.cache.get(String(channelId));
     if (!channel?.messages?.fetch) throw Object.assign(new Error(`Message channel not found: ${channelId}`), { code: 'CHANNEL_NOT_FOUND', exitCode: 1 });
