@@ -47,7 +47,7 @@ results = parallel(
 print(results)
 ```
 
-Only parallelize independent work. Do not parallelize mutations that depend on ordering, share a target resource, or could exceed Discord rate limits. If one operation rejects, the combined result rejects and normal cleanup still runs.
+Only parallelize independent work. Do not parallelize mutations that depend on ordering, share a target resource, or could exceed Discord rate limits. If one operation rejects, the combined result rejects and normal cleanup still runs. Use `timeout(operation, milliseconds)` to bound waiting and `retry(callback, attempts, delay)` only around idempotent or explicitly retry-safe work.
 
 `race()` resolves with the first completed operation. `allSettled()` waits for every operation and returns status/value or status/reason records. Both receive already-started operation arguments, so use `mapLimit(items, limit, callback)` when processing a collection with bounded concurrency:
 

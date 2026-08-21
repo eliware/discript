@@ -1,0 +1,12 @@
+/*
+  Retry and timeout
+
+  Retry is callback-based so each attempt can create a fresh operation. Keep
+  retries bounded and reserve them for idempotent reads. Timeout bounds the
+  script's wait but cannot cancel a request already sent to Discord.
+*/
+fn readAttempt(attempt) {
+  return {attempt: attempt, status: "ok"}
+}
+result = retry(readAttempt, 3, 25)
+print(timeout(result, 100))

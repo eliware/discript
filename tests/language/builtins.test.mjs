@@ -33,6 +33,14 @@ describe('language builtins', () => {
     expect(active.max).toBeLessThanOrEqual(2);
   });
 
+  test('times out operations and retries callbacks', async () => {
+    await expect(builtins.timeout(Promise.resolve('done'), 20)).resolves.toBe('done');
+    await expect(builtins.timeout(new Promise(resolve => setTimeout(resolve, 20)), 1)).rejects.toMatchObject({ code: 'OPERATION_TIMEOUT', exitCode: 6 });
+    let attempts = 0;
+    await expect(builtins.retry(async attempt => { attempts = attempt; if (attempt < 3) throw new Error('try again'); return 'ok'; }, 3)).resolves.toBe('ok');
+    expect(attempts).toBe(3);
+  });
+
   test('rejects invalid inputs and oversized ranges', () => {
     expect(() => builtins.length(1)).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));
     expect(() => builtins.keys(1)).toThrow(expect.objectContaining({ code: 'INVALID_ARGUMENT' }));

@@ -30,6 +30,22 @@ export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
     now() { return clock().toISOString(); },
     race(...operations) { return Promise.race(operations); },
     allSettled(...operations) { return Promise.allSettled(operations); },
+    timeout(operation, milliseconds) {
+      const delay = Number(milliseconds);
+      if (!Number.isInteger(delay) || delay < 1) return Promise.reject(Object.assign(new Error('timeout() requires a positive integer duration.'), { code: 'INVALID_ARGUMENT', exitCode: 2 }));
+      return Promise.race([operation, new Promise((_, reject) => setTimeout(() => reject(Object.assign(new Error(`Operation timed out after ${delay}ms.`), { code: 'OPERATION_TIMEOUT', exitCode: 6 })), delay))]);
+    },
+    async retry(callback, attempts = 3, delay = 0) {
+      if (typeof callback !== 'function') throw Object.assign(new Error('retry() expects a callback.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      const count = Number(attempts);
+      const wait = Number(delay);
+      if (!Number.isInteger(count) || count < 1 || !Number.isInteger(wait) || wait < 0) throw Object.assign(new Error('retry() expects positive attempts and a non-negative delay.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
+      let lastError;
+      for (let attempt = 1; attempt <= count; attempt += 1) {
+        try { return await callback(attempt); } catch (error) { lastError = error; if (attempt < count && wait > 0) await new Promise(resolve => setTimeout(resolve, wait)); }
+      }
+      throw lastError;
+    },
     async mapLimit(items, limit, callback) {
       if (!Array.isArray(items) || typeof callback !== 'function') throw Object.assign(new Error('mapLimit() expects an array and callback.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
       const concurrency = Number(limit);

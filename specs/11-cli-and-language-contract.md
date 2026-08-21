@@ -53,6 +53,7 @@ The initial language shall support:
 - Conditional expressions and optional member/index/call access
 - Array and object spread expressions
 - Array and object destructuring assignments with rest capture
+- Bounded timeout and callback-based retry helpers
 
 Example:
 
