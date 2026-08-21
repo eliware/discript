@@ -96,7 +96,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add graceful shutdown coordination between MCP server, broker, Discord runtime, and child MCP client processes. MCP and broker shutdown are idempotent and concurrency-safe, broker callbacks coordinate listener teardown, and the separate-process MCP integration test verifies child cleanup.
 - [x] Define trust boundaries for stdio child processes and remote HTTP callers.
 - [x] Document stable MCP release compatibility versus draft 2026 discovery features.
-- [ ] Define remote server lifecycle, health checks, and failure recovery behavior. A read-only `/healthz` endpoint is implemented; lifecycle and failure-recovery policy remain pending.
+- [x] Define remote server lifecycle, health checks, and failure recovery behavior. `/healthz`, startup validation/cleanup, bounded retry, structured request failures, graceful shutdown ordering, and abnormal-exit recovery checks are documented in `docs/mcp/operations-release-checklist.md`.
 
 ## Phase 8 — Tests and verification
 

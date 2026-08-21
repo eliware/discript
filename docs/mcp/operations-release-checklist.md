@@ -20,6 +20,15 @@ Use this checklist before exposing a Discript MCP server or publishing a release
 - [ ] Exercise read-only discovery and a dry-run before approving a mutation; require `force`/`-y` for destructive work.
 - [ ] Rotate certificates and bearer/OAuth credentials using an overlap or rollback plan.
 
+## Lifecycle and failure recovery
+
+- Start the configured MCP listener only after configuration validation and TLS material checks succeed; a failed listener startup must close the broker/runtime it acquired.
+- Treat `/healthz` as readiness for the MCP listener and shared Discord runtime, not as an authorization bypass for tool calls.
+- Retry transient Discord gateway startup failures according to the gateway retry policy; do not blindly retry invalid credentials, intents, or TLS configuration.
+- On request timeout, queue overflow, authentication failure, or output-limit failure, return a structured error and keep unrelated requests alive.
+- On graceful shutdown, stop accepting new MCP requests, close MCP transports, close the broker, destroy the Discord client, and remove the local socket.
+- After an abnormal exit, verify the health endpoint, socket/path availability, and logs before restarting; use bounded restart backoff.
+
 ## Release gates
 
 - [ ] Run `npm test`, `npm run test:mcp`, `npm run lint`, and `npm run docs:check`.
