@@ -1,0 +1,8 @@
+// Return a structured failure candidate instead of leaking an unhandled exception.
+result = try {
+  discord.guilds.get(env.DISCRIPT_UNKNOWN_GUILD)
+} catch (error) {
+  {ok: false, code: error.code, message: error.message}
+}
+result
+

@@ -1,0 +1,8 @@
+// Bulk deletion is destructive; this example only emits a preview plan.
+channelId = env.DISCRIPT_CHANNEL_ID
+messageIds = env.DISCRIPT_MESSAGE_IDS
+if (messageIds == null) {
+  exit(2, "set DISCRIPT_MESSAGE_IDS to a comma-separated list")
+}
+discord.messages.bulkDelete(channelId, messageIds, {dryRun: true})
+

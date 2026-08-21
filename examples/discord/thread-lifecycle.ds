@@ -1,0 +1,6 @@
+// Thread lifecycle planning: list current threads and prepare a safe create operation.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+threads = channel.threads.list()
+planned = channel.threads.create("agent-review", {dryRun: true})
+{threads: threads, planned: planned}
+

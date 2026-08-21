@@ -1,0 +1,5 @@
+// Print one object per event so --output jsonl can stream records to an agent.
+on("messageCreate") {
+  print({event: "messageCreate", id: event.id, channelId: event.channelId})
+}
+

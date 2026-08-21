@@ -1,0 +1,4 @@
+// Prefer a small stable projection over returning every Discord object field.
+guild = discord.guilds.get(env.TEST_GUILD)
+compact = map(guild.channels.list(), channel => channel.name)
+{guildId: guild.id, channels: compact}

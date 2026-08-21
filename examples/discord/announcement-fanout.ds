@@ -1,0 +1,6 @@
+// Build a fan-out plan first, keeping the message content and targets explicit.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = filter(guild.channels.list(), "name", "announcements")
+message = env.DISCRIPT_ANNOUNCEMENT
+{targets: channels, content: message, dryRun: true}
+

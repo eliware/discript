@@ -1,0 +1,3 @@
+// Submit this source through run_discript with dryRun=true for a remote plan.
+guild = discord.guilds.get(env.TEST_GUILD)
+{operation: "channel mutation", targetGuild: guild.id, dryRun: true}

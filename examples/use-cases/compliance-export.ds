@@ -1,0 +1,4 @@
+// Export only audit-friendly fields, avoiding raw tokens and unnecessary payloads.
+guild = discord.guilds.get(env.TEST_GUILD)
+print({guild: {id: guild.id, name: guild.name}, channels: guild.channels.list(), roles: guild.roles.list()})
+

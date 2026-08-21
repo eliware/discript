@@ -1,0 +1,5 @@
+// Filter a declared target list before doing any expensive or mutating operation.
+guild = discord.guilds.get(env.TEST_GUILD)
+targets = filter(guild.channels.list(), "type", 0)
+print({candidateCount: targets.length, candidates: targets})
+

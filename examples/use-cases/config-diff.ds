@@ -1,0 +1,7 @@
+// Compare the live guild inventory with a small desired policy.
+guild = discord.guilds.get(env.TEST_GUILD)
+desiredChannels = ["general", "rules", "welcome"]
+liveChannels = guild.channels.list()
+missing = filter(desiredChannels, name => find(liveChannels, "name", name) == null)
+{desired: desiredChannels, missing: missing, compliant: missing.length == 0}
+

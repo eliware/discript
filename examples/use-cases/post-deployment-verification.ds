@@ -1,0 +1,9 @@
+// Post-deployment verification returns a status suitable for CI or an agent.
+guild = discord.guilds.get(env.TEST_GUILD)
+healthy = guild.id != null && guild.name != null
+if (healthy) {
+  {ok: true, guildId: guild.id}
+} else {
+  exit(1, "guild verification failed")
+}
+

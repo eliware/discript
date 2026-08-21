@@ -1,0 +1,4 @@
+// The remote caller must explicitly pass force=true; this source remains declarative.
+guild = discord.guilds.get(env.TEST_GUILD)
+{requested: "approved mutation", guildId: guild.id, requiresForce: true}
+

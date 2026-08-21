@@ -1,0 +1,4 @@
+// Incident snapshot: collect compact state for an agent or incident ticket.
+guild = discord.guilds.get(env.TEST_GUILD)
+print({guildId: guild.id, name: guild.name, channels: guild.channels.list(), members: guild.members.list()})
+

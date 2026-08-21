@@ -1,0 +1,8 @@
+// Verify a deployment by checking that required names exist after provisioning.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+roles = guild.roles.list()
+required = ["general", "rules"]
+missing = filter(required, name => find(channels, "name", name) == null)
+{guildId: guild.id, missingChannels: missing, roleCount: roles.length, verified: missing.length == 0}
+

@@ -1,0 +1,5 @@
+// Preview a lockdown permission policy before applying it to a target channel.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+target = env.TEST_GUILD
+channel.permissions.set(target, {deny: ["SendMessages"]}, {dryRun: true})
+

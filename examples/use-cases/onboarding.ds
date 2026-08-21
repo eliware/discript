@@ -1,0 +1,7 @@
+// Onboarding report: identify the welcome and rules destinations for an agent.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+welcome = find(channels, "name", "welcome")
+rules = find(channels, "name", "rules")
+{guildId: guild.id, welcome: welcome, rules: rules, ready: welcome != null && rules != null}
+

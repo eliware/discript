@@ -1,0 +1,5 @@
+// Produce one compact report per guild; each iteration is independently printable.
+for (guild in discord.guilds.list()) {
+  print({id: guild.id, name: guild.name})
+}
+

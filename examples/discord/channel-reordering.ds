@@ -1,0 +1,5 @@
+// Channel position and parent changes can be previewed independently.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+preview = channel.update({position: 1, parent: null, dryRun: true})
+{channelId: channel.id, preview: preview}
+

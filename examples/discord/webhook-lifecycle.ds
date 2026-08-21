@@ -1,0 +1,5 @@
+// Webhooks are channel-scoped resources; inspect them before planning changes.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+webhooks = channel.webhooks.list()
+{channelId: channel.id, webhooks: webhooks}
+

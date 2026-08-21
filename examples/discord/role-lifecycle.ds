@@ -1,0 +1,6 @@
+// Role lifecycle planning: inspect roles, then preview a create/update/delete sequence.
+guild = discord.guilds.get(env.TEST_GUILD)
+roles = guild.roles.list()
+candidate = guild.roles.create("Automation Role", {dryRun: true})
+{existing: roles, planned: candidate}
+
