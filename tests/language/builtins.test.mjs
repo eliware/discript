@@ -21,6 +21,15 @@ describe('language builtins', () => {
     expect(builtins.trim('  ready  ')).toBe('ready');
   });
 
+  test('reports language version and supported features', () => {
+    expect(builtins.language.version).toBe('1.0');
+    expect(builtins.language.supports('closures')).toBe(true);
+    expect(builtins.language.supports('future-feature')).toBe(false);
+    expect(builtins.language.requireVersion('1.0')).toBe(true);
+    expect(() => builtins.language.requireVersion('2.0')).toThrow(expect.objectContaining({ code: 'LANGUAGE_VERSION_UNSUPPORTED' }));
+    expect(() => builtins.language.requireVersion('not-a-version')).toThrow(expect.objectContaining({ code: 'LANGUAGE_VERSION_UNSUPPORTED' }));
+  });
+
   test('creates bounded ascending and descending ranges', () => {
     expect(builtins.range(3)).toEqual([0, 1, 2]);
     expect(builtins.range(2, 7, 2)).toEqual([2, 4, 6]);

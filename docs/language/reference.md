@@ -79,7 +79,7 @@ env.set("DISCRIPT_LAST_RUN", "agent")
 env.clear("DISCRIPT_LAST_RUN")
 ```
 
-Built-ins include `print(value)`, `exit(code, message)`, `env`, `args`, `defer callback`, `length`, `keys`, `values`, `range`, `now`, `race`, `allSettled`, `mapLimit`, `timeout`, `retry`, `on`, `every`, `after`, and the `discord` API root. Environment values are strings or absent/null-like values. Registration helpers return cancellable handles. See the [standard library](standard-library.md) for helper contracts.
+Built-ins include `print(value)`, `exit(code, message)`, `env`, `args`, `defer callback`, `length`, `keys`, `values`, `range`, `now`, `race`, `allSettled`, `mapLimit`, `timeout`, `retry`, `language`, `capabilities`, `on`, `every`, `after`, and the `discord` API root. Environment values are strings or absent/null-like values. Registration helpers return cancellable handles. `language.version`, `language.supports(feature)`, and `language.requireVersion(version)` support runtime compatibility checks. See the [standard library](standard-library.md) for helper contracts.
 
 ## Operation options and errors
 

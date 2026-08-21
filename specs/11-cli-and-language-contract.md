@@ -60,6 +60,7 @@ The initial language shall support:
 - Function calls use lexical scopes; nested functions retain state in captured outer bindings while parameters and new locals remain per-call
 - The standard library provides bounded text normalization and delimiter helpers (`split`, `join`, `includes`, `lower`, `upper`, and `trim`)
 - Hosts may restrict script mutation capabilities with `DISCRIPT_CAPABILITIES`; previews require read access, ordinary approved mutations require `discord:write`, and destructive approvals require `discord:admin`
+- Scripts can inspect `language.version`, detect features with `language.supports(name)`, and require a compatible version with `language.requireVersion(version)`
 
 Example:
 

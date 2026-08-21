@@ -1,3 +1,5 @@
+export const LANGUAGE_VERSION = '1.0';
+
 export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
   return {
     length(value) {
@@ -37,6 +39,18 @@ export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
     trim(value) {
       if (typeof value !== 'string') throw Object.assign(new Error('trim() expects a string.'), { code: 'INVALID_ARGUMENT', exitCode: 2 });
       return value.trim();
+    },
+    language: {
+      version: LANGUAGE_VERSION,
+      supports(feature) {
+        return new Set(['arrays', 'objects', 'functions', 'closures', 'events', 'modules', 'optional-access', 'destructuring', 'async', 'capabilities']).has(String(feature));
+      },
+      requireVersion(required) {
+        const requested = parseVersion(required);
+        const current = parseVersion(LANGUAGE_VERSION);
+        if (!requested || requested.major !== current.major || requested.minor > current.minor) throw Object.assign(new Error(`Discript language version ${required} is not supported; current version is ${LANGUAGE_VERSION}.`), { code: 'LANGUAGE_VERSION_UNSUPPORTED', exitCode: 2, details: { requested: String(required), current: LANGUAGE_VERSION } });
+        return true;
+      },
     },
     range(start, end = null, step = 1) {
       const first = end === null ? 0 : Number(start);
@@ -86,4 +100,9 @@ export function createLanguageBuiltins({ clock = () => new Date() } = {}) {
       return results;
     },
   };
+}
+
+function parseVersion(value) {
+  const match = /^(\d+)\.(\d+)$/.exec(String(value ?? '').trim());
+  return match ? { major: Number(match[1]), minor: Number(match[2]) } : null;
 }
