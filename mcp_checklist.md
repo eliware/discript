@@ -21,7 +21,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Keep `TEST_GUILD` explicitly marked as test-only rather than part of the normal application profile.
 - [x] Add a typed configuration profile loader for `DISCRIPT_CONNECTION_MODE` with direct as the default.
 - [x] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
-- [ ] Add MCP server profile loading for transport, host, port, endpoint, auth, TLS, redirect, and CORS settings.
+- [x] Add MCP server profile loading for transport, port, endpoint, static/bearer auth, TLS files, redirect, and CORS settings.
 - [ ] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
 - [ ] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
 - [ ] Make normal CLI commands use the configured daemon/client profile when selected.
@@ -44,19 +44,19 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 ## Phase 4 — Authentication, authorization, and TLS
 
-- [ ] Support `auth.mode: none` only for trusted local stdio/development use.
-- [ ] Support static bearer authentication for HTTP deployments.
-- [ ] Support bearer-passthrough mode for forwarding validated-at-the-edge tokens to backend operations.
+- [x] Support `auth.mode: none` as the local/development default; remote-use policy enforcement remains pending.
+- [x] Support static bearer authentication for HTTP deployments.
+- [x] Support bearer-passthrough mode for forwarding validated-at-the-edge tokens to backend operations.
 - [ ] Support OAuth2 resource-server authentication with issuer and resource/audience validation.
 - [ ] Support OAuth2 token introspection with required scopes and sanitized identity metadata.
 - [ ] Expose OAuth protected-resource metadata endpoints.
 - [ ] Decide whether Discript needs server-side OAuth only or also OAuth client helpers.
 - [ ] If OAuth client support is needed, add provider discovery, client registration, PKCE, authorization-code exchange, and durable state handling.
-- [ ] Add HTTP/HTTPS configuration for daemon MCP mode.
+- [x] Add HTTP/HTTPS configuration for daemon MCP mode.
 - [ ] Support inline TLS key/certificate/CA configuration.
-- [ ] Support TLS key/certificate/CA files and `TLS_KEY_FILE`, `TLS_CERT_FILE`, and `TLS_CA_FILE` environment variables.
-- [ ] Support HTTP-to-HTTPS redirects.
-- [ ] Add configurable CORS `allowedOrigins`.
+- [x] Support TLS key/certificate/CA files and `TLS_KEY_FILE`, `TLS_CERT_FILE`, and `TLS_CA_FILE` environment variables.
+- [ ] Support HTTP-to-HTTPS redirects with separately configurable HTTP and HTTPS listeners; the current redirect flag is passed through but needs profile-level dual-listener configuration.
+- [x] Add configurable CORS `allowedOrigins`.
 - [ ] Add authentication, authorization, TLS, CORS, and remote-host trust documentation.
 - [ ] Define scope mapping for read-only, mutating, destructive, and administrative Discript operations.
 

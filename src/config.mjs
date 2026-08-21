@@ -28,7 +28,7 @@ export function loadConfig(env = process.env) {
     mcp: {
       transport: mcpTransport,
       host: stringValue(env.DISCRIPT_MCP_HOST, '127.0.0.1'),
-      port: numberValue(env.DISCRIPT_MCP_PORT, null, 'DISCRIPT_MCP_PORT'),
+      port: numberValue(env.DISCRIPT_MCP_PORT, 8765, 'DISCRIPT_MCP_PORT'),
       endpoint: stringValue(env.DISCRIPT_MCP_ENDPOINT, '/mcp'),
       authMode: mcpAuthMode,
       authToken: stringValue(env.DISCRIPT_MCP_AUTH_TOKEN, null),

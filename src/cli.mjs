@@ -63,8 +63,8 @@ function runConfig(options, stdout) {
 
 async function runMcp(options) {
   const { startMcpServer } = await import('./mcp/server.mjs');
-  const token = loadConfig().token;
-  return startMcpServer({ stdio: options.stdio === true, token });
+  const config = loadConfig();
+  return startMcpServer({ config, stdio: options.stdio === true, token: config.token });
 }
 
 async function runBrokerCommand(command, options, stdout) {
@@ -96,7 +96,7 @@ async function runDaemon(action, options, stdout) {
       const mcpPort = validateMcpPort(configuredMcpPort);
       const { startMcpServer, closeMcpServer } = await import('./mcp/server.mjs');
       try {
-        const mcp = await startMcpServer({ httpPort: mcpPort, token, context: { runtime: broker.runtime } });
+        const mcp = await startMcpServer({ config, httpPort: mcpPort, token, context: { runtime: broker.runtime } });
         broker.setOnClose(() => closeMcpServer(mcp));
       } catch (error) {
         await broker.close();
