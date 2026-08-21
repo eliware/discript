@@ -150,3 +150,9 @@ An initial useful version should be able to:
 The language and Discord standard library should grow from real automation use cases while keeping the execution model simple and predictable.
 
 The CLI and language contracts are defined in [specs/11-cli-and-language-contract.md](specs/11-cli-and-language-contract.md). Both interfaces should use the same underlying Discord capability layer.
+
+## Transport contract
+
+The daemon may expose a local Unix socket (or Windows named pipe), MCP stdio, MCP HTTP/HTTPS, or a hybrid profile. Hybrid mode runs the local broker and MCP server over the same Discord runtime: local Discript commands use the socket, while remote clients use MCP. Each command or script execution returns a request ID, `ok`, an integer `exitCode`, and either `value` or a structured error; warnings and diagnostics are arrays.
+
+Unknown CLI options are errors rather than implicit booleans. Long-form resource identifiers accept documented aliases such as `--guild-id` for `--guild`. Script programs can use the constrained `json.parse` and `json.stringify` helpers for portable data exchange without exposing the full host `JSON` object.

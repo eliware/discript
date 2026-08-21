@@ -2,6 +2,8 @@
 
 Discript has two Discord transport modes:
 
+It also has two service topologies. `socket` is local-only. `mcp` starts the local broker plus the configured MCP listener. `hybrid` makes that same arrangement explicit: local CLI invocations select the socket broker, while remote agents select MCP over stdio or HTTP/HTTPS. Both interfaces share one Discord runtime and therefore do not create a second Gateway Identify session.
+
 ## REST mode
 
 One-shot commands should use Discord’s HTTP REST API whenever the operation does not need a live event stream. REST mode avoids opening a Gateway session, so repeated commands do not consume Gateway identify capacity or leave WebSocket clients running.
@@ -42,5 +44,7 @@ The implementation should select the lightest transport that satisfies the opera
 Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands or scripts to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one. Broker requests have a bounded timeout and return structured `BROKER_TIMEOUT` or `BROKER_UNAVAILABLE` errors.
 
 Starting a second daemon for the same token is rejected with `BROKER_ALREADY_RUNNING`; the existing broker endpoint is never removed during startup. A stale endpoint is cleaned up only after no active broker can connect, and bind-time races are reported as the same duplicate-start error.
+
+Broker and MCP execution responses use the same request envelope. Successful executions contain `ok: true`, `requestId`, `exitCode: 0`, `value`, `warnings`, and `diagnostics`; failures retain the request ID and include a sanitized `code`, `error`, and exit code. This lets agents correlate local and remote execution without transport-specific parsing.
 
 Transient startup contention is retried with bounded exponential backoff. Session-limit errors use Discord’s `reset_after` value when available. Authentication failures, invalid intents, and disallowed intents are reported immediately and are never retried.

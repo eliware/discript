@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 export const DEFAULT_INTENTS = ['Guilds', 'GuildMessages', 'GuildMembers'];
 export const CONNECTION_MODES = ['direct', 'daemon', 'mcp-client'];
-export const DAEMON_MODES = ['socket', 'mcp'];
+export const DAEMON_MODES = ['socket', 'mcp', 'hybrid'];
 export const MCP_TRANSPORTS = ['stdio', 'http', 'https'];
 export const MCP_AUTH_MODES = ['none', 'static', 'bearer-passthrough', 'oauth2'];
 export const MCP_CLIENT_TRANSPORTS = ['http', 'https', 'sse', 'stdio'];

@@ -29,6 +29,16 @@ describe('configuration', () => {
     expect(() => loadConfig({ DISCRIPT_CONNECTION_MODE: 'unknown' })).toThrow('DISCRIPT_CONNECTION_MODE must be one of');
   });
 
+  test('supports the hybrid daemon profile', () => {
+    expect(validateConfig(loadConfig({
+      DISCRIPT_CONNECTION_MODE: 'daemon',
+      DISCRIPT_DAEMON_MODE: 'hybrid',
+      DISCRIPT_MCP_TRANSPORT: 'https',
+      DISCRIPT_MCP_TLS_KEY_FILE: '/run/key.pem',
+      DISCRIPT_MCP_TLS_CERT_FILE: '/run/cert.pem',
+    })).daemonMode).toBe('hybrid');
+  });
+
   test('redacts secrets for configuration inspection', () => {
     const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_MCP_OAUTH_CLIENT_SECRET: 'oauth-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret', DISCRIPT_CLIENT_HEADERS: '{"Authorization":"header-secret","X-Agent":"discript"}' });
     expect(redactedConfig(config)).toMatchObject({ token: '[redacted]', mcp: { authToken: '[redacted]' }, client: { token: '[redacted]' } });
