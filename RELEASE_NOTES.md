@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.0.8
+
+- Made MCP end-to-end and CLI mode tests hermetic across CI environments by avoiding implicit local Discord credentials and Gateway startup.
+
 ## 1.0.7
 
 - Added MCP server and client modes over stdio, HTTP, and HTTPS with configurable authentication, TLS, OAuth2 delegation, health checks, bounded concurrency, and lifecycle cleanup.
