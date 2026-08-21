@@ -57,7 +57,9 @@ describe('configuration', () => {
     });
     expect(validateConfig(config).client).toMatchObject({ url: 'https://agent.example/mcp', transport: 'https', headers: { 'X-Agent': 'discript', 'X-Run': '1' }, reconnect: false, maxReconnectAttempts: 3 });
     expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client' }))).toThrow('requires DISCRIPT_CLIENT_URL');
-    expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_URL: 'http://localhost/mcp', DISCRIPT_CLIENT_TRANSPORT: 'stdio' }))).toThrow('requires explicit child-process');
+    expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_TRANSPORT: 'stdio' }))).toThrow('requires DISCRIPT_CLIENT_COMMAND');
+    expect(validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_TRANSPORT: 'stdio', DISCRIPT_CLIENT_COMMAND: 'discript', DISCRIPT_CLIENT_ARGS: '["mcp","--stdio"]' })).client).toMatchObject({ command: 'discript', args: ['mcp', '--stdio'] });
+    expect(() => loadConfig({ DISCRIPT_CLIENT_ARGS: '{}'})).toThrow('must be a JSON array');
     expect(() => loadConfig({ DISCRIPT_CLIENT_HEADERS: 'not-json' })).toThrow('must be a JSON object');
   });
 });

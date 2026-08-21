@@ -2,14 +2,13 @@ import mcpClient from '@eliware/mcp-client';
 
 export function createMcpClientOptions(config = {}) {
   const client = config.client ?? {};
-  if (client.transport === 'stdio') {
-    throw Object.assign(new Error('stdio MCP client transport is not yet available through the profile; use HTTP or SSE.'), { code: 'MCP_CLIENT_TRANSPORT_UNAVAILABLE', exitCode: 2 });
-  }
   return {
     url: client.url,
     transport: client.transport,
     token: client.token ?? undefined,
     headers: client.headers,
+    command: client.command ?? undefined,
+    args: client.args,
     reconnect: client.reconnect,
     reconnectBaseDelay: client.reconnectBaseDelay,
     reconnectMaxDelay: client.reconnectMaxDelay,

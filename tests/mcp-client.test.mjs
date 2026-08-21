@@ -14,8 +14,8 @@ describe('MCP client mode', () => {
     expect(client.close).toHaveBeenCalled();
   });
 
-  test('rejects unsupported profile stdio transport', () => {
-    expect(() => createMcpClientOptions({ client: { transport: 'stdio' } })).toThrow('not yet available');
+  test('maps configured stdio child-process transport', () => {
+    expect(createMcpClientOptions({ client: { transport: 'stdio', command: 'discript', args: ['mcp', '--stdio'] } })).toMatchObject({ transport: 'stdio', command: 'discript', args: ['mcp', '--stdio'] });
   });
 
   test('invokes tools, reads resources, and retrieves prompts', async () => {

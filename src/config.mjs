@@ -50,6 +50,8 @@ export function loadConfig(env = process.env) {
       transport: clientTransport,
       token: stringValue(env.DISCRIPT_CLIENT_TOKEN, null),
       headers: headersValue(env.DISCRIPT_CLIENT_HEADERS),
+      command: stringValue(env.DISCRIPT_CLIENT_COMMAND, null),
+      args: jsonArrayValue(env.DISCRIPT_CLIENT_ARGS, 'DISCRIPT_CLIENT_ARGS'),
       reconnect: booleanValue(env.DISCRIPT_CLIENT_RECONNECT, true),
       reconnectBaseDelay: numberValue(env.DISCRIPT_CLIENT_RECONNECT_BASE_DELAY, 1000, 'DISCRIPT_CLIENT_RECONNECT_BASE_DELAY'),
       reconnectMaxDelay: numberValue(env.DISCRIPT_CLIENT_RECONNECT_MAX_DELAY, 60000, 'DISCRIPT_CLIENT_RECONNECT_MAX_DELAY'),
@@ -79,7 +81,7 @@ export function validateConfig(config = loadConfig()) {
     throw configurationError('An HTTPS MCP listener requires DISCRIPT_MCP_TLS_KEY_FILE and DISCRIPT_MCP_TLS_CERT_FILE.');
   }
   const client = config.client ?? {};
-  if (config.connectionMode === 'mcp-client' && !client.url) {
+  if (config.connectionMode === 'mcp-client' && client.transport !== 'stdio' && !client.url) {
     throw configurationError('DISCRIPT_CONNECTION_MODE=mcp-client requires DISCRIPT_CLIENT_URL.');
   }
   if (client.url) {
@@ -90,8 +92,8 @@ export function validateConfig(config = loadConfig()) {
       throw configurationError('DISCRIPT_CLIENT_URL must be a valid HTTP, HTTPS, or file URL.');
     }
   }
-  if (config.connectionMode === 'mcp-client' && client.transport === 'stdio') {
-    throw configurationError('DISCRIPT_CLIENT_TRANSPORT=stdio requires explicit child-process configuration and is not available from the profile yet.');
+  if (config.connectionMode === 'mcp-client' && client.transport === 'stdio' && !client.command) {
+    throw configurationError('DISCRIPT_CLIENT_TRANSPORT=stdio requires DISCRIPT_CLIENT_COMMAND.');
   }
   return config;
 }
@@ -131,6 +133,17 @@ function headersValue(value) {
     return Object.fromEntries(Object.entries(result).map(([key, item]) => [String(key), String(item)]));
   } catch {
     throw configurationError('DISCRIPT_CLIENT_HEADERS must be a JSON object.');
+  }
+}
+
+function jsonArrayValue(value, name) {
+  if (value === undefined || value === null || String(value).trim() === '') return [];
+  try {
+    const result = JSON.parse(String(value));
+    if (!Array.isArray(result)) throw new Error('not an array');
+    return result.map(item => String(item));
+  } catch {
+    throw configurationError(`${name} must be a JSON array.`);
   }
 }
 
