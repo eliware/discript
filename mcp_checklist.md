@@ -62,7 +62,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 
 ## Phase 5 — Help, resources, prompts, and discovery
 
-- [ ] Expose server-level instructions describing Discript, safety rules, transports, and execution patterns.
+- [x] Expose server-level instructions describing Discript, safety rules, transports, and execution patterns.
 - [x] Expose `discript://help` as a generated high-level guide.
 - [x] Expose `discript://commands` from the live command catalog.
 - [x] Expose `discript://language` for syntax and scripting semantics.

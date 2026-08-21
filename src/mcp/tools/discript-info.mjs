@@ -23,6 +23,7 @@ const staticResources = {
 };
 
 export default function registerDiscriptInfo({ mcpServer }) {
+  if (mcpServer.server) mcpServer.server._instructions = 'Discript is a Discord scripting runtime for CLI and AI-agent automation. Use run_discript for one command or a source program. Discover discript://help, discript://commands, discript://language, and discript://safety before acting. Prefer read-only inventory and dryRun=true previews; require force=true for destructive changes. Keep tokens and other secrets in environment variables, and correlate executions with the requestId returned by the tool.';
   for (const [uri, resource] of Object.entries(staticResources)) {
     mcpServer.registerResource(resource.name, uri, { title: resource.title, description: resource.description, mimeType: resource.mimeType, annotations: { audience: ['assistant'], priority: 0.8 } }, async requestedUri => ({ contents: [{ uri: requestedUri.toString(), mimeType: resource.mimeType, text: resource.text }] }));
   }

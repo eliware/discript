@@ -13,6 +13,7 @@ describe('MCP server/client HTTP integration', () => {
       const health = await fetch(`http://127.0.0.1:${port}/healthz`);
       expect(health.status).toBe(200);
       expect(await health.json()).toMatchObject({ ok: true, service: 'discript-mcp', ready: true });
+      expect(client.getInstructions?.()).toContain('Discript is a Discord scripting runtime');
       const tools = await client.listTools();
       const resources = await client.listResources();
       const prompts = await client.listPrompts();
