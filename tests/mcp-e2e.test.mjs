@@ -136,11 +136,34 @@ describe('MCP server/client HTTP integration', () => {
       });
       expect(response.status).toBe(200);
       expect(response.body).toContain('Discript');
+      await expect(new Promise((resolve, reject) => {
+        const request = https.request(`https://localhost:${port}/mcp`, { method: 'POST', headers: { accept: 'application/json, text/event-stream', 'content-type': 'application/json' } }, resolve);
+        request.on('error', reject);
+        request.end();
+      })).rejects.toMatchObject({ code: expect.stringMatching(/SELF_SIGNED|CERT/) });
     } finally {
       await closeMcpServer(server);
       await rm(directory, { recursive: true, force: true });
     }
   }, 30000);
+
+  test('returns protocol errors for malformed HTTP MCP requests', async () => {
+    const server = await mcpServer({
+      httpPort: 0, endpointPath: '/mcp', auth: { mode: 'none' },
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpInstance.address().port;
+    try {
+      const malformed = await fetch(`http://127.0.0.1:${port}/mcp`, { method: 'POST', headers: { accept: 'application/json, text/event-stream', 'content-type': 'application/json' }, body: '{' });
+      expect(malformed.status).toBe(406);
+      expect(await malformed.json()).toMatchObject({ error: 'Invalid JSON' });
+      const unsupported = await fetch(`http://127.0.0.1:${port}/mcp`, { method: 'GET', headers: { accept: 'application/json, text/event-stream' } });
+      expect([404, 405]).toContain(unsupported.status);
+    } finally {
+      await closeMcpServer(server);
+    }
+  }, 15000);
 
   test('accepts an OAuth2 token validated by a local introspection service', async () => {
     const introspection = createServer((request, response) => {
