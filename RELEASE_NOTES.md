@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.0.7
+
+- Added MCP server and client modes over stdio, HTTP, and HTTPS with configurable authentication, TLS, OAuth2 delegation, health checks, bounded concurrency, and lifecycle cleanup.
+- Added MCP discovery metadata, help, command catalogs, examples, resources, prompts, structured execution results, scopes, dry-run previews, force approval, and sanitized errors.
+- Added remote MCP capability preflight, REST-first direct and source execution, cross-platform packaging checks, live test-guild gates, and dedicated CI coverage.
+- Expanded MCP configuration, deployment, operations, security, release, and agent workflow documentation.
+
 ## Unreleased
 
 - Added REST-first command execution for read-only operations and selected safe mutations.
