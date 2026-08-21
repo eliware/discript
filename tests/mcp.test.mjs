@@ -7,9 +7,9 @@ const { default: registerRunDiscript } = await import('../src/mcp/tools/run-disc
 const { createMcpServerOptions } = await import('../src/mcp/server.mjs');
 
 describe('MCP run_discript tool', () => {
-  function registeredTool() {
+  function registeredTool(context = {}) {
     const tool = {};
-    const mcpServer = { tool: jest.fn((name, description, schema, handler) => Object.assign(tool, { name, description, schema, handler })) };
+    const mcpServer = { context, tool: jest.fn((name, description, schema, handler) => Object.assign(tool, { name, description, schema, handler })) };
     registerRunDiscript({ mcpServer });
     return tool;
   }
@@ -37,7 +37,7 @@ describe('MCP run_discript tool', () => {
     }));
     const result = await registeredTool().handler({ source: 'guilds list' });
     expect(result.isError).toBe(true);
-    expect(JSON.parse(result.content[0].text)).toEqual({
+    expect(JSON.parse(result.content[0].text)).toEqual(expect.objectContaining({
       ok: false,
       exitCode: 4,
       code: 'DISCORD_TOKEN_MISSING',
@@ -45,7 +45,17 @@ describe('MCP run_discript tool', () => {
       details: { message: 'missing access token' },
       warnings: ['check environment'],
       diagnostics: [{ phase: 'startup' }],
-    });
+    }));
+    expect(JSON.parse(result.content[0].text).requestId).toEqual(expect.any(String));
+  });
+
+  test('logs a correlated, sanitized execution outcome', async () => {
+    const log = { debug: jest.fn(), info: jest.fn() };
+    const result = await registeredTool({ mcpLog: log }).handler({ command: ['guilds', 'list'] });
+    const payload = JSON.parse(result.content[0].text);
+    expect(log.debug).toHaveBeenCalledWith(expect.objectContaining({ event: 'mcp.execution.started', requestId: payload.requestId, mode: 'command', dryRun: false, force: false }));
+    expect(log.info).toHaveBeenCalledWith(expect.objectContaining({ event: 'mcp.execution.completed', requestId: payload.requestId, mode: 'command', ok: true, exitCode: 0, durationMs: expect.any(Number) }));
+    expect(JSON.stringify(log.info.mock.calls)).not.toContain('DISCORD_TOKEN');
   });
 
   test('passes force approval and preview flags to both execution layers', async () => {

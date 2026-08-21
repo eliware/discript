@@ -91,7 +91,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 ## Phase 7 — Security, operations, and observability
 
 - [x] Add rate limits and bounded queues for remote HTTP execution. MCP execution has bounded concurrency and a configurable pending queue (`DISCRIPT_MCP_MAX_PENDING`); Discord API-native rate-limit backoff remains delegated to Discord.js.
-- [ ] Add request IDs, execution duration, transport, command/source mode, exit code, and sanitized failure-category logging.
+- [x] Add request IDs, execution duration, transport, command/source mode, exit code, and sanitized failure-category logging. MCP execution responses and logs include correlation IDs, duration, mode, status, and sanitized error codes; transport is supplied by the MCP server layer.
 - [ ] Never log Discord tokens, MCP bearer tokens, OAuth secrets, TLS key material, or sensitive tool arguments/results.
 - [ ] Add graceful shutdown coordination between MCP server, broker, Discord runtime, and child MCP client processes.
 - [x] Define trust boundaries for stdio child processes and remote HTTP callers.
