@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from '@jest/globals';
-import { callMcpClient, createMcpClientOptions, inspectMcpServer } from '../src/mcp/client.mjs';
+import { callMcpClient, createMcpClientOptions, inspectMcpServer, runRemoteDiscript } from '../src/mcp/client.mjs';
 
 describe('MCP client mode', () => {
   test('maps configured remote client settings', () => {
@@ -26,5 +26,15 @@ describe('MCP client mode', () => {
     await expect(callMcpClient({ client: { url: 'http://localhost/mcp' } }, { action: 'get-prompt', name: 'safe-mutation', arguments: '{"guild":"123"}', clientFactory })).resolves.toEqual({ result: { name: 'safe-mutation', arguments: { guild: '123' } } });
     expect(client.close).toHaveBeenCalledTimes(3);
     await expect(callMcpClient({ client: { url: 'http://localhost/mcp' } }, { action: 'call', name: 'x', arguments: 'bad', clientFactory })).rejects.toThrow('--arguments must be a JSON object');
+  });
+
+  test('runs source remotely and preserves structured results', async () => {
+    const client = { callTool: jest.fn(async input => ({ structuredContent: { ok: true, exitCode: 0, value: input.arguments } })), close: jest.fn(async () => {}) };
+    await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { source: 'guilds list', dryRun: true, clientFactory: async () => client })).resolves.toEqual({ ok: true, exitCode: 0, value: { source: 'guilds list', dryRun: true, force: false, rest: false } });
+  });
+
+  test('preserves remote failures and exit codes', async () => {
+    const client = { callTool: jest.fn(async () => ({ isError: true, structuredContent: { ok: false, code: 'MISSING_PERMISSION', exitCode: 5, error: 'Denied' } })), close: jest.fn(async () => {}) };
+    await expect(runRemoteDiscript({ client: { url: 'http://localhost/mcp' } }, { command: ['roles', 'delete'], clientFactory: async () => client })).rejects.toMatchObject({ code: 'MISSING_PERMISSION', exitCode: 5, message: 'Denied' });
   });
 });

@@ -82,11 +82,11 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Support remote stdio connections by launching another Discript process or compatible MCP server.
 - [ ] Let client mode discover server instructions, resources, prompts, and tools before execution.
 - [x] Add client commands for remote tool invocation, resource reading, prompt retrieval, and server inspection.
-- [ ] Support piping Discript source into the remote client without temporary files.
+- [x] Support piping Discript source into the remote client without temporary files.
 - [ ] Support client-side static tokens, async token providers, custom headers, and OAuth/PKCE integration where selected.
 - [ ] Add remote execution examples for local agents, CI harnesses, and multi-host Discord automation.
 - [ ] Define whether remote execution returns raw MCP JSON, normalized Discript JSON, JSONL, or human-readable output.
-- [ ] Preserve remote MCP errors, Discript exit codes, and authentication failures in the local CLI contract.
+- [x] Preserve remote MCP errors, Discript exit codes, and authentication failures in the local CLI contract.
 
 ## Phase 7 — Security, operations, and observability
 

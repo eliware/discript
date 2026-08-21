@@ -19,6 +19,7 @@ export function helpText() {
     `  discript mcp-client call --tool <name> --arguments <json>\n` +
     `  discript mcp-client read-resource --uri <uri>\n` +
     `  discript mcp-client get-prompt --name <name> --arguments <json>\n` +
+    `  cat script.ds | discript mcp-client run\n` +
     `  discript daemon start --mcp-port <port>  Start daemon with MCP HTTP\n` +
     `  discript daemon start             Start the shared Gateway broker\n\n` +
     `Options:\n` +

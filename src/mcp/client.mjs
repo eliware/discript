@@ -50,6 +50,27 @@ export async function callMcpClient(config, { action, name, uri, arguments: rawA
   }
 }
 
+export async function runRemoteDiscript(config, { source, command, dryRun = false, force = false, timeout, rest = false, clientFactory = mcpClient } = {}) {
+  const client = await clientFactory(createMcpClientOptions(config));
+  try {
+    const response = await client.callTool({ name: 'run_discript', arguments: {
+      ...(source !== undefined ? { source } : { command }), dryRun, force,
+      ...(timeout !== undefined ? { timeout } : {}), rest,
+    } });
+    return normalizeRemoteResponse(response);
+  } finally { await client.close?.(); }
+}
+
+function normalizeRemoteResponse(response) {
+  const payload = response?.structuredContent ?? response;
+  if (response?.isError || payload?.ok === false) {
+    throw Object.assign(new Error(payload?.error ?? 'Remote Discript execution failed.'), {
+      code: payload?.code ?? 'REMOTE_DISCRIPT_ERROR', exitCode: payload?.exitCode ?? 1, details: payload?.details,
+    });
+  }
+  return payload?.ok === true && 'value' in payload ? payload : { ok: true, exitCode: 0, value: payload };
+}
+
 function parseArguments(value) {
   if (value === undefined || value === null || value === '') return {};
   try {

@@ -30,7 +30,7 @@ export async function run(argv = [], dependencies = {}) {
   if (options.version) return stdout(VERSION);
   if (positionals[0] === 'config') return runConfig(options, stdout);
   if (positionals[0] === 'mcp') return runMcp(options);
-  if (positionals[0] === 'mcp-client') return runMcpClient(positionals[1], options, stdout);
+  if (positionals[0] === 'mcp-client') return runMcpClient(positionals[1], options, stdout, positionals.slice(2), stdin);
   if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
   const config = loadConfig();
   if (options.broker || (config.connectionMode === 'daemon' && !options.direct)) {
@@ -68,12 +68,16 @@ async function runMcp(options) {
   return startMcpServer({ config, stdio: options.stdio === true, token: config.token });
 }
 
-async function runMcpClient(action = 'inspect', options, stdout) {
-  const { callMcpClient, inspectMcpServer } = await import('./mcp/client.mjs');
+async function runMcpClient(action = 'inspect', options, stdout, positionals = [], stdin) {
+  const { callMcpClient, inspectMcpServer, runRemoteDiscript } = await import('./mcp/client.mjs');
   const mappedAction = action === 'list-tools' ? 'tools' : action === 'list-resources' ? 'resources' : action === 'list-prompts' ? 'prompts' : action;
-  const result = ['call', 'read-resource', 'get-prompt'].includes(mappedAction)
-    ? await callMcpClient(loadConfig(), { action: mappedAction, name: options.name ?? options.tool, uri: options.uri, arguments: options.arguments })
-    : await inspectMcpServer(loadConfig(), { action: mappedAction });
+  let result;
+  if (mappedAction === 'run') {
+    const input = await readSource(positionals, options, stdin);
+    result = await runRemoteDiscript(loadConfig(), { ...(input.kind === 'source' ? { source: input.source } : { command: input.command }), dryRun: options.dry_run === true, force: options.yes === true, timeout: options.timeout, rest: options.rest === true });
+  } else if (['call', 'read-resource', 'get-prompt'].includes(mappedAction)) {
+    result = await callMcpClient(loadConfig(), { action: mappedAction, name: options.name ?? options.tool, uri: options.uri, arguments: options.arguments });
+  } else result = await inspectMcpServer(loadConfig(), { action: mappedAction });
   writeResult(result, options, stdout);
   return result;
 }
