@@ -7,6 +7,7 @@
     "scripts": {
         "start": "node bin/discript.mjs",
         "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
+        "test:mcp": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --runInBand tests/mcp.test.mjs tests/mcp-client.test.mjs tests/mcp-e2e.test.mjs",
         "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
         "test:live": "DISCRIPT_LIVE=1 npx --node-options=\"--experimental-vm-modules --no-warnings\" jest tests/runtime.test.mjs --runInBand",
         "test:live:mutations": "DISCRIPT_LIVE=1 DISCRIPT_LIVE_MUTATIONS=1 npx --node-options=\"--experimental-vm-modules --no-warnings\" jest tests/runtime.test.mjs --runInBand",

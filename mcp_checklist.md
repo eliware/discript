@@ -118,7 +118,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add CLI help, command discovery, shell completion, specs, and release notes for server and client modes.
 - [x] Add authentication and TLS configuration examples for local, private HTTP, HTTPS, and OAuth2 deployments. Added `docs/mcp/deployment-examples.md` with stdio, loopback HTTP, static bearer HTTPS, and OAuth2 introspection profiles.
 - [x] Add packaging checks ensuring MCP dependencies and examples are included correctly. The package smoke check now verifies MCP client/server sources, deployment documentation, examples, and the public spec are present before installing the tarball.
-- [ ] Add CI coverage for local stdio, HTTP, HTTPS, authentication, and remote MCP integration.
+- [x] Add CI coverage for local stdio, HTTP, HTTPS, authentication, and remote MCP integration. CI runs the dedicated MCP suite on both Linux and Windows in addition to the full test suite.
 - [ ] Add an MCP operations/release checklist, including secret and certificate handling.
 - [ ] Publish only after all required security, integration, packaging, and CI gates pass.
 - [ ] Commit server integration, configuration, security, resources, client mode, tests, documentation, and release work as separate solid checkpoints.

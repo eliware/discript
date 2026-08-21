@@ -30,6 +30,8 @@ jobs:
         run: npm run docs:check
       - name: Run tests
         run: npm test
+      - name: Run MCP transport and authentication tests
+        run: npm run test:mcp
       - name: Run lint
         run: npm run lint
       - name: Validate package contents
