@@ -20,7 +20,7 @@ import { writeResult } from './output.mjs';
 import { withTimeout, validateTimeout } from "./cli/lifecycle.mjs";
 import { executeInput } from './cli/script.mjs';
 import { brokerRequest, startGatewayBroker } from './broker.mjs';
-import { loadConfig } from './config.mjs';
+import { loadConfig, redactedConfig } from './config.mjs';
 import { withGatewayRetry } from './gateway-retry.mjs';
 
 export async function run(argv = [], dependencies = {}) {
@@ -28,9 +28,11 @@ export async function run(argv = [], dependencies = {}) {
   const { positionals, options } = parseArgs(argv);
   if (options.help) return stdout(helpText());
   if (options.version) return stdout(VERSION);
+  if (positionals[0] === 'config') return runConfig(options, stdout);
   if (positionals[0] === 'mcp') return runMcp(options);
   if (positionals[0] === 'daemon') return runDaemon(positionals[1] ?? 'status', options, stdout);
-  if (options.broker) {
+  const config = loadConfig();
+  if (options.broker || (config.connectionMode === 'daemon' && !options.direct)) {
     const brokerInput = await readSource(positionals, options, stdin);
     if (brokerInput.kind === 'source') return runBrokerScript(brokerInput.source, options, stdout);
     return runBrokerCommand(brokerInput.command, options, stdout);
@@ -51,6 +53,12 @@ export async function run(argv = [], dependencies = {}) {
     shutdownHook?.removeHandlers?.();
     errors.removeHandlers();
   }
+}
+
+function runConfig(options, stdout) {
+  const value = redactedConfig(loadConfig());
+  writeResult(value, { ...options, json: true }, stdout);
+  return value;
 }
 
 async function runMcp(options) {
@@ -78,12 +86,14 @@ async function runBrokerScript(source, options, stdout) {
 }
 
 async function runDaemon(action, options, stdout) {
-  const token = loadConfig().token;
+  const config = loadConfig();
+  const token = config.token;
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   if (action === 'start') {
     const broker = await withGatewayRetry(() => startGatewayBroker({ token }));
-    if (options.mcp_port !== undefined) {
-      const mcpPort = validateMcpPort(options.mcp_port);
+    const configuredMcpPort = options.mcp_port ?? (config.daemonMode === 'mcp' ? config.mcp.port : undefined);
+    if (configuredMcpPort !== undefined && configuredMcpPort !== null) {
+      const mcpPort = validateMcpPort(configuredMcpPort);
       const { startMcpServer, closeMcpServer } = await import('./mcp/server.mjs');
       try {
         const mcp = await startMcpServer({ httpPort: mcpPort, token, context: { runtime: broker.runtime } });
@@ -93,7 +103,7 @@ async function runDaemon(action, options, stdout) {
         throw error;
       }
     }
-    stdout({ started: true, endpoint: broker.endpoint, ...(options.mcp_port !== undefined ? { mcpPort: validateMcpPort(options.mcp_port) } : {}) });
+    stdout({ started: true, endpoint: broker.endpoint, ...(configuredMcpPort !== undefined && configuredMcpPort !== null ? { mcpPort: validateMcpPort(configuredMcpPort) } : {}) });
     return broker;
   }
   const result = await brokerRequest({ token, method: action === 'stop' ? 'shutdown' : 'status' });

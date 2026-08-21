@@ -18,6 +18,7 @@ export function parseArgs(argv = []) {
     else if (token === '-y') options.yes = true;
     else if (token === '--rest') options.rest = true;
     else if (token === '--broker') options.broker = true;
+    else if (token === '--direct') options.direct = true;
     else if (token === '--stdio') options.stdio = true;
     else if (token.startsWith('--')) {
       const [rawKey, inlineValue] = token.slice(2).split('=', 2);

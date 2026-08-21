@@ -19,14 +19,14 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Expand `.env.example` with direct, daemon, MCP server, TLS, authentication, and remote client profile placeholders.
 - [x] Keep `DISCORD_TOKEN` and `DISCRIPT_INTENTS` as the real application configuration variables.
 - [x] Keep `TEST_GUILD` explicitly marked as test-only rather than part of the normal application profile.
-- [ ] Add a typed configuration profile loader for `DISCRIPT_CONNECTION_MODE` with direct as the default.
-- [ ] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
+- [x] Add a typed configuration profile loader for `DISCRIPT_CONNECTION_MODE` with direct as the default.
+- [x] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
 - [ ] Add MCP server profile loading for transport, host, port, endpoint, auth, TLS, redirect, and CORS settings.
 - [ ] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
 - [ ] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
 - [ ] Make normal CLI commands use the configured daemon/client profile when selected.
-- [ ] Preserve explicit CLI flags as higher-precedence one-shot overrides.
-- [ ] Add `discript config` and `discript config --json` with complete secret redaction.
+- [x] Preserve explicit `--direct` and `--broker` flags as higher-precedence one-shot overrides.
+- [x] Add `discript config` and `discript config --json` with complete secret redaction.
 - [ ] Validate incompatible profiles before starting Discord, MCP, or network listeners.
 - [ ] Document precedence: process environment, project `.env`, user `~/.discript.env`, profile defaults, then CLI overrides.
 

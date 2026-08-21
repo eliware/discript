@@ -26,6 +26,7 @@ export function helpText() {
     `  -y, --yes            Approve mutations\n` +
     `  --rest               Use REST for supported operations\n` +
     `  --broker             Use the persistent local Gateway broker\n` +
+    `  --direct             Force direct one-shot execution\n` +
     `  --timeout <ms>       Set an execution timeout\n` +
     `  -h, --help           Show this help\n` +
     `  -v, --version        Show the installed version`;
