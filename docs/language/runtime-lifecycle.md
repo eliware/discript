@@ -115,7 +115,7 @@ Bound any event or timer script used by automation:
 discript monitor.ds --timeout 30000 --output jsonl
 ```
 
-An expired timeout returns `EXECUTION_TIMEOUT` with process status `6`. A normal termination signal also enters cleanup. The runtime does not expose a script-level timer cancellation API yet; design repeating scripts around a bounded process or external stop signal.
+An expired timeout returns `EXECUTION_TIMEOUT` with process status `6`. A normal termination signal also enters cleanup. Timer and event registrations expose idempotent `.cancel()` handles, and an execution abort cancels remaining registrations before shutdown. Use a bounded process or external stop signal for workflows that should end even when no handler is available.
 
 ## Errors in concurrent work
 
