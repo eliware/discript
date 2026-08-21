@@ -1,0 +1,8 @@
+// Destructive actions should be isolated behind an explicit force decision.
+approved = env.DISCRIPT_FORCE == "true"
+if (approved) {
+  print({approved: true, force: true})
+} else {
+  print({approved: false, next: "rerun with force: true after review"})
+}
+

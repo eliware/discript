@@ -1,0 +1,9 @@
+// Missing resources are normal in repeatable automation; recover with a plan.
+guild = discord.guilds.get(env.TEST_GUILD)
+target = find(guild.channels.list(), "name", env.DISCRIPT_CHANNEL_NAME)
+if (target == null) {
+  {found: false, action: "create-or-request-approval"}
+} else {
+  {found: true, channelId: target.id, action: "inspect"}
+}
+

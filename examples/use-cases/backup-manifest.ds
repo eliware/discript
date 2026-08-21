@@ -1,0 +1,4 @@
+// A manifest records what a later provisioning or restore script should inspect.
+guild = discord.guilds.get(env.TEST_GUILD)
+{version: 1, guild: {id: guild.id, name: guild.name}, resources: ["channels", "roles", "members", "permissions"]}
+

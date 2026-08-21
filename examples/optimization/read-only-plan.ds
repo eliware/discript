@@ -1,0 +1,5 @@
+// Separate read-only discovery from a later mutation phase for safer batching.
+guild = discord.guilds.get(env.TEST_GUILD)
+inventory = {channels: guild.channels.list(), roles: guild.roles.list(), members: guild.members.list()}
+print({phase: "discovery", counts: {channels: inventory.channels.length, roles: inventory.roles.length, members: inventory.members.length}})
+

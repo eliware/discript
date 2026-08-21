@@ -1,0 +1,4 @@
+// `await` makes an asynchronous operation read naturally in a sequential workflow.
+guilds = await discord.guilds.list()
+{count: guilds.length, guilds: guilds}
+

@@ -1,0 +1,5 @@
+// sleep pauses an async script without blocking the Node event loop.
+started = {status: "started"}
+sleep(10)
+{before: started, status: "finished"}
+

@@ -1,0 +1,4 @@
+// Project a large value into a stable object contract for a later command or agent.
+source = {id: "example", label: "projection", metadata: {safe: true}}
+{id: source.id, label: source.label, safe: source.metadata.safe}
+

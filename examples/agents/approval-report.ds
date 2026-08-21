@@ -1,0 +1,5 @@
+// Keep approval metadata beside a plan so a caller can make the final decision.
+guildId = env.TEST_GUILD
+plan = {guildId: guildId, action: "mutation", dryRun: true, requiresForce: true}
+print(plan)
+

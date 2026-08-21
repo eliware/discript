@@ -1,0 +1,7 @@
+// Compare a declared role policy with the live role inventory.
+guild = discord.guilds.get(env.TEST_GUILD)
+roles = guild.roles.list()
+required = ["Moderator", "Member"]
+missing = filter(required, name => find(roles, "name", name) == null)
+{guildId: guild.id, required: required, missing: missing, compliant: missing.length == 0}
+

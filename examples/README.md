@@ -26,6 +26,8 @@ Every `.ds` file in this directory is an executable mini-tutorial. Run one direc
 | Optimization | [sequential versus parallel](optimization/sequential-vs-parallel.ds), [cached lookups](optimization/cache-lookups.ds), [REST-first inventory](optimization/rest-first-inventory.ds), [bounded batches](optimization/bounded-batch.ds), [compact output](optimization/compact-agent-output.ds) |
 | Composition | [imported functions](composition/imported-functions.ds), [shared formatting](shared/format.ds) |
 
+Additional focused recipes include [async/await](fundamentals/async-await.ds), [object projection](fundamentals/object-projection.ds), [approval reports](agents/approval-report.ds), [resource selection](agents/resource-selection.ds), [destructive confirmation](safety/destructive-confirmation.ds), [missing-target recovery](safety/missing-target-recovery.ds), [role policy reports](use-cases/role-policy-report.ds), [channel policy reports](use-cases/channel-policy-report.ds), [backup manifests](use-cases/backup-manifest.ds), [read-only plans](optimization/read-only-plan.ds), and [timer plus event workflows](events/timer-and-event.ds).
+
 ## Safety reminder
 
 Examples using `dryRun: true` produce plans without changing Discord. Destructive operations require `force: true` in source or `--yes`/`-y` at the CLI. Use `TEST_GUILD` and explicit target IDs while learning.

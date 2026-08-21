@@ -1,0 +1,8 @@
+// Combine event-driven work with periodic health output in one long-running script.
+on("messageCreate") {
+  print({event: "messageCreate", id: event.id})
+}
+every(60000) {
+  print({event: "heartbeat", healthy: true})
+}
+

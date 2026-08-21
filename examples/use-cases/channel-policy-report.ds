@@ -1,0 +1,6 @@
+// Report channels that do not match a simple naming policy.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+named = filter(channels, channel => channel.name != null)
+{guildId: guild.id, total: channels.length, named: named.length}
+

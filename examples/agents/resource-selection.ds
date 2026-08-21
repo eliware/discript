@@ -1,0 +1,9 @@
+// Select by a stable property before performing a follow-up operation.
+guild = discord.guilds.get(env.TEST_GUILD)
+channels = guild.channels.list()
+selected = find(channels, "name", env.DISCRIPT_CHANNEL_NAME)
+if (selected == null) {
+  exit(1, "target channel was not found")
+}
+{selected: {id: selected.id, name: selected.name}}
+
