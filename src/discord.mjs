@@ -5,8 +5,9 @@ import { createVoiceApi } from './discord/voice.mjs';
 import { createMessagesApi } from './discord/messages.mjs';
 import { createChannelsApi } from './discord/channels.mjs';
 import { createGuildsApi } from './discord/guilds.mjs';
+import { createRestDiscordApi } from './rest-api.mjs';
 
-export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null } = {}) {
+export function createDiscordApi(client, { yes = false, dryRun = false, voiceModule = null, rest = null } = {}) {
   let loadedVoiceModule = voiceModule;
   const loadVoiceModule = async () => {
     if (!loadedVoiceModule) loadedVoiceModule = await import('@discordjs/voice');
@@ -27,6 +28,7 @@ export function createDiscordApi(client, { yes = false, dryRun = false, voiceMod
     messages: createMessagesApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }),
     channels: createChannelsApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }),
     guilds: createGuildsApi({ client, dryRun, loadVoiceModule, mapCache, normalizeChannel, normalizeMessage, normalizeWebhook, normalizeOverwrite, resolveMessage, settingsReason, requireApproval, requirePermission, requireManageableRole, requireManageableMember, requireChannelPermission }),
+    ...(rest ? { rest: createRestDiscordApi(rest) } : {}),
   };
 
 }

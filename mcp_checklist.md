@@ -33,7 +33,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 ## Phase 3 — Transport and execution behavior
 
 - [x] Use REST-first execution for MCP direct commands that do not require Gateway state. MCP direct-command calls default to `rest: true`; operations without a REST adapter fall back to the shared Gateway runtime, while callers can explicitly set `rest: false`.
-- [ ] Extend REST-first behavior to source-level Discord operations where possible.
+- [x] Extend REST-first behavior to source-level Discord operations where possible. Source programs can opt into supported REST operations through `discord.rest` with REST mode enabled; the Gateway facade remains available for operations requiring live client state.
 - [x] Enforce dry-run and force behavior identically across CLI, scripts, and MCP.
 - [x] Require explicit MCP approval for destructive operations through `force: true`.
 - [x] Return structured MCP results containing value, success state, exit code, warnings, and diagnostics.

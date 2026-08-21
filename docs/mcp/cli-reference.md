@@ -52,3 +52,4 @@ discript mcp-client call --tool run_discript --arguments '{"command":["guilds","
 discript mcp-client read-resource --uri discript://help --json
 discript mcp-client get-prompt --name safe-mutation --arguments '{"request":"create a channel"}' --json
 ```
+Source programs can opt into the supported REST facade with `--rest` (or `rest: true` when invoked through MCP). In that mode, REST operations are available under `discord.rest`; the existing `discord.*` facade remains Gateway-backed. This is useful for bounded reads and mutations that do not require Gateway state.

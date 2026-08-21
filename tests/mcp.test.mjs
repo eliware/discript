@@ -115,6 +115,14 @@ describe('MCP server profile mapping', () => {
     expect(createMcpServerOptions({ mcp: { transport: 'https', port: 9443, tlsKey: 'key', tlsCert: 'cert', tlsCa: 'ca' } }).tls).toEqual({ key: 'key', cert: 'cert', ca: 'ca' });
   });
 
+  test('prefers TLS file paths over inline values when both are configured', () => {
+    expect(createMcpServerOptions({ mcp: {
+      transport: 'https', port: 9443,
+      tlsKeyFile: '/run/key.pem', tlsCertFile: '/run/cert.pem', tlsCaFile: '/run/ca.pem',
+      tlsKey: 'inline-key', tlsCert: 'inline-cert', tlsCa: 'inline-ca',
+    } }).tls).toEqual({ keyFile: '/run/key.pem', certFile: '/run/cert.pem', caFile: '/run/ca.pem' });
+  });
+
   test('maps separate HTTP and HTTPS listeners for redirects', () => {
     const options = createMcpServerOptions({ mcp: {
       transport: 'http', port: 8765, httpPort: 8080, httpsPort: 8443,

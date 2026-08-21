@@ -44,7 +44,7 @@ export default function registerRunDiscript({ mcpServer, runtime }) {
       log.debug?.({ event: 'mcp.execution.started', requestId, mode, dryRun, force, rest });
       try {
         release = await limits.limiter?.acquire?.();
-        const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal }), effectiveTimeout, { onTimeout: () => controller.abort() });
+        const value = await withTimeout(executeInput(input, options, { runtime, signal: controller.signal, ...(mcpServer.context?.token !== undefined ? { token: mcpServer.context.token } : {}) }), effectiveTimeout, { onTimeout: () => controller.abort() });
         const result = {
           ok: true,
           requestId,

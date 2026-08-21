@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, jest, test } from '@jest/globals';
 import { EventEmitter } from 'node:events';
 
 const { executeInput } = await import('../../src/cli/script.mjs');
@@ -27,5 +27,16 @@ describe('cli/script', () => {
     controller.abort();
     await expect(execution).rejects.toMatchObject({ code: 'EXECUTION_CANCELLED', exitCode: 130 });
     expect(active.client.listenerCount('messageCreate')).toBe(0);
+  });
+
+  test('exposes supported REST operations under discord.rest in REST mode', async () => {
+    const active = runtime();
+    const request = jest.fn(async () => [{ id: 'guild-1', name: 'Test Guild' }]);
+    await expect(executeInput(
+      { kind: 'source', source: 'discord.rest.guilds.list()' },
+      { rest: true },
+      { runtime: active, token: 'test-token', rest: { request }, stdout: () => {} },
+    )).resolves.toEqual([{ id: 'guild-1', name: 'Test Guild' }]);
+    expect(request).toHaveBeenCalledWith('/users/@me/guilds', {});
   });
 });

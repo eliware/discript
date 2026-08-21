@@ -5,6 +5,7 @@ import { writeResult } from "../output.mjs";
 import { parse } from "../parser.mjs";
 import { evaluate, ScriptExit } from "../evaluator.mjs";
 import { createDiscordApi } from "../discord.mjs";
+import { createDiscordRest } from "../rest.mjs";
 import { createEnvironment } from "../env.mjs";
 export async function executeInput(input, options, dependencies, onRuntime = () => {}) {
   if (input.kind === 'command') return executeDirectCommand(input.command, options, dependencies);
@@ -26,9 +27,12 @@ export async function executeInput(input, options, dependencies, onRuntime = () 
       return { timer: repeating ? 'interval' : 'timeout', delay: milliseconds, registered: true };
     };
     const baseDir = input.origin && !['eval', 'stdin'].includes(input.origin) ? dirname(resolve(input.origin)) : process.cwd();
+    const rest = options.rest === true
+      ? createDiscordRest({ token: dependencies.token, rest: dependencies.rest })
+      : null;
     const result = await evaluate(parse(input.source), {
       env: createEnvironment(),
-      discord: createDiscordApi(runtime.client, options),
+      discord: createDiscordApi(runtime.client, { ...options, rest }),
       find: (items, property, expected) => (items ?? []).find(item => item?.[property] === expected),
       filter: async (items, selector, expected) => {
         if (typeof selector === 'function') {
