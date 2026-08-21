@@ -107,7 +107,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Test static bearer, bearer-passthrough, OAuth2 introspection, required scopes, and protected-resource metadata. Includes tool-level read/write/admin scope enforcement.
 - [x] Test broker reuse, shutdown, duplicate startup, timeouts, cancellation, output limits, and concurrency bounds. Broker reuse/duplicate-startup, concurrent broker and MCP shutdown, client/server timeouts, cancellation signaling, output limits, and concurrency bounds are covered.
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping. Structured success/failure results and sanitized error mapping are covered; dry-run/force approval coverage remains pending.
-- [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
+- [x] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup. CI runs the MCP suite on Linux and Windows; transport/process tests cover stdio child cleanup, HTTP/HTTPS listeners, Unix broker paths, Windows named-pipe path generation, and the package verifier is Node-native rather than Unix-`tar` dependent.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
 - [x] Add MCP examples to the package and documentation checker.
 - [x] Add an end-to-end test where an MCP client discovers help, reads the command catalog, reads an example, and executes a dry-run. Core HTTP discovery/help/dry-run coverage is complete; command-catalog and example reads remain additional assertions.
