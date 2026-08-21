@@ -11,12 +11,24 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
   }
   function parsePostfix() {
     let expression = parsePrimary();
-    while (match('.')) {
-      const property = consume('identifier', 'Expected a property name after `.`');
-      expression = { type: 'MemberExpression', object: expression, property: property.value };
-      if (match('(')) expression = { type: 'CallExpression', callee: expression, arguments: parseArguments() };
+    while (true) {
+      if (match('.')) {
+        const property = consume('identifier', 'Expected a property name after `.`');
+        expression = { type: 'MemberExpression', object: expression, property: property.value };
+        continue;
+      }
+      if (match('[')) {
+        const property = parseExpression();
+        consume(']', 'Expected `]` after the index expression.');
+        expression = { type: 'IndexExpression', object: expression, property };
+        continue;
+      }
+      if (match('(')) {
+        expression = { type: 'CallExpression', callee: expression, arguments: parseArguments() };
+        continue;
+      }
+      break;
     }
-    if (match('(')) expression = { type: 'CallExpression', callee: expression, arguments: parseArguments() };
     if (match('=>')) {
       if (expression.type !== 'Identifier') throw syntaxError('Arrow callbacks require a single parameter name.');
       const body = peek()?.value === '{' ? { type: 'BlockBody', body: parseBlock() } : { type: 'ExpressionBody', body: parseExpression() };

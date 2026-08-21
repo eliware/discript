@@ -48,7 +48,11 @@ export function createStatementParser({ peek, match, take, consume, parseExpress
       return { type: 'IfStatement', test, consequent, alternate };
     }
     const expression = parseExpression();
-    if (expression.type === 'Identifier' && match('=')) return { type: 'Assignment', name: expression.name, value: parseExpression() };
+    if (match('=')) {
+      if (expression.type === 'Identifier') return { type: 'Assignment', name: expression.name, value: parseExpression() };
+      if (expression.type === 'MemberExpression' || expression.type === 'IndexExpression') return { type: 'Assignment', target: expression, value: parseExpression() };
+      throw syntaxError('Only variables, members, and indexes can be assignment targets.');
+    }
     return { type: 'ExpressionStatement', expression };
   };
 }

@@ -1,0 +1,13 @@
+/*
+  Indexed data
+
+  Discript supports array indexes and computed object properties. These are
+  useful when an earlier Discord query returns a collection and a later step
+  needs one selected resource. Assignments can update members and indexes.
+*/
+records = [{name: "general", enabled: true}, {name: "alerts", enabled: false}]
+selected = records[0]
+key = "name"
+selected[key] = "welcome"
+records[1].enabled = true
+print({first: selected.name, secondEnabled: records[1].enabled})

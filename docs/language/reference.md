@@ -17,11 +17,12 @@ if (name == "discript") {
 
 Values include `null`, booleans, numbers, strings, arrays, objects, functions, and normalized Discord results. Discord snowflake IDs are strings.
 
-From lowest to highest precedence: `||`; `&&`; `==` and `!=`; `<`, `<=`, `>`, `>=`; `+` and `-`; `*` and `/`; unary `!` and `-`; then member access `.`, and calls `()`. Use parentheses for generated conditions. Array indexing syntax is not currently part of the language; iterate arrays with `for` instead.
+From lowest to highest precedence: `||`; `&&`; `==` and `!=`; `<`, `<=`, `>`, `>=`; `+` and `-`; `*` and `/`; unary `!` and `-`; then member access `.`, indexes `[]`, and calls `()`. Indexes may contain any expression and can be used for arrays or computed object properties.
 
 ```text
 settings = {name: "general", position: 0}
 names = ["rules", "welcome", "general"]
+settings["name"] = names[0]
 ```
 
 ## Variables and functions

@@ -34,6 +34,12 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
       const value = object?.[expression.property];
       return typeof value === 'function' ? value.bind(object) : value;
     }
+    if (expression.type === 'IndexExpression') {
+      const object = await evaluateExpression(expression.object);
+      const property = await evaluateExpression(expression.property);
+      const value = object?.[property];
+      return typeof value === 'function' ? value.bind(object) : value;
+    }
     if (expression.type === 'CallExpression') { const callee = await evaluateExpression(expression.callee); if (typeof callee !== 'function') throw runtimeError('The expression is not callable.'); return callee(...await Promise.all(expression.arguments.map(evaluateExpression))); }
     throw runtimeError(`Unsupported expression: ${expression.type}`);
   };

@@ -42,6 +42,31 @@ describe('collection helpers', () => {
   });
 });
 
+describe('collection access and assignment', () => {
+  test('reads array indexes and computed object properties', async () => {
+    await expect(evaluate(parse('items[1].name'), { items: [{ name: 'one' }, { name: 'two' }] })).resolves.toBe('two');
+    await expect(evaluate(parse('key = "name"; object[key]'), { object: { name: 'value' } })).resolves.toBe('value');
+  });
+
+  test('assigns members and array indexes', async () => {
+    const object = { name: 'before' };
+    const items = ['zero', 'before'];
+    await expect(evaluate(parse('object.name = "after"; items[1] = object.name; items[1]'), { object, items })).resolves.toBe('after');
+    expect(object.name).toBe('after');
+    expect(items[1]).toBe('after');
+  });
+
+  test('supports chained computed access and method calls', async () => {
+    await expect(evaluate(parse('groups[0].names[1].toUpperCase()'), {
+      groups: [{ names: ['one', 'two'] }],
+    })).resolves.toBe('TWO');
+  });
+
+  test('rejects assignment through a null member', async () => {
+    await expect(evaluate(parse('missing.name = "value"'), { missing: null })).rejects.toMatchObject({ code: 'RUNTIME_ERROR' });
+  });
+});
+
 describe('core language contract', () => {
   test('preserves the receiver for member method calls', async () => {
     await expect(evaluate(parse('"discript-test-1".startsWith("discript-test-")'))).resolves.toBe(true);

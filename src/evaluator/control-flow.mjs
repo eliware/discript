@@ -10,7 +10,12 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
       return load(statement.path, scope, baseDir);
     }
     if (statement.type === 'ReturnStatement') throw new ReturnSignal(statement.value === null ? undefined : await evaluateExpression(statement.value));
-    if (statement.type === 'Assignment') { const value = await evaluateExpression(statement.value); scope.set(statement.name, value); return value; }
+    if (statement.type === 'Assignment') {
+      const value = await evaluateExpression(statement.value);
+      if (statement.name) scope.set(statement.name, value);
+      else await assignTarget(statement.target, value);
+      return value;
+    }
     if (statement.type === 'ExpressionStatement') return evaluateExpression(statement.expression);
     if (statement.type === 'EventStatement') {
       const register = scope.get('on');
@@ -44,4 +49,11 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
     }
     throw runtimeError(`Unsupported statement: ${statement.type}`);
   };
+
+  async function assignTarget(target, value) {
+    const object = await evaluateExpression(target.object);
+    if (object === null || object === undefined) throw runtimeError('Cannot assign a property on a null value.');
+    const property = target.type === 'IndexExpression' ? await evaluateExpression(target.property) : target.property;
+    object[property] = value;
+  }
 }
