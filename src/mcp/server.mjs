@@ -46,7 +46,7 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
     allowedOrigins: mcp.allowedOrigins ?? [],
     context: {
       token: token ?? config.token ?? null,
-      mcpLimits: { timeout: mcp.executionTimeout ?? 300000, maxOutputBytes: mcp.maxOutputBytes ?? 1048576, limiter: createConcurrencyLimiter(mcp.maxConcurrent ?? 4) },
+      mcpLimits: { timeout: mcp.executionTimeout ?? 300000, maxOutputBytes: mcp.maxOutputBytes ?? 1048576, limiter: createConcurrencyLimiter(mcp.maxConcurrent ?? 4, mcp.maxPending ?? 32) },
       ...context,
     },
     stdio,

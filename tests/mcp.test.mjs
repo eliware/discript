@@ -115,5 +115,6 @@ describe('MCP server profile mapping', () => {
     expect(options.context.mcpLimits.timeout).toBe(1000);
     expect(options.context.mcpLimits.maxOutputBytes).toBe(4096);
     expect(options.context.mcpLimits.limiter.limit).toBe(2);
+    expect(options.context.mcpLimits.limiter.maxPending).toBe(32);
   });
 });

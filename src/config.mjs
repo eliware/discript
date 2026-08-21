@@ -49,6 +49,7 @@ export function loadConfig(env = process.env) {
       allowedOrigins: listValue(env.DISCRIPT_MCP_ALLOWED_ORIGINS),
       executionTimeout: numberValue(env.DISCRIPT_MCP_EXECUTION_TIMEOUT, 300000, 'DISCRIPT_MCP_EXECUTION_TIMEOUT'),
       maxConcurrent: numberValue(env.DISCRIPT_MCP_MAX_CONCURRENT, 4, 'DISCRIPT_MCP_MAX_CONCURRENT'),
+      maxPending: numberValue(env.DISCRIPT_MCP_MAX_PENDING, 32, 'DISCRIPT_MCP_MAX_PENDING'),
       maxOutputBytes: numberValue(env.DISCRIPT_MCP_MAX_OUTPUT_BYTES, 1048576, 'DISCRIPT_MCP_MAX_OUTPUT_BYTES'),
     },
     client: {
