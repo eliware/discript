@@ -1,4 +1,5 @@
 # Environment variables
 
-Read with `env.NAME` or `env.get("NAME")`; write with `env.set("NAME", value)`; remove with `env.clear("NAME")`. Values are strings at the process boundary. Use variables for IDs, modes, approval decisions, and message templates.
+Discript reads the process environment and the user's private environment file, commonly `~/.discript.env` (with a platform-appropriate home directory). Scripts can read `env.NAME`, call `env.get()`, set values with `env.set()`, and clear them with `env.clear()`.
 
+Use environment variables for tokens, guild IDs, connection mode, MCP endpoint, TLS, and approval policy. Never commit secrets or put them in script source. See [configuration](../getting-started/configuration.md) and `.env.example`.
