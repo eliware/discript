@@ -57,6 +57,23 @@ describe('parse', () => {
     }));
   });
 
+  test('ignores inline and multiline block comments', () => {
+    expect(parse('value = /* between tokens */ 1; /*\n      explain the next expression\n    */ value')).toEqual(expect.objectContaining({
+      body: expect.arrayContaining([
+        expect.objectContaining({ type: 'Assignment' }),
+        expect.objectContaining({ type: 'ExpressionStatement' }),
+      ]),
+    }));
+  });
+
+  test('accepts a script containing only a block comment', () => {
+    expect(parse('/* comment-only script\n   with multiple lines */')).toEqual({ type: 'Program', body: [] });
+  });
+
+  test('rejects an unterminated block comment', () => {
+    expect(() => parse('1 /* missing terminator')).toThrow(expect.objectContaining({ code: 'PARSE_ERROR' }));
+  });
+
   test('parses the complete core statement and expression forms', () => {
     const program = parse(`
       import "./shared.ds"
