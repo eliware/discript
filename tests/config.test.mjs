@@ -34,6 +34,7 @@ describe('configuration', () => {
     expect(redactedConfig(config)).toMatchObject({ token: '[redacted]', mcp: { authToken: '[redacted]' }, client: { token: '[redacted]' } });
     expect(redactedConfig(config).client.headers).toEqual({ Authorization: '[redacted]', 'X-Agent': 'discript' });
     expect(JSON.stringify(redactedConfig(config))).not.toContain('secret');
+    expect(redactedConfig({ token: null, mcp: {}, client: {} })).toMatchObject({ token: null, mcp: {}, client: { headers: {} } });
   });
 
   test('rejects incompatible MCP profiles before startup', () => {
@@ -67,10 +68,22 @@ describe('configuration', () => {
     expect(validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_TRANSPORT: 'stdio', DISCRIPT_CLIENT_COMMAND: 'discript', DISCRIPT_CLIENT_ARGS: '["mcp","--stdio"]' })).client).toMatchObject({ command: 'discript', args: ['mcp', '--stdio'] });
     expect(() => loadConfig({ DISCRIPT_CLIENT_ARGS: '{}'})).toThrow('must be a JSON array');
     expect(() => loadConfig({ DISCRIPT_CLIENT_HEADERS: 'not-json' })).toThrow('must be a JSON object');
+    expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_URL: 'not-a-url' }))).toThrow('must be a valid HTTP, HTTPS, or file URL');
+    expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_URL: 'ftp://agent.example/mcp' }))).toThrow('must be a valid HTTP, HTTPS, or file URL');
+    expect(() => loadConfig({ DISCRIPT_MCP_PORT: 'not-a-number' })).toThrow('must be an integer');
+    expect(() => loadConfig({ DISCRIPT_CLIENT_HEADERS: '[]' })).toThrow('must be a JSON object');
   });
 
   test('requires complete OAuth2 server configuration', () => {
     expect(() => validateConfig(loadConfig({ DISCRIPT_MCP_AUTH_MODE: 'oauth2' }))).toThrow('requires issuer, resource, and introspection endpoint');
     expect(validateConfig(loadConfig({ DISCRIPT_MCP_AUTH_MODE: 'oauth2', DISCRIPT_MCP_OAUTH_ISSUER: 'https://auth', DISCRIPT_MCP_OAUTH_RESOURCE: 'https://resource', DISCRIPT_MCP_OAUTH_INTROSPECTION_ENDPOINT: 'https://auth/introspect' })).mcp.authMode).toBe('oauth2');
+  });
+
+  test('covers default validation and missing test guild errors', () => {
+    expect(() => validateConfig()).not.toThrow();
+    expect(() => validateConfig({ connectionMode: 'direct' })).not.toThrow();
+    expect(redactedConfig()).toBeDefined();
+    expect(() => requireTestGuild({})).toThrow('TEST_GUILD is not configured');
+    expect(requireTestGuild()).toBeTruthy();
   });
 });

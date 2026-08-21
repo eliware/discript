@@ -55,4 +55,20 @@ describe('Discord runtime lifecycle', () => {
     expect(client.listenerCount('clientReady')).toBe(0);
     expect(client.listenerCount('error')).toBe(0);
   });
+
+  test('still reports the login failure when startup cleanup also fails', async () => {
+    const client = new EventEmitter();
+    client.login = async () => { throw new Error('login failed'); };
+    client.destroy = jest.fn(async () => { throw new Error('cleanup failed'); });
+    await expect(createDiscordRuntime({ token: 'test-token', client })).rejects.toThrow('login failed');
+    expect(client.destroy).toHaveBeenCalledTimes(1);
+  });
+
+  test('resolves shutdown when client destruction fails', async () => {
+    const client = clientFixture();
+    client.destroy.mockRejectedValueOnce(new Error('destroy failed'));
+    const runtime = await createDiscordRuntime({ token: 'test-token', client });
+    await expect(runtime.shutdown()).resolves.toBeUndefined();
+    await expect(runtime.waitForStop()).resolves.toBeUndefined();
+  });
 });

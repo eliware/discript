@@ -95,6 +95,10 @@ describe('MCP run_discript tool', () => {
 });
 
 describe('MCP server profile mapping', () => {
+  test('applies defaults when no server profile is supplied', () => {
+    expect(createMcpServerOptions()).toMatchObject({ httpPort: 8765, endpointPath: '/mcp', auth: { mode: 'none' }, stdio: false });
+  });
+
   test('maps HTTP static-auth profile settings', () => {
     const options = createMcpServerOptions({ token: 'discord', mcp: {
       transport: 'http', port: 9000, endpoint: '/api/mcp', authMode: 'static', authToken: 'mcp-secret',
@@ -140,6 +144,10 @@ describe('MCP server profile mapping', () => {
     expect(options.auth).toMatchObject({ mode: 'oauth2', issuer: 'https://auth', resource: 'https://resource', requiredScopes: ['discord:read'], introspection: { introspectionEndpoint: 'https://auth/introspect', clientId: 'client', clientSecret: 'secret' } });
   });
 
+  test('defaults OAuth2 required scopes when omitted', () => {
+    expect(createMcpServerOptions({ mcp: { authMode: 'oauth2', oauthIssuer: 'https://auth', oauthResource: 'https://resource', oauthIntrospectionEndpoint: 'https://auth/introspect' } }).auth.requiredScopes).toEqual([]);
+  });
+
   test('maps MCP execution safety limits into server context', () => {
     const options = createMcpServerOptions({ mcp: { executionTimeout: 1000, maxConcurrent: 2, maxOutputBytes: 4096 } });
     expect(options.context.mcpLimits.timeout).toBe(1000);
@@ -151,6 +159,25 @@ describe('MCP server profile mapping', () => {
   test('coordinates repeated and concurrent MCP shutdown calls', async () => {
     const server = await startMcpServer({ config: { mcp: { authMode: 'none' } }, httpPort: 0 });
     await Promise.all([closeMcpServer(server), closeMcpServer(server), closeMcpServer(server)]);
+    await closeMcpServer(server);
+  });
+
+  test('configures and serves the health endpoint hook', async () => {
+    const options = createMcpServerOptions();
+    const app = { get: jest.fn() };
+    await options.configureApp(app);
+    expect(app.get).toHaveBeenCalledWith('/healthz', expect.any(Function));
+    const response = { json: jest.fn() };
+    app.get.mock.calls[0][1]({}, response);
+    expect(response.json).toHaveBeenCalledWith({ ok: true, service: 'discript-mcp', ready: true });
+  });
+
+  test('ignores an absent server during shutdown', async () => {
+    await expect(closeMcpServer()).resolves.toBeUndefined();
+  });
+
+  test('starts the default MCP server profile', async () => {
+    const server = await startMcpServer();
     await closeMcpServer(server);
   });
 });
