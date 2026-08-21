@@ -30,8 +30,9 @@ describe('configuration', () => {
   });
 
   test('redacts secrets for configuration inspection', () => {
-    const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret' });
+    const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret', DISCRIPT_CLIENT_HEADERS: '{"Authorization":"header-secret","X-Agent":"discript"}' });
     expect(redactedConfig(config)).toMatchObject({ token: '[redacted]', mcp: { authToken: '[redacted]' }, client: { token: '[redacted]' } });
+    expect(redactedConfig(config).client.headers).toEqual({ Authorization: '[redacted]', 'X-Agent': 'discript' });
     expect(JSON.stringify(redactedConfig(config))).not.toContain('secret');
   });
 
@@ -46,5 +47,16 @@ describe('configuration', () => {
       DISCRIPT_MCP_HTTP_REDIRECT: 'true', DISCRIPT_MCP_HTTP_PORT: '8080', DISCRIPT_MCP_HTTPS_PORT: '8443',
       DISCRIPT_MCP_TLS_KEY_FILE: '/run/key.pem', DISCRIPT_MCP_TLS_CERT_FILE: '/run/cert.pem',
     })).mcp).toMatchObject({ httpPort: 8080, httpsPort: 8443, httpRedirect: true });
+  });
+
+  test('loads remote client profile and validates client mode', () => {
+    const config = loadConfig({
+      DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_URL: 'https://agent.example/mcp',
+      DISCRIPT_CLIENT_TRANSPORT: 'https', DISCRIPT_CLIENT_HEADERS: '{"X-Agent":"discript","X-Run":"1"}',
+      DISCRIPT_CLIENT_RECONNECT: 'false', DISCRIPT_CLIENT_MAX_RECONNECT_ATTEMPTS: '3',
+    });
+    expect(validateConfig(config).client).toMatchObject({ url: 'https://agent.example/mcp', transport: 'https', headers: { 'X-Agent': 'discript', 'X-Run': '1' }, reconnect: false, maxReconnectAttempts: 3 });
+    expect(() => validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client' }))).toThrow('requires DISCRIPT_CLIENT_URL');
+    expect(() => loadConfig({ DISCRIPT_CLIENT_HEADERS: 'not-json' })).toThrow('must be a JSON object');
   });
 });

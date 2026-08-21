@@ -5,6 +5,7 @@ export const CONNECTION_MODES = ['direct', 'daemon', 'mcp-client'];
 export const DAEMON_MODES = ['socket', 'mcp'];
 export const MCP_TRANSPORTS = ['stdio', 'http', 'https'];
 export const MCP_AUTH_MODES = ['none', 'static', 'bearer-passthrough', 'oauth2'];
+export const MCP_CLIENT_TRANSPORTS = ['http', 'https', 'sse', 'stdio'];
 
 export function parseIntents(value) {
   const raw = String(value ?? '').trim();
@@ -19,6 +20,7 @@ export function loadConfig(env = process.env) {
   const daemonMode = enumValue(env.DISCRIPT_DAEMON_MODE, DAEMON_MODES, 'socket', 'DISCRIPT_DAEMON_MODE');
   const mcpTransport = enumValue(env.DISCRIPT_MCP_TRANSPORT, MCP_TRANSPORTS, 'http', 'DISCRIPT_MCP_TRANSPORT');
   const mcpAuthMode = enumValue(env.DISCRIPT_MCP_AUTH_MODE, MCP_AUTH_MODES, 'none', 'DISCRIPT_MCP_AUTH_MODE');
+  const clientTransport = enumValue(env.DISCRIPT_CLIENT_TRANSPORT, MCP_CLIENT_TRANSPORTS, 'http', 'DISCRIPT_CLIENT_TRANSPORT');
   return {
     token: token || null,
     testGuild: testGuild || null,
@@ -45,8 +47,9 @@ export function loadConfig(env = process.env) {
     },
     client: {
       url: stringValue(env.DISCRIPT_CLIENT_URL, null),
-      transport: stringValue(env.DISCRIPT_CLIENT_TRANSPORT, 'http'),
+      transport: clientTransport,
       token: stringValue(env.DISCRIPT_CLIENT_TOKEN, null),
+      headers: headersValue(env.DISCRIPT_CLIENT_HEADERS),
       reconnect: booleanValue(env.DISCRIPT_CLIENT_RECONNECT, true),
       reconnectBaseDelay: numberValue(env.DISCRIPT_CLIENT_RECONNECT_BASE_DELAY, 1000, 'DISCRIPT_CLIENT_RECONNECT_BASE_DELAY'),
       reconnectMaxDelay: numberValue(env.DISCRIPT_CLIENT_RECONNECT_MAX_DELAY, 60000, 'DISCRIPT_CLIENT_RECONNECT_MAX_DELAY'),
@@ -60,7 +63,7 @@ export function redactedConfig(config = loadConfig()) {
     ...config,
     token: redact(config.token),
     mcp: { ...config.mcp, authToken: redact(config.mcp.authToken) },
-    client: { ...config.client, token: redact(config.client.token) },
+    client: { ...config.client, token: redact(config.client.token), headers: redactedHeaders(config.client.headers) },
   };
 }
 
@@ -74,6 +77,18 @@ export function validateConfig(config = loadConfig()) {
   }
   if (mcp.httpsPort && (!mcp.tlsKeyFile || !mcp.tlsCertFile)) {
     throw configurationError('An HTTPS MCP listener requires DISCRIPT_MCP_TLS_KEY_FILE and DISCRIPT_MCP_TLS_CERT_FILE.');
+  }
+  const client = config.client ?? {};
+  if (config.connectionMode === 'mcp-client' && !client.url) {
+    throw configurationError('DISCRIPT_CONNECTION_MODE=mcp-client requires DISCRIPT_CLIENT_URL.');
+  }
+  if (client.url) {
+    try {
+      const url = new URL(client.url);
+      if (!['http:', 'https:', 'file:'].includes(url.protocol)) throw new Error('unsupported protocol');
+    } catch {
+      throw configurationError('DISCRIPT_CLIENT_URL must be a valid HTTP, HTTPS, or file URL.');
+    }
   }
   return config;
 }
@@ -105,8 +120,23 @@ function listValue(value) {
   return String(value ?? '').split(',').map(item => item.trim()).filter(Boolean);
 }
 
+function headersValue(value) {
+  if (value === undefined || value === null || String(value).trim() === '') return {};
+  try {
+    const result = JSON.parse(String(value));
+    if (!result || Array.isArray(result) || typeof result !== 'object') throw new Error('not an object');
+    return Object.fromEntries(Object.entries(result).map(([key, item]) => [String(key), String(item)]));
+  } catch {
+    throw configurationError('DISCRIPT_CLIENT_HEADERS must be a JSON object.');
+  }
+}
+
 function redact(value) {
   return value ? '[redacted]' : null;
+}
+
+function redactedHeaders(headers = {}) {
+  return Object.fromEntries(Object.entries(headers).map(([key, value]) => [key, /authorization|token|secret|api[-_]?key/i.test(key) ? redact(value) : value]));
 }
 
 function configurationError(message) {

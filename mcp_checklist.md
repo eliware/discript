@@ -22,7 +22,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add a typed configuration profile loader for `DISCRIPT_CONNECTION_MODE` with direct as the default.
 - [x] Add daemon profile selection through `DISCRIPT_DAEMON_MODE` (`socket` or `mcp`).
 - [x] Add MCP server profile loading for transport, port, endpoint, static/bearer auth, TLS files, redirect, and CORS settings.
-- [ ] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
+- [x] Add remote client profile loading for URL, transport, token, headers, and reconnect settings.
 - [x] Make `discript daemon` start the configured daemon profile without requiring repeated flags.
 - [ ] Make normal CLI commands use the configured daemon/client profile when selected.
 - [x] Preserve explicit `--direct` and `--broker` flags as higher-precedence one-shot overrides.
