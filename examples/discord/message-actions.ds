@@ -1,0 +1,5 @@
+// Message actions share one target and differ only by the guarded operation selected.
+channelId = env.DISCRIPT_CHANNEL_ID
+messageId = env.DISCRIPT_MESSAGE_ID
+{channelId: channelId, messageId: messageId, actions: ["edit", "react", "pin", "unpin", "delete"], dryRun: true}
+

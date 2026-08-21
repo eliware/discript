@@ -1,0 +1,5 @@
+// Scheduled-event management starts with a normalized inventory and explicit target.
+guild = discord.guilds.get(env.TEST_GUILD)
+events = guild.scheduledEvents.list()
+{guildId: guild.id, eventCount: events.length, events: events}
+

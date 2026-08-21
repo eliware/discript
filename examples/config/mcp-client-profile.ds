@@ -1,0 +1,3 @@
+// The MCP client profile is read by the CLI; this script reports selected non-secret fields.
+{mode: env.DISCRIPT_CONNECTION_MODE, transport: env.DISCRIPT_CLIENT_TRANSPORT, url: env.DISCRIPT_CLIENT_URL}
+

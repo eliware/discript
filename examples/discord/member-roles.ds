@@ -1,0 +1,5 @@
+// Member roles: inspect a member before planning a role assignment or removal.
+guild = discord.guilds.get(env.TEST_GUILD)
+member = guild.members.get(env.DISCRIPT_USER_ID)
+{memberId: member.id, username: member.username, roles: member.roles}
+

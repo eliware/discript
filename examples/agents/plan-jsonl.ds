@@ -1,0 +1,5 @@
+// Print individual plan records so a caller can consume them incrementally as JSONL.
+print({step: 1, action: "inspect", safe: true})
+print({step: 2, action: "preview", safe: true})
+print({step: 3, action: "approve", requiresForce: true})
+

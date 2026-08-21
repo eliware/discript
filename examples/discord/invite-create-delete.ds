@@ -1,0 +1,5 @@
+// Invite mutations are guarded; this file demonstrates the read-before-write plan.
+guild = discord.guilds.get(env.TEST_GUILD)
+invites = guild.invites.list()
+{existing: invites, channelId: env.DISCRIPT_CHANNEL_ID, createRequiresApproval: true}
+

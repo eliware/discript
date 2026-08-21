@@ -1,0 +1,7 @@
+// CI-friendly scripts finish with a small status object and a meaningful exit path.
+guildId = env.TEST_GUILD
+if (guildId == null) {
+  exit(2, "TEST_GUILD is required")
+}
+{ok: true, guildId: guildId, check: "configuration"}
+

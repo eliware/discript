@@ -1,0 +1,4 @@
+// Voice sessions need a live adapter; preview the intended join/leave workflow first.
+guild = discord.guilds.get(env.TEST_GUILD)
+{guildId: guild.id, channelId: env.DISCRIPT_VOICE_CHANNEL_ID, dryRun: true, requiresApproval: true}
+

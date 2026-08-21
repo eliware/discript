@@ -1,0 +1,4 @@
+// Keep webhook changes declarative until the agent has reviewed the target channel.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+{channelId: channel.id, current: channel.webhooks.list(), planned: "update", dryRun: true}
+

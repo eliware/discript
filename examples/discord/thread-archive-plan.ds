@@ -1,0 +1,4 @@
+// Thread archiving is destructive to workflow state; show the target before approval.
+channel = discord.channels.get(env.DISCRIPT_CHANNEL_ID)
+{channelId: channel.id, threads: channel.threads.list(), plannedAction: "archive", dryRun: true}
+
