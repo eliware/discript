@@ -14,6 +14,7 @@ export function helpText() {
     `  discript commands list            List supported direct commands\n` +
     `  discript completion bash          Generate shell completion\n` +
     `  discript mcp --stdio              Run as an MCP stdio server\n` +
+    `  discript daemon start --mcp-port <port>  Start daemon with MCP HTTP\n` +
     `  discript daemon start             Start the shared Gateway broker\n\n` +
     `Options:\n` +
     `  -e, --eval <source>  Evaluate source\n` +

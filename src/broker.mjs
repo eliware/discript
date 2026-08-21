@@ -11,11 +11,13 @@ export function brokerEndpoint(token, home = homedir(), os = platform()) {
   return os === 'win32' ? `\\\\.\\pipe\\discript-${id}` : posix.join(home, `.discript-${id}.sock`);
 }
 
-export async function startGatewayBroker({ token, endpoint = brokerEndpoint(token), runtimeOptions = {}, enforceSessionLimit = true, limits } = {}) {
+export async function startGatewayBroker({ token, endpoint = brokerEndpoint(token), runtimeOptions = {}, enforceSessionLimit = true, limits, onClose } = {}) {
   const sessionLimits = limits ?? (!runtimeOptions.client && enforceSessionLimit ? await getGatewaySessionLimits({ token }) : null);
   if (sessionLimits && shouldWaitForGatewayStart(sessionLimits)) throw Object.assign(new Error(`Discord Gateway session-start limit exhausted; retry after ${sessionLimits.resetAfter}ms.`), { code: 'GATEWAY_SESSION_LIMIT', exitCode: 6, resetAfter: sessionLimits.resetAfter });
   if (await brokerEndpointIsActive(endpoint)) throw brokerAlreadyRunningError(endpoint);
   const runtime = await createDiscordRuntime({ token, ...runtimeOptions });
+  let closeBroker;
+  let onCloseHandler = onClose;
   const server = net.createServer(socket => {
     let buffer = '';
     socket.setEncoding('utf8');
@@ -24,7 +26,7 @@ export async function startGatewayBroker({ token, endpoint = brokerEndpoint(toke
       let newline;
       while ((newline = buffer.indexOf('\n')) >= 0) {
         const line = buffer.slice(0, newline); buffer = buffer.slice(newline + 1);
-        void handleBrokerRequest(line, socket, runtime);
+        void handleBrokerRequest(line, socket, runtime, () => closeBroker?.());
       }
     });
   });
@@ -37,16 +39,19 @@ export async function startGatewayBroker({ token, endpoint = brokerEndpoint(toke
     throw error;
   }
   let closed = false;
+  closeBroker = async () => {
+    if (closed) return;
+    closed = true;
+    await onCloseHandler?.();
+    await runtime.shutdown();
+    await new Promise(resolve => server.close(resolve));
+    await unlink(endpoint).catch(() => undefined);
+  };
   return {
     endpoint,
     runtime,
-    async close() {
-      if (closed) return;
-      closed = true;
-      await runtime.shutdown();
-      await new Promise(resolve => server.close(resolve));
-      await unlink(endpoint).catch(() => undefined);
-    },
+    setOnClose(callback) { onCloseHandler = callback; },
+    close: closeBroker,
   };
 }
 
@@ -71,11 +76,11 @@ async function brokerEndpointIsActive(endpoint, timeout = 250) {
   });
 }
 
-async function handleBrokerRequest(line, socket, runtime) {
+async function handleBrokerRequest(line, socket, runtime, close) {
   try {
     const request = JSON.parse(line);
     if (request.method === 'status') reply(socket, { ok: true, ready: runtime.client.isReady?.() ?? true });
-    else if (request.method === 'shutdown') { reply(socket, { ok: true }); await runtime.shutdown(); }
+    else if (request.method === 'shutdown') { reply(socket, { ok: true }); await close?.(); }
     else if (request.method === 'command') {
       const { executeDirectCommand } = await import('./cli/commands/index.mjs');
       const value = await executeDirectCommand(request.command, request.options ?? {}, { runtime });

@@ -6,8 +6,8 @@
 - [x] Define a stable `run_discript` tool with compact inputs for source, command, dry-run, force, timeout, and REST preference. Output mode and daemon target context remain later extensions.
 - [x] Route tool execution through the existing Discript engine so CLI, scripts, broker, and MCP share identical behavior.
 - [x] Add stdio mode with `discript mcp --stdio` for local MCP clients.
-- [ ] Add daemon HTTP mode with `discript daemon start --mcp-port <port>`.
-- [ ] Reuse the daemon’s existing Gateway broker runtime for HTTP MCP requests.
+- [x] Add daemon HTTP mode with `discript daemon start --mcp-port <port>`.
+- [x] Reuse the daemon’s existing Gateway broker runtime for HTTP MCP requests.
 - [ ] Use REST-first execution for MCP requests that do not require Gateway state.
 - [ ] Add HTTP bearer authentication and configurable allowed origins.
 - [ ] Add per-request timeouts, output-size limits, concurrency limits, and cancellation handling.

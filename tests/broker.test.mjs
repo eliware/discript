@@ -12,15 +12,17 @@ describe('Gateway broker', () => {
   test('reports status and shuts down through IPC', async () => {
     const endpoint = brokerEndpoint('test', tmpdir(), platform());
     const client = new EventEmitter();
+    const onClose = jest.fn(async () => undefined);
     client.login = async () => queueMicrotask(() => client.emit('clientReady'));
     client.isReady = () => true;
     client.destroy = jest.fn(async () => undefined);
-    const broker = await startGatewayBroker({ token: 'test', endpoint, runtimeOptions: { client }, limits: { remaining: 1, resetAfter: 0 } });
+    const broker = await startGatewayBroker({ token: 'test', endpoint, runtimeOptions: { client }, limits: { remaining: 1, resetAfter: 0 }, onClose });
     await expect(startGatewayBroker({ token: 'test', endpoint, runtimeOptions: { client }, limits: { remaining: 1, resetAfter: 0 } })).rejects.toMatchObject({ code: 'BROKER_ALREADY_RUNNING', exitCode: 1 });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'status' })).resolves.toEqual({ ok: true, ready: true });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'command', command: ['unknown'] })).resolves.toMatchObject({ ok: false, code: 'UNKNOWN_COMMAND', exitCode: 2 });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'script', source: '7', options: {} })).resolves.toMatchObject({ ok: true, value: 7 });
     await expect(brokerRequest({ token: 'test', endpoint, method: 'shutdown' })).resolves.toEqual({ ok: true });
+    expect(onClose).toHaveBeenCalledTimes(1);
     await broker.close();
   });
 

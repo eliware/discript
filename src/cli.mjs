@@ -82,10 +82,27 @@ async function runDaemon(action, options, stdout) {
   if (!token) throw Object.assign(new Error('DISCORD_TOKEN is not set.'), { code: 'DISCORD_TOKEN_MISSING', exitCode: 4 });
   if (action === 'start') {
     const broker = await withGatewayRetry(() => startGatewayBroker({ token }));
-    stdout({ started: true, endpoint: broker.endpoint });
+    if (options.mcp_port !== undefined) {
+      const mcpPort = validateMcpPort(options.mcp_port);
+      const { startMcpServer, closeMcpServer } = await import('./mcp/server.mjs');
+      try {
+        const mcp = await startMcpServer({ httpPort: mcpPort, token, context: { runtime: broker.runtime } });
+        broker.setOnClose(() => closeMcpServer(mcp));
+      } catch (error) {
+        await broker.close();
+        throw error;
+      }
+    }
+    stdout({ started: true, endpoint: broker.endpoint, ...(options.mcp_port !== undefined ? { mcpPort: validateMcpPort(options.mcp_port) } : {}) });
     return broker;
   }
   const result = await brokerRequest({ token, method: action === 'stop' ? 'shutdown' : 'status' });
   stdout(result);
   return result;
+}
+
+function validateMcpPort(value) {
+  const port = Number(value);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) throw Object.assign(new Error('--mcp-port must be an integer between 1 and 65535.'), { code: 'INVALID_MCP_PORT', exitCode: 2 });
+  return port;
 }
