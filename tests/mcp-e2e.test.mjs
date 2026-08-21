@@ -52,6 +52,26 @@ describe('MCP server/client HTTP integration', () => {
     }
   }, 15000);
 
+  test('rejects missing and invalid static bearer tokens', async () => {
+    const server = await mcpServer({
+      httpPort: 0, endpointPath: '/mcp', auth: { mode: 'static', token: 'integration-secret' },
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpInstance.address().port;
+    try {
+      for (const headers of [{}, { authorization: 'Bearer wrong-token' }]) {
+        const response = await fetch(`http://127.0.0.1:${port}/mcp`, {
+          method: 'POST', headers: { 'content-type': 'application/json', ...headers },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } } }),
+        });
+        expect(response.status).toBe(401);
+      }
+    } finally {
+      await closeMcpServer(server);
+    }
+  }, 15000);
+
   test('accepts an OAuth2 token validated by a local introspection service', async () => {
     const introspection = createServer((request, response) => {
       if (request.method !== 'POST' || request.url !== '/introspect') {
@@ -101,6 +121,35 @@ describe('MCP server/client HTTP integration', () => {
       expect(await metadata.json()).toMatchObject({ resource: 'http://127.0.0.1/mcp' });
     } finally {
       await client.close();
+      await closeMcpServer(server);
+      await new Promise(resolve => introspection.close(resolve));
+    }
+  }, 15000);
+
+  test('rejects an OAuth2 token when introspection marks it inactive', async () => {
+    const introspection = createServer((_request, response) => {
+      response.setHeader('content-type', 'application/json');
+      response.end(JSON.stringify({ active: false }));
+    });
+    await new Promise(resolve => introspection.listen(0, '127.0.0.1', resolve));
+    const introspectionPort = introspection.address().port;
+    const server = await mcpServer({
+      httpPort: 0, endpointPath: '/mcp',
+      auth: {
+        mode: 'oauth2', issuer: 'http://127.0.0.1/issuer', resource: 'http://127.0.0.1/mcp',
+        introspection: { introspectionEndpoint: `http://127.0.0.1:${introspectionPort}/introspect` },
+      },
+      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      log: { debug() {}, info() {}, warn() {}, error() {} },
+    });
+    const port = server.httpInstance.address().port;
+    try {
+      const response = await fetch(`http://127.0.0.1:${port}/mcp`, {
+        method: 'POST', headers: { authorization: 'Bearer inactive-token', 'content-type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '1' } } }),
+      });
+      expect(response.status).toBe(401);
+    } finally {
       await closeMcpServer(server);
       await new Promise(resolve => introspection.close(resolve));
     }
