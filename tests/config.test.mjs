@@ -21,7 +21,7 @@ describe('configuration', () => {
       DISCRIPT_DAEMON_MODE: 'mcp',
       DISCRIPT_MCP_TRANSPORT: 'https',
       DISCRIPT_MCP_PORT: '8443',
-      DISCRIPT_MCP_AUTH_MODE: 'oauth2',
+      DISCRIPT_MCP_AUTH_MODE: 'oauth2', DISCRIPT_MCP_OAUTH_ISSUER: 'https://auth.example', DISCRIPT_MCP_OAUTH_RESOURCE: 'https://discript.example/mcp', DISCRIPT_MCP_OAUTH_INTROSPECTION_ENDPOINT: 'https://auth.example/introspect',
       DISCRIPT_MCP_OAUTH_REQUIRED_SCOPES: 'discord:read, discord:write',
       DISCRIPT_MCP_HTTP_REDIRECT: 'true',
     });
@@ -30,7 +30,7 @@ describe('configuration', () => {
   });
 
   test('redacts secrets for configuration inspection', () => {
-    const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret', DISCRIPT_CLIENT_HEADERS: '{"Authorization":"header-secret","X-Agent":"discript"}' });
+    const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_MCP_OAUTH_CLIENT_SECRET: 'oauth-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret', DISCRIPT_CLIENT_HEADERS: '{"Authorization":"header-secret","X-Agent":"discript"}' });
     expect(redactedConfig(config)).toMatchObject({ token: '[redacted]', mcp: { authToken: '[redacted]' }, client: { token: '[redacted]' } });
     expect(redactedConfig(config).client.headers).toEqual({ Authorization: '[redacted]', 'X-Agent': 'discript' });
     expect(JSON.stringify(redactedConfig(config))).not.toContain('secret');
@@ -61,5 +61,10 @@ describe('configuration', () => {
     expect(validateConfig(loadConfig({ DISCRIPT_CONNECTION_MODE: 'mcp-client', DISCRIPT_CLIENT_TRANSPORT: 'stdio', DISCRIPT_CLIENT_COMMAND: 'discript', DISCRIPT_CLIENT_ARGS: '["mcp","--stdio"]' })).client).toMatchObject({ command: 'discript', args: ['mcp', '--stdio'] });
     expect(() => loadConfig({ DISCRIPT_CLIENT_ARGS: '{}'})).toThrow('must be a JSON array');
     expect(() => loadConfig({ DISCRIPT_CLIENT_HEADERS: 'not-json' })).toThrow('must be a JSON object');
+  });
+
+  test('requires complete OAuth2 server configuration', () => {
+    expect(() => validateConfig(loadConfig({ DISCRIPT_MCP_AUTH_MODE: 'oauth2' }))).toThrow('requires issuer, resource, and introspection endpoint');
+    expect(validateConfig(loadConfig({ DISCRIPT_MCP_AUTH_MODE: 'oauth2', DISCRIPT_MCP_OAUTH_ISSUER: 'https://auth', DISCRIPT_MCP_OAUTH_RESOURCE: 'https://resource', DISCRIPT_MCP_OAUTH_INTROSPECTION_ENDPOINT: 'https://auth/introspect' })).mcp.authMode).toBe('oauth2');
   });
 });

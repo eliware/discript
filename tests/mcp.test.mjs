@@ -63,4 +63,9 @@ describe('MCP server profile mapping', () => {
   test('stdio disables network listeners regardless of profile transport', () => {
     expect(createMcpServerOptions({ mcp: { transport: 'https', port: 9443 } }, { stdio: true })).toMatchObject({ stdio: true, httpPort: null, httpsPort: undefined });
   });
+
+  test('maps OAuth2 introspection profile settings', () => {
+    const options = createMcpServerOptions({ mcp: { authMode: 'oauth2', oauthIssuer: 'https://auth', oauthResource: 'https://resource', oauthRequiredScopes: ['discord:read'], oauthIntrospectionEndpoint: 'https://auth/introspect', oauthClientId: 'client', oauthClientSecret: 'secret' } });
+    expect(options.auth).toMatchObject({ mode: 'oauth2', issuer: 'https://auth', resource: 'https://resource', requiredScopes: ['discord:read'], introspection: { introspectionEndpoint: 'https://auth/introspect', clientId: 'client', clientSecret: 'secret' } });
+  });
 });

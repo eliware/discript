@@ -13,7 +13,16 @@ export function createMcpServerOptions(config = {}, { stdio = false, port, trans
   const authMode = mcp.authMode ?? 'none';
   const auth = authMode === 'none'
     ? { mode: 'none' }
-    : { mode: authMode, ...(mcp.authToken ? { token: mcp.authToken } : {}) };
+    : {
+      mode: authMode,
+      ...(mcp.authToken ? { token: mcp.authToken } : {}),
+      ...(authMode === 'oauth2' ? {
+        issuer: mcp.oauthIssuer,
+        resource: mcp.oauthResource,
+        requiredScopes: mcp.oauthRequiredScopes ?? [],
+        introspection: { introspectionEndpoint: mcp.oauthIntrospectionEndpoint, clientId: mcp.oauthClientId, clientSecret: mcp.oauthClientSecret },
+      } : {}),
+    };
   const tls = {
     ...(mcp.tlsKeyFile ? { keyFile: mcp.tlsKeyFile } : {}),
     ...(mcp.tlsCertFile ? { certFile: mcp.tlsCertFile } : {}),

@@ -39,6 +39,9 @@ export function loadConfig(env = process.env) {
       oauthIssuer: stringValue(env.DISCRIPT_MCP_OAUTH_ISSUER, null),
       oauthResource: stringValue(env.DISCRIPT_MCP_OAUTH_RESOURCE, null),
       oauthRequiredScopes: listValue(env.DISCRIPT_MCP_OAUTH_REQUIRED_SCOPES),
+      oauthIntrospectionEndpoint: stringValue(env.DISCRIPT_MCP_OAUTH_INTROSPECTION_ENDPOINT, null),
+      oauthClientId: stringValue(env.DISCRIPT_MCP_OAUTH_CLIENT_ID, null),
+      oauthClientSecret: stringValue(env.DISCRIPT_MCP_OAUTH_CLIENT_SECRET, null),
       tlsKeyFile: stringValue(env.DISCRIPT_MCP_TLS_KEY_FILE, null),
       tlsCertFile: stringValue(env.DISCRIPT_MCP_TLS_CERT_FILE, null),
       tlsCaFile: stringValue(env.DISCRIPT_MCP_TLS_CA_FILE, null),
@@ -64,13 +67,16 @@ export function redactedConfig(config = loadConfig()) {
   return {
     ...config,
     token: redact(config.token),
-    mcp: { ...config.mcp, authToken: redact(config.mcp.authToken) },
+    mcp: { ...config.mcp, authToken: redact(config.mcp.authToken), oauthClientSecret: redact(config.mcp.oauthClientSecret) },
     client: { ...config.client, token: redact(config.client.token), headers: redactedHeaders(config.client.headers) },
   };
 }
 
 export function validateConfig(config = loadConfig()) {
   const mcp = config.mcp ?? {};
+  if (mcp.authMode === 'oauth2' && (!mcp.oauthIssuer || !mcp.oauthResource || !mcp.oauthIntrospectionEndpoint)) {
+    throw configurationError('OAuth2 MCP auth requires issuer, resource, and introspection endpoint.');
+  }
   if (config.daemonMode === 'mcp' && mcp.transport === 'stdio') {
     throw configurationError('DISCRIPT_DAEMON_MODE=mcp requires an HTTP or HTTPS MCP transport.');
   }

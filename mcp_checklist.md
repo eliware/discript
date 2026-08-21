@@ -47,9 +47,9 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Support `auth.mode: none` as the local/development default; remote-use policy enforcement remains pending.
 - [x] Support static bearer authentication for HTTP deployments.
 - [x] Support bearer-passthrough mode for forwarding validated-at-the-edge tokens to backend operations.
-- [ ] Support OAuth2 resource-server authentication with issuer and resource/audience validation.
-- [ ] Support OAuth2 token introspection with required scopes and sanitized identity metadata.
-- [ ] Expose OAuth protected-resource metadata endpoints.
+- [x] Support OAuth2 resource-server authentication with issuer and resource/audience validation.
+- [x] Support OAuth2 token introspection with required scopes and sanitized identity metadata.
+- [x] Expose OAuth protected-resource metadata endpoints.
 - [ ] Decide whether Discript needs server-side OAuth only or also OAuth client helpers.
 - [ ] If OAuth client support is needed, add provider discovery, client registration, PKCE, authorization-code exchange, and durable state handling.
 - [x] Add HTTP/HTTPS configuration for daemon MCP mode.
