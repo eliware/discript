@@ -135,8 +135,8 @@ describe('MCP server/client HTTP integration', () => {
       }
       client = await mcpClient({ url: `http://127.0.0.1:${port}/mcp`, reconnect: false });
       expect((await client.listTools()).tools.map(tool => tool.name)).toContain('run_discript');
-      const result = await client.callTool({ name: 'run_discript', arguments: { source: '1' } });
-      expect(JSON.parse(result.content[0].text)).toMatchObject({ ok: true, exitCode: 0 });
+      const result = await client.callTool({ name: 'run_discript', arguments: { source: '1', dryRun: true } });
+      expect(JSON.parse(result.content[0].text)).toMatchObject({ ok: true, exitCode: 0, value: { dryRun: true } });
     } finally {
       await client?.close();
       child.kill('SIGTERM');

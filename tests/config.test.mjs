@@ -84,6 +84,9 @@ describe('configuration', () => {
     expect(() => validateConfig({ connectionMode: 'direct' })).not.toThrow();
     expect(redactedConfig()).toBeDefined();
     expect(() => requireTestGuild({})).toThrow('TEST_GUILD is not configured');
-    expect(requireTestGuild()).toBeTruthy();
+    const previousGuild = process.env.TEST_GUILD;
+    process.env.TEST_GUILD = '123';
+    expect(requireTestGuild()).toBe('123');
+    if (previousGuild === undefined) delete process.env.TEST_GUILD; else process.env.TEST_GUILD = previousGuild;
   });
 });

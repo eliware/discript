@@ -2,6 +2,8 @@ import { describe, expect, jest, test } from '@jest/globals';
 
 const runRemoteDiscript = jest.fn(async (_config, input) => ({ ok: true, exitCode: 0, value: input }));
 jest.unstable_mockModule('../../src/mcp/client.mjs', () => ({ runRemoteDiscript }));
+const executeInput = jest.fn(async () => 1);
+jest.unstable_mockModule('../../src/cli/script.mjs', () => ({ executeInput }));
 
 const { run } = await import('../../src/cli.mjs');
 
