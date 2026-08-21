@@ -57,7 +57,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Support TLS key/certificate/CA files and `TLS_KEY_FILE`, `TLS_CERT_FILE`, and `TLS_CA_FILE` environment variables.
 - [x] Support HTTP-to-HTTPS redirects with separately configurable HTTP and HTTPS listeners.
 - [x] Add configurable CORS `allowedOrigins`.
-- [ ] Add authentication, authorization, TLS, CORS, and remote-host trust documentation.
+- [x] Add authentication, authorization, TLS, CORS, and remote-host trust documentation.
 - [ ] Define scope mapping for read-only, mutating, destructive, and administrative Discript operations.
 
 ## Phase 5 — Help, resources, prompts, and discovery
@@ -94,8 +94,8 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Add request IDs, execution duration, transport, command/source mode, exit code, and sanitized failure-category logging.
 - [ ] Never log Discord tokens, MCP bearer tokens, OAuth secrets, TLS key material, or sensitive tool arguments/results.
 - [ ] Add graceful shutdown coordination between MCP server, broker, Discord runtime, and child MCP client processes.
-- [ ] Define trust boundaries for stdio child processes and remote HTTP callers.
-- [ ] Document stable MCP release compatibility versus draft 2026 discovery features.
+- [x] Define trust boundaries for stdio child processes and remote HTTP callers.
+- [x] Document stable MCP release compatibility versus draft 2026 discovery features.
 - [ ] Define remote server lifecycle, health checks, and failure recovery behavior.
 
 ## Phase 8 — Tests and verification
