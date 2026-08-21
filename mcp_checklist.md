@@ -84,7 +84,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [x] Add client commands for remote tool invocation, resource reading, prompt retrieval, and server inspection.
 - [x] Support piping Discript source into the remote client without temporary files.
 - [ ] Support client-side static tokens, async token providers, custom headers, and OAuth/PKCE integration where selected. Static tokens and custom headers are complete; async providers and OAuth/PKCE remain pending.
-- [ ] Add remote execution examples for local agents, CI harnesses, and multi-host Discord automation.
+- [x] Add remote execution examples for local agents, CI harnesses, and multi-host Discord automation.
 - [ ] Define whether remote execution returns raw MCP JSON, normalized Discript JSON, JSONL, or human-readable output.
 - [x] Preserve remote MCP errors, Discript exit codes, and authentication failures in the local CLI contract.
 
@@ -109,7 +109,7 @@ This checklist is ordered by dependency. `[x]` means implemented and locally ver
 - [ ] Test dry-run, force approval, structured results, and sanitized error mapping.
 - [ ] Add cross-platform tests for Windows stdio, HTTP, Unix sockets, and process cleanup.
 - [ ] Add live integration tests against `TEST_GUILD` with read-only and explicitly gated mutation cases.
-- [ ] Add MCP examples to the package and documentation checker.
+- [x] Add MCP examples to the package and documentation checker.
 - [ ] Add an end-to-end test where an MCP client discovers help, reads the command catalog, reads an example, and executes a dry-run.
 - [ ] Add an end-to-end remote test where one Discript process serves MCP and another discovers it and runs a script.
 

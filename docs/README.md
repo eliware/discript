@@ -13,9 +13,9 @@ This directory contains the maintained documentation for Discript. The structure
 - [Agent integration](agents/README.md) — stdin, JSON, approvals, and harness patterns.
 - [Developer guide](developers/README.md) — architecture and extension points.
 - [Operations](operations/README.md) — deployment, security, troubleshooting, and releases.
+- [MCP](mcp/README.md) — MCP server/client modes, configuration, and agent workflows.
 - [Examples](examples/README.md) — runnable examples organized by use case.
 - [Contributing](contributing/README.md) — repository workflow and documentation conventions.
 - [Architecture decisions](adr/README.md) — decisions that affect long-term design.
 
 Documentation should describe observable behavior, include a runnable example where useful, and link to the canonical reference instead of duplicating large command tables.
-
