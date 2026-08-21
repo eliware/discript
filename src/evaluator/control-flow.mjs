@@ -1,3 +1,5 @@
+import { BreakSignal, ContinueSignal, ScriptThrow } from './errors.mjs';
+
 export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, evaluateExpression, runtimeError, ReturnSignal, createClosure, baseDir }) {
   return async function evaluateStatement(statement) {
     if (statement.type === 'FunctionDeclaration') {
@@ -10,6 +12,9 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
       return load(statement.path, scope, baseDir);
     }
     if (statement.type === 'ReturnStatement') throw new ReturnSignal(statement.value === null ? undefined : await evaluateExpression(statement.value));
+    if (statement.type === 'BreakStatement') throw new BreakSignal();
+    if (statement.type === 'ContinueStatement') throw new ContinueSignal();
+    if (statement.type === 'ThrowStatement') throw new ScriptThrow(await evaluateExpression(statement.value));
     if (statement.type === 'Assignment') {
       const value = await evaluateExpression(statement.value);
       if (statement.name) scope.set(statement.name, value);
@@ -36,7 +41,8 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
       let iterations = 0; let result;
       while (await evaluateExpression(statement.test)) {
         if (++iterations > 10000) throw Object.assign(new Error('Loop exceeded the 10000 iteration limit.'), { code: 'LOOP_LIMIT', exitCode: 1 });
-        for (const nested of statement.body) result = await evaluateStatement(nested);
+        try { for (const nested of statement.body) result = await evaluateStatement(nested); }
+        catch (error) { if (error instanceof BreakSignal) break; if (error instanceof ContinueSignal) continue; throw error; }
       }
       return result;
     }
@@ -45,7 +51,11 @@ export function createStatementEvaluator({ scope, scopeContext, evaluateBlock, e
       const values = Array.isArray(iterable) ? iterable : iterable?.values ? [...iterable.values()] : iterable && typeof iterable === 'object' ? Object.values(iterable) : null;
       if (!values) throw runtimeError('The `for` collection must be an array or object.');
       if (values.length > 10000) throw Object.assign(new Error('Loop exceeded the 10000 item limit.'), { code: 'LOOP_LIMIT', exitCode: 1 });
-      let result; for (const value of values) { scope.set(statement.binding, value); for (const nested of statement.body) result = await evaluateStatement(nested); } return result;
+      let result; for (const value of values) {
+        scope.set(statement.binding, value);
+        try { for (const nested of statement.body) result = await evaluateStatement(nested); }
+        catch (error) { if (error instanceof BreakSignal) break; if (error instanceof ContinueSignal) continue; throw error; }
+      } return result;
     }
     throw runtimeError(`Unsupported statement: ${statement.type}`);
   };

@@ -1,0 +1,24 @@
+/*
+  Control flow and recoverable failures
+
+  `continue` skips the current item, `break` stops a loop, and `throw` lets a
+  script create a domain failure that `try/catch/finally` can inspect and
+  clean up. This pattern is useful before a Discord mutation batch.
+*/
+values = [1, 2, 3, 4, 5]
+total = 0
+for (value in values) {
+  if (value == 2) { continue }
+  if (value == 5) { break }
+  total = total + value
+}
+
+result = try {
+  if (total != 8) { throw {code: "BAD_TOTAL", message: "unexpected total"} }
+  {ok: true, total: total}
+} catch (error) {
+  {ok: false, code: error.code, message: error.message}
+} finally {
+  print({phase: "validation-finished", total: total})
+}
+print(result)

@@ -10,3 +10,16 @@ export class ScriptExit extends Error {
     this.name = 'ScriptExit'; this.code = 'SCRIPT_EXIT'; this.exitCode = Number(exitCode); this.details = message ? { message } : undefined;
   }
 }
+
+export class ScriptThrow extends Error {
+  constructor(value) {
+    super(typeof value === 'string' ? value : value?.message ?? 'Script threw a value.');
+    this.name = 'ScriptThrow';
+    this.code = value?.code ?? 'SCRIPT_THROW';
+    this.value = value;
+    this.exitCode = value?.exitCode ?? 1;
+  }
+}
+
+export class BreakSignal extends Error { constructor() { super('Break'); this.name = 'BreakSignal'; } }
+export class ContinueSignal extends Error { constructor() { super('Continue'); this.name = 'ContinueSignal'; } }

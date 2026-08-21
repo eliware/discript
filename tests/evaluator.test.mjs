@@ -93,4 +93,16 @@ describe('evaluate', () => {
     const iterable = { values: () => new Set([1]) };
     await expect(evaluate(program([{ type: 'ForInStatement', binding: 'x', iterable: { type: 'Identifier', name: 'iterable' }, body: [{ type: 'Assignment', name: 'seen', value: { type: 'Identifier', name: 'x' } }] }]), { iterable })).resolves.toBe(1);
   });
+
+  test('supports break and continue in loops', async () => {
+    await expect(evaluate(parse('values = [1, 2, 3, 4]; total = 0; for (value in values) { if (value == 2) { continue } if (value == 4) { break } total = total + value }; total'))).resolves.toBe(4);
+  });
+
+  test('throws script values and catches them with finally cleanup', async () => {
+    await expect(evaluate(parse('result = try { throw "bad" } catch (error) { error.message } finally { cleaned = true }; result'))).resolves.toEqual({ ok: false, exitCode: 1, error: { code: 'SCRIPT_THROW', message: 'bad', exitCode: 1 } });
+  });
+
+  test('runs finally when a try body succeeds', async () => {
+    await expect(evaluate(parse('result = try { 7 } catch (error) { 0 } finally { 9 }; result'))).resolves.toEqual({ ok: true, exitCode: 0, value: 7 });
+  });
 });

@@ -19,6 +19,13 @@ export function createStatementParser({ peek, match, take, consume, parseExpress
       take();
       return { type: 'ReturnStatement', value: peek()?.value === ';' || peek()?.value === '}' ? null : parseExpression() };
     }
+    if (peek()?.type === 'identifier' && (peek().value === 'break' || peek().value === 'continue')) {
+      return { type: peek().value === 'break' ? 'BreakStatement' : 'ContinueStatement', keyword: take().value };
+    }
+    if (peek()?.type === 'identifier' && peek().value === 'throw') {
+      take();
+      return { type: 'ThrowStatement', value: parseExpression() };
+    }
     if (peek()?.type === 'identifier' && peek().value === 'on') {
       take(); consume('(', 'Expected `(` after `on`.');
       const event = consume('string', 'Expected an event name after `on(`.');

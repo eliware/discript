@@ -50,7 +50,9 @@ export function createExpressionParser({ peek, match, take, consume, syntaxError
       take(); const body = parseBlock();
       if (peek()?.type !== 'identifier' || peek().value !== 'catch') throw syntaxError('Expected `catch` after `try` block.');
       take(); consume('(', 'Expected `(` after `catch`.'); const binding = consume('identifier', 'Expected a catch variable.'); consume(')', 'Expected `)` after catch variable.');
-      return { type: 'TryExpression', body, binding: binding.value, handler: parseBlock() };
+      const handler = parseBlock();
+      const finalizer = peek()?.type === 'identifier' && peek().value === 'finally' ? (take(), parseBlock()) : null;
+      return { type: 'TryExpression', body, binding: binding.value, handler, finalizer };
     }
     if (token?.type === 'string' || token?.type === 'number') { take(); return { type: 'Literal', value: token.value }; }
     if (token?.type === 'identifier') { take(); if (token.value === 'true' || token.value === 'false') return { type: 'Literal', value: token.value === 'true' }; if (token.value === 'null') return { type: 'Literal', value: null }; return { type: 'Identifier', name: token.value }; }

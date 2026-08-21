@@ -84,12 +84,21 @@ describe('parse', () => {
       for (item in items) { print(item) }
       if (ready) { value = await source.get() } else if (!ready) { value = -1 } else { value = null }
       while (value < 2) { value = value + 1 }
-      result = try { announce("a", "b") } catch (error) { error }
+      result = try { announce("a", "b") } catch (error) { error } finally { print("done") }
       source.method(1)
       result
     `);
     expect(program.type).toBe('Program');
     expect(program.body).toHaveLength(11);
+  });
+
+  test('parses loop controls and thrown values', () => {
+    expect(parse('while (true) { if (ready) { break } continue }; throw "failed"')).toMatchObject({
+      body: [
+        { type: 'WhileStatement' },
+        { type: 'ThrowStatement', value: { type: 'Literal', value: 'failed' } },
+      ],
+    });
   });
 
   test('rejects malformed core forms', () => {

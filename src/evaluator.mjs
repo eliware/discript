@@ -4,7 +4,7 @@ import { ReturnSignal, createClosure } from './evaluator/functions.mjs';
 import { createStatementEvaluator } from './evaluator/control-flow.mjs';
 import { createExpressionEvaluator } from './evaluator/expressions.mjs';
 
-export { ScriptExit } from './evaluator/errors.mjs';
+export { ScriptExit, ScriptThrow, BreakSignal, ContinueSignal } from './evaluator/errors.mjs';
 
 export async function evaluate(program, globals = {}, { scope: sharedScope, baseDir = process.cwd() } = {}) {
   const { baseScope, context: scopeContext, scope } = createScope(globals, sharedScope);

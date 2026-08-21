@@ -13,8 +13,19 @@ export function createExpressionEvaluator({ scope, scopeContext, evaluateBlock, 
       return scopeContext.run(localScope, async () => expression.body.type === 'ExpressionBody' ? evaluateExpression(expression.body.body) : evaluateBlock(expression.body.body));
     };
     if (expression.type === 'TryExpression') {
-      try { const value = await evaluateBlock(expression.body); return { ok: true, exitCode: 0, value }; }
-      catch (error) { if (error instanceof ScriptExit) throw error; scope.set(expression.binding, normalizeError(error)); await evaluateBlock(expression.handler); return { ok: false, exitCode: error?.exitCode ?? 1, error: normalizeError(error) }; }
+      let result;
+      try {
+        const value = await evaluateBlock(expression.body);
+        result = { ok: true, exitCode: 0, value };
+      } catch (error) {
+        if (error instanceof ScriptExit) throw error;
+        scope.set(expression.binding, normalizeError(error));
+        await evaluateBlock(expression.handler);
+        result = { ok: false, exitCode: error?.exitCode ?? 1, error: normalizeError(error) };
+      } finally {
+        if (expression.finalizer) await evaluateBlock(expression.finalizer);
+      }
+      return result;
     }
     if (expression.type === 'BinaryExpression') {
       const left = await evaluateExpression(expression.left);
