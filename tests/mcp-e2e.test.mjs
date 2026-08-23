@@ -7,6 +7,8 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+const toolsDir = fileURLToPath(new URL('../src/mcp/tools/', import.meta.url));
 import { mcpServer } from '@eliware/mcp-server';
 import mcpClient from '@eliware/mcp-client';
 import { closeMcpServer, startMcpServer } from '../src/mcp/server.mjs';
@@ -44,7 +46,7 @@ describe('MCP server/client HTTP integration', () => {
   test('accepts a configured static bearer token', async () => {
     const server = await mcpServer({
       httpPort: 0, endpointPath: '/mcp', auth: { mode: 'static', token: 'integration-secret' },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpInstance.address().port;
@@ -60,7 +62,7 @@ describe('MCP server/client HTTP integration', () => {
   test('rejects missing and invalid static bearer tokens', async () => {
     const server = await mcpServer({
       httpPort: 0, endpointPath: '/mcp', auth: { mode: 'static', token: 'integration-secret' },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpInstance.address().port;
@@ -81,7 +83,7 @@ describe('MCP server/client HTTP integration', () => {
     const server = await mcpServer({
       httpPort: 0, endpointPath: '/mcp', auth: { mode: 'bearer-passthrough' },
       allowedOrigins: ['https://agent.example'],
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpInstance.address().port;
@@ -148,10 +150,16 @@ describe('MCP server/client HTTP integration', () => {
     const directory = await mkdtemp(join(tmpdir(), 'discript-mcp-tls-'));
     const keyFile = join(directory, 'key.pem');
     const certFile = join(directory, 'cert.pem');
-    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', keyFile, '-out', certFile, '-subj', '/CN=localhost', '-days', '1'], { stdio: 'ignore' });
+    try {
+      execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', keyFile, '-out', certFile, '-subj', '/CN=localhost', '-days', '1'], { stdio: 'ignore' });
+    } catch (error) {
+      await rm(directory, { recursive: true, force: true });
+      if (error?.code === 'ENOENT') return;
+      throw error;
+    }
     const server = await mcpServer({
       httpPort: null, httpsPort: 0, endpointPath: '/mcp', tls: { keyFile, certFile }, auth: { mode: 'none' },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpsInstance.address().port;
@@ -180,7 +188,7 @@ describe('MCP server/client HTTP integration', () => {
   test('returns protocol errors for malformed HTTP MCP requests', async () => {
     const server = await mcpServer({
       httpPort: 0, endpointPath: '/mcp', auth: { mode: 'none' },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpInstance.address().port;
@@ -232,7 +240,7 @@ describe('MCP server/client HTTP integration', () => {
           clientId: 'client', clientSecret: 'secret',
         },
       },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpInstance.address().port;
@@ -262,7 +270,7 @@ describe('MCP server/client HTTP integration', () => {
         mode: 'oauth2', issuer: 'http://127.0.0.1/issuer', resource: 'http://127.0.0.1/mcp',
         introspection: { introspectionEndpoint: `http://127.0.0.1:${introspectionPort}/introspect` },
       },
-      toolsDir: new URL('../src/mcp/tools/', import.meta.url).pathname,
+      toolsDir,
       log: { debug() {}, info() {}, warn() {}, error() {} },
     });
     const port = server.httpInstance.address().port;
