@@ -29,6 +29,7 @@ export function loadConfig(env = process.env) {
     capabilities,
     connectionMode,
     daemonMode,
+    socketPath: stringValue(env.DISCRIPT_SOCKET_PATH, null),
     mcp: {
       transport: mcpTransport,
       host: stringValue(env.DISCRIPT_MCP_HOST, '127.0.0.1'),

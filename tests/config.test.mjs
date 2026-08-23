@@ -44,6 +44,10 @@ describe('configuration', () => {
     })).daemonMode).toBe('hybrid');
   });
 
+  test('loads an explicit socket path for multi-daemon profiles', () => {
+    expect(loadConfig({ DISCRIPT_SOCKET_PATH: '/run/discript/bot-a.sock' }).socketPath).toBe('/run/discript/bot-a.sock');
+  });
+
   test('redacts secrets for configuration inspection', () => {
     const config = loadConfig({ DISCORD_TOKEN: 'discord-secret', DISCRIPT_MCP_AUTH_TOKEN: 'mcp-secret', DISCRIPT_MCP_OAUTH_CLIENT_SECRET: 'oauth-secret', DISCRIPT_CLIENT_TOKEN: 'client-secret', DISCRIPT_CLIENT_HEADERS: '{"Authorization":"header-secret","X-Agent":"discript"}' });
     expect(redactedConfig(config)).toMatchObject({ token: '[redacted]', mcp: { authToken: '[redacted]' }, client: { token: '[redacted]' } });

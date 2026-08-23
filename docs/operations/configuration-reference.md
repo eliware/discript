@@ -6,7 +6,9 @@ Precedence is: explicitly exported process environment, project `.env`, user `~/
 
 ## MCP server profile
 
-Set `DISCRIPT_CONNECTION_MODE=daemon` and `DISCRIPT_DAEMON_MODE=socket`, `mcp`, or `hybrid` to start the daemon. The daemon owns one Discord Gateway connection and its local socket broker. `mcp` and `hybrid` also start the configured MCP listener; `hybrid` is the explicit profile for local CLI-over-socket plus remote MCP clients. Use `DISCRIPT_MCP_TRANSPORT=http` or `https`, `DISCRIPT_MCP_PORT` for the primary listener, and `DISCRIPT_MCP_HTTP_PORT`/`DISCRIPT_MCP_HTTPS_PORT` for separate listeners and redirects. HTTPS requires `DISCRIPT_MCP_TLS_KEY_FILE` and `DISCRIPT_MCP_TLS_CERT_FILE`.
+Set `DISCRIPT_CONNECTION_MODE=daemon` and `DISCRIPT_DAEMON_MODE=socket`, `mcp`, or `hybrid` to start the daemon. Set `DISCRIPT_SOCKET_PATH` to an explicit Unix socket or Windows named-pipe endpoint for multi-daemon profiles; clients using that path do not need the Discord token. If unset, the legacy token-derived endpoint is used. The daemon owns one Discord Gateway connection and its local socket broker. `mcp` and `hybrid` also start the configured MCP listener; `hybrid` is the explicit profile for local CLI-over-socket plus remote MCP clients. Use `DISCRIPT_MCP_TRANSPORT=http` or `https`, `DISCRIPT_MCP_PORT` for the primary listener, and `DISCRIPT_MCP_HTTP_PORT`/`DISCRIPT_MCP_HTTPS_PORT` for separate listeners and redirects. HTTPS requires `DISCRIPT_MCP_TLS_KEY_FILE` and `DISCRIPT_MCP_TLS_CERT_FILE`.
+
+For multiple Linux daemons, keep one profile per bot under `/etc/discript/<name>.env`, give each profile a distinct `DISCRIPT_SOCKET_PATH`, MCP ports, and credentials, and run the packaged `deploy/systemd/discript@.service` as `discript@<name>.service`. Use `/run/discript-<name>/` for sockets when using the template's `RuntimeDirectory`.
 
 Select `DISCRIPT_MCP_AUTH_MODE=none`, `static`, `bearer-passthrough`, or `oauth2`. OAuth2 additionally requires issuer, resource, and introspection endpoint settings. `DISCRIPT_MCP_ALLOWED_ORIGINS` is a comma-separated CORS allowlist.
 

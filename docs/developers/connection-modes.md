@@ -41,9 +41,9 @@ The Gateway limits helper exposes Discord’s current `remaining`, `reset_after`
 
 The implementation should select the lightest transport that satisfies the operation. A command must not open Gateway solely because it performs a normal REST mutation.
 
-Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands or scripts to reuse that connection. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one. Broker requests have a bounded timeout and return structured `BROKER_TIMEOUT` or `BROKER_UNAVAILABLE` errors.
+Use `discript daemon start` once, then pass `--broker` on Gateway-backed commands or scripts to reuse that connection. Set `DISCRIPT_SOCKET_PATH` for an explicit, permission-protected socket; this lets local clients connect without the Discord token and supports multiple daemon profiles. Give each bot a distinct socket and MCP port profile; Linux deployments can use `deploy/systemd/discript@.service`. Leave it unset to retain the legacy token-derived endpoint. `--broker` is intentionally explicit so an agent can tell whether it is starting a new session or using the shared one. Broker requests have a bounded timeout and return structured `BROKER_TIMEOUT` or `BROKER_UNAVAILABLE` errors.
 
-Starting a second daemon for the same token is rejected with `BROKER_ALREADY_RUNNING`; the existing broker endpoint is never removed during startup. A stale endpoint is cleaned up only after no active broker can connect, and bind-time races are reported as the same duplicate-start error.
+Starting a second daemon for the same explicit socket path is rejected with `BROKER_ALREADY_RUNNING`; use a distinct socket and MCP port profile for each bot. The existing broker endpoint is never removed during startup. A stale endpoint is cleaned up only after no active broker can connect, and bind-time races are reported as the same duplicate-start error.
 
 Broker and MCP execution responses use the same request envelope. Successful executions contain `ok: true`, `requestId`, `exitCode: 0`, `value`, `warnings`, and `diagnostics`; failures retain the request ID and include a sanitized `code`, `error`, and exit code. This lets agents correlate local and remote execution without transport-specific parsing.
 

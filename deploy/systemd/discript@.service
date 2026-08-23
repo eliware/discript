@@ -1,0 +1,20 @@
+[Unit]
+Description=Discript Discord daemon (%i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/etc/discript/%i.env
+RuntimeDirectory=discript-%i
+ExecStart=/usr/bin/env node /opt/discript/bin/discript.mjs daemon start
+Restart=on-failure
+RestartSec=10
+KillSignal=SIGTERM
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
