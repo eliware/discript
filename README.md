@@ -1,5 +1,7 @@
 # Discript
 
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+
 Discript is a scripting language and CLI for safe, programmatic Discord automation. It is designed for developers, AI agents, and coding harnesses that need repeatable commands, composable scripts, structured results, and explicit control over side effects.
 
 At its core, Discript parses and runs `.ds` programs or commands from files, stdin, or inline CLI input. The same engine can connect directly to Discord for one-shot work, reuse a long-lived daemon connection over a local socket, or expose and consume the engine through MCP stdio and HTTP/HTTPS transports.
