@@ -1,6 +1,6 @@
 # Development setup
 
-Discript is an ESM Node.js package. From `/opt/discript`, install dependencies and run the local checks:
+Discript is an ESM Node.js package. From the checked-out project root, install dependencies and run the local checks:
 
 ```bash
 npm install
